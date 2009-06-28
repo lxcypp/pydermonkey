@@ -29,6 +29,19 @@ PYM_jsvalToPyObject(jsval value) {
   if (JSVAL_IS_NULL(value))
     Py_RETURN_NONE;
 
+  if (JSVAL_IS_STRING(value) && JS_CStringsAreUTF8()) {
+    // TODO: What to do if C strings aren't UTF-8?  The jschar *
+    // type isn't actually UTF-16, it's just "UTF-16-ish", so
+    // there doesn't seem to be any other lossless way of
+    // transferring the string other than perhaps by transmitting
+    // its JSON representation.
+
+    JSString *str = JSVAL_TO_STRING(value);
+    const char *bytes = JS_GetStringBytes(str);
+    const char *errors;
+    return PyUnicode_DecodeUTF8(bytes, strlen(bytes), errors);
+  }
+
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");
@@ -45,6 +58,9 @@ PYM_evaluate(PyObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "s#si", &source, &sourceLen,
                         &filename, &lineNo))
     return NULL;
+
+  if (!JS_CStringsAreUTF8())
+    JS_SetCStringsAreUTF8();
 
   JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
   if (rt == NULL) {

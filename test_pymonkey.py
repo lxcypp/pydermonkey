@@ -2,6 +2,11 @@ import unittest
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
+    def testEvaluateReturnsUnicode(self):
+        retval = pymonkey.evaluate("'o hai\u2026'", '<string>', 1)
+        self.assertTrue(type(retval) == unicode)
+        self.assertEqual(retval, u'o hai\u2026')
+
     def testEvaluateReturnsTrue(self):
         self.assertTrue(pymonkey.evaluate('true', '<string>', 1) is True)
 
