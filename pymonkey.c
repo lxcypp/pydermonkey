@@ -15,6 +15,11 @@ PYM_jsvalToPyObject(jsval value) {
   if (JSVAL_IS_INT(value))
     return PyInt_FromLong(JSVAL_TO_INT(value));
 
+  if (JSVAL_IS_DOUBLE(value)) {
+    jsdouble *doubleRef = JSVAL_TO_DOUBLE(value);
+    return PyFloat_FromDouble(*doubleRef);
+  }
+
   // TODO: Support more types.
 
   Py_INCREF(Py_None);
@@ -78,11 +83,13 @@ PYM_evaluate(PyObject *self, PyObject *args)
     return NULL;
   }
 
+  PyObject *pyRval = PYM_jsvalToPyObject(rval);
+
   JS_EndRequest(cx);
   JS_DestroyContext(cx);
   JS_DestroyRuntime(rt);
 
-  return PYM_jsvalToPyObject(rval);
+  return pyRval;
 }
 
 static PyMethodDef PYM_methods[] = {
