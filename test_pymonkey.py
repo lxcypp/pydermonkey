@@ -2,6 +2,13 @@ import unittest
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
+    def testUndefinedCannotBeInstantiated(self):
+        self.assertRaises(TypeError, pymonkey.undefined)
+
+    def testEvaluateReturnsUndefined(self):
+        retval = pymonkey.evaluate("", '<string>', 1)
+        self.assertTrue(retval is pymonkey.undefined)
+
     def testEvaluateReturnsUnicode(self):
         retval = pymonkey.evaluate("'o hai\u2026'", '<string>', 1)
         self.assertTrue(type(retval) == unicode)

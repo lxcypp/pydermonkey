@@ -1,6 +1,44 @@
 #include "jsapi.h"
 #include <Python/Python.h>
 
+#define Py_RETURN_UNDEFINED  { Py_INCREF(PYM_undefined);        \
+                               return PYM_undefined; }
+
+typedef struct {
+  PyObject_HEAD
+} PYM_undefinedObject;
+
+// TODO: We should make this behave as much like JavaScript's
+// "undefined" value as possible; e.g., its string value should
+// be "undefined", the singleton should be falsy, etc.
+static PyTypeObject PYM_undefinedType = {
+  PyObject_HEAD_INIT(NULL)
+  0,                           /*ob_size*/
+  "pymonkey.undefined",        /*tp_name*/
+  sizeof(PYM_undefinedObject), /*tp_basicsize*/
+  0,                           /*tp_itemsize*/
+  0,                           /*tp_dealloc*/
+  0,                           /*tp_print*/
+  0,                           /*tp_getattr*/
+  0,                           /*tp_setattr*/
+  0,                           /*tp_compare*/
+  0,                           /*tp_repr*/
+  0,                           /*tp_as_number*/
+  0,                           /*tp_as_sequence*/
+  0,                           /*tp_as_mapping*/
+  0,                           /*tp_hash */
+  0,                           /*tp_call*/
+  0,                           /*tp_str*/
+  0,                           /*tp_getattro*/
+  0,                           /*tp_setattro*/
+  0,                           /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /* tp_doc */
+  "Pythonic equivalent of JavaScript's 'undefined' value",
+};
+
+static PyObject *PYM_undefined = (PyObject *) &PYM_undefinedType;
+
 static JSClass PYM_jsGlobalClass = {
   "PymonkeyGlobal", JSCLASS_GLOBAL_FLAGS,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
@@ -28,6 +66,9 @@ PYM_jsvalToPyObject(jsval value) {
 
   if (JSVAL_IS_NULL(value))
     Py_RETURN_NONE;
+
+  if (JSVAL_IS_VOID(value))
+    Py_RETURN_UNDEFINED;
 
   if (JSVAL_IS_STRING(value) && JS_CStringsAreUTF8()) {
     // TODO: What to do if C strings aren't UTF-8?  The jschar *
@@ -131,6 +172,12 @@ initpymonkey(void)
   module = Py_InitModule("pymonkey", PYM_methods);
   if (module == NULL)
     return;
+
+  if (PyType_Ready(&PYM_undefinedType) < 0)
+    return;
+
+  Py_INCREF(PYM_undefined);
+  PyModule_AddObject(module, "undefined", PYM_undefined);
 
   PYM_error = PyErr_NewException("pymonkey.error", NULL, NULL);
   Py_INCREF(PYM_error);
