@@ -1,7 +1,7 @@
 #include "jsapi.h"
 #include <Python/Python.h>
 
-static JSClass PYM_JSGlobalClass = {
+static JSClass PYM_jsGlobalClass = {
   "PymonkeyGlobal", JSCLASS_GLOBAL_FLAGS,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
   JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub,
@@ -9,6 +9,17 @@ static JSClass PYM_JSGlobalClass = {
 };
 
 static PyObject *PYM_error;
+
+static PyObject *
+PYM_jsvalToPyObject(jsval value) {
+  if (JSVAL_IS_INT(value))
+    return PyInt_FromLong(JSVAL_TO_INT(value));
+
+  // TODO: Support more types.
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
 
 static PyObject *
 PYM_evaluate(PyObject *self, PyObject *args)
@@ -39,7 +50,7 @@ PYM_evaluate(PyObject *self, PyObject *args)
 
   JS_BeginRequest(cx);
 
-  JSObject *global = JS_NewObject(cx, &PYM_JSGlobalClass, NULL, NULL);
+  JSObject *global = JS_NewObject(cx, &PYM_jsGlobalClass, NULL, NULL);
   if (global == NULL) {
     PyErr_SetString(PYM_error, "JS_NewObject() failed");
     JS_EndRequest(cx);
@@ -71,10 +82,7 @@ PYM_evaluate(PyObject *self, PyObject *args)
   JS_DestroyContext(cx);
   JS_DestroyRuntime(rt);
 
-  // TODO: Get the return value of the script.
-
-  Py_INCREF(Py_None);
-  return Py_None;
+  return PYM_jsvalToPyObject(rval);
 }
 
 static PyMethodDef PYM_methods[] = {
