@@ -20,10 +20,14 @@ PYM_jsvalToPyObject(jsval value) {
     return PyFloat_FromDouble(*doubleRef);
   }
 
-  // TODO: Support more types.
+  if (JSVAL_IS_NULL(value)) {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
 
-  Py_INCREF(Py_None);
-  return Py_None;
+  // TODO: Support more types.
+  PyErr_SetString(PyExc_NotImplementedError,
+                  "Data type conversion not implemented.");
 }
 
 static PyObject *
