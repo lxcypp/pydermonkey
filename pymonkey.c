@@ -20,6 +20,12 @@ PYM_jsvalToPyObject(jsval value) {
     return PyFloat_FromDouble(*doubleRef);
   }
 
+  if (value == JSVAL_FALSE)
+    Py_RETURN_FALSE;
+
+  if (value == JSVAL_TRUE)
+    Py_RETURN_TRUE;
+
   if (JSVAL_IS_NULL(value)) {
     Py_INCREF(Py_None);
     return Py_None;

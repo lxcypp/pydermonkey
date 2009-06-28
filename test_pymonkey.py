@@ -2,6 +2,12 @@ import unittest
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
+    def testEvaluateReturnsTrue(self):
+        self.assertTrue(pymonkey.evaluate('true', '<string>', 1) is True)
+
+    def testEvaluateReturnsFalse(self):
+        self.assertTrue(pymonkey.evaluate('false', '<string>', 1) is False)
+
     def testEvaluateReturnsNone(self):
         self.assertTrue(pymonkey.evaluate('null', '<string>', 1) is None)
 
