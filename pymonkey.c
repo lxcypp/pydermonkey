@@ -26,10 +26,8 @@ PYM_jsvalToPyObject(jsval value) {
   if (value == JSVAL_TRUE)
     Py_RETURN_TRUE;
 
-  if (JSVAL_IS_NULL(value)) {
-    Py_INCREF(Py_None);
-    return Py_None;
-  }
+  if (JSVAL_IS_NULL(value))
+    Py_RETURN_NONE;
 
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
