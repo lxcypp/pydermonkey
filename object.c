@@ -65,3 +65,21 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /* tp_alloc */
   0,                           /* tp_new */
 };
+
+PYM_JSObject *PYM_newJSObject(PYM_JSRuntimeObject *runtime,
+                              JSObject *obj) {
+  PYM_JSObject *object = PyObject_New(PYM_JSObject,
+                                      &PYM_JSObjectType);
+  if (object == NULL)
+    return NULL;
+
+  object->runtime = runtime;
+  Py_INCREF(object->runtime);
+
+  object->obj = obj;
+
+  JS_AddNamedRootRT(object->runtime->rt, &object->obj,
+                    "Pymonkey-Generated Object");
+
+  return object;
+}
