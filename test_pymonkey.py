@@ -9,6 +9,17 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def testObjectGetattrWorks(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        cx.evaluate_script(obj, 'boop = 5', '<string>', 1)
+        cx.evaluate_script(obj, 'this["blarg\u2026"] = 5', '<string>', 1)
+        self.assertEqual(cx.get_property(obj, "beans"),
+                         pymonkey.undefined)
+        self.assertEqual(cx.get_property(obj, u"blarg\u2026"), 5)
+        self.assertEqual(cx.get_property(obj, "boop"), 5)
+
     def testContextIsInstance(self):
         cx = pymonkey.Runtime().new_context()
         self.assertTrue(isinstance(cx, pymonkey.Context))

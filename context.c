@@ -48,6 +48,47 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
+{
+  // TODO: We're making a lot of copies of the string here, which
+  // can't be very efficient.
+
+  PYM_JSObject *object;
+  char *string;
+
+  if (!JS_CStringsAreUTF8()) {
+    PyErr_SetString(PyExc_NotImplementedError,
+                    "Data type conversion not implemented.");
+    return NULL;
+  }
+
+  if (!PyArg_ParseTuple(args, "O!es", &PYM_JSObjectType, &object,
+                        "utf-8", &string))
+    return NULL;
+
+  JSString *jsString = JS_NewStringCopyZ(self->cx, string);
+  if (jsString == NULL) {
+    PyMem_Free(string);
+    PyErr_SetString(PYM_error, "JS_NewStringCopyZ() failed");
+    return NULL;
+  }
+
+  jsval val;
+  if (!JS_GetUCProperty(self->cx, object->obj,
+                        JS_GetStringChars(jsString),
+                        JS_GetStringLength(jsString), &val)) {
+    // TODO: Get the actual JS exception. Any exception that exists
+    // here will probably still be pending on the JS context.
+    PyMem_Free(string);
+    PyErr_SetString(PYM_error, "Getting property failed.");
+    return NULL;
+  }
+
+  PyMem_Free(string);
+  return PYM_jsvalToPyObject(val);
+}
+
+static PyObject *
 PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_JSObject *object;
@@ -107,7 +148,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Evaluate the given JavaScript code in the context of the given "
    "global object, using the given filename"
    "and line number information."},
-
+  {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
+   "Gets the given property for the given JavaScript object."},
   {NULL, NULL, 0, NULL}
 };
 
