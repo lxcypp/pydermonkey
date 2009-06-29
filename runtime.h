@@ -7,6 +7,7 @@
 typedef struct {
   PyObject_HEAD
   JSRuntime *rt;
+  PyObject *objects;
 } PYM_JSRuntimeObject;
 
 extern PyTypeObject PYM_JSRuntimeType;

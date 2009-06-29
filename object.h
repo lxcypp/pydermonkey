@@ -12,6 +12,8 @@ typedef struct {
   PyObject_HEAD
   PYM_JSRuntimeObject *runtime;
   JSObject *obj;
+  PyObject *uniqueId;
+  PyObject *weakrefList;
 } PYM_JSObject;
 
 extern PyTypeObject PYM_JSObjectType;

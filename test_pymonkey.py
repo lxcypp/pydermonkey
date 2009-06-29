@@ -9,6 +9,16 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def testObjectIsIdentityPreserving(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        cx.evaluate_script(obj, 'foo = {bar: 1}', '<string>', 1)
+        self.assertTrue(isinstance(cx.get_property(obj, "foo"),
+                                   pymonkey.Object))
+        self.assertTrue(cx.get_property(obj, "foo") is
+                        cx.get_property(obj, "foo"))
+
     def testObjectGetattrWorks(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()

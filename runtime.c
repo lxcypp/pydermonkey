@@ -10,11 +10,21 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 
   self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
   if (self != NULL) {
-    self->rt = JS_NewRuntime(8L * 1024L * 1024L);
-    if (!self->rt) {
-      PyErr_SetString(PYM_error, "JS_NewRuntime() failed");
+    self->rt = NULL;
+
+    self->objects = PyDict_New();
+    if (self->objects == NULL) {
       type->tp_dealloc((PyObject *) self);
       self = NULL;
+    }
+
+    if (self != NULL) {
+      self->rt = JS_NewRuntime(8L * 1024L * 1024L);
+      if (!self->rt) {
+        PyErr_SetString(PYM_error, "JS_NewRuntime() failed");
+        type->tp_dealloc((PyObject *) self);
+        self = NULL;
+      }
     }
   }
 
@@ -24,6 +34,11 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 static void
 PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
 {
+  if (self->objects) {
+    Py_DECREF(self->objects);
+    self->objects = NULL;
+  }
+
   if (self->rt) {
     JS_DestroyRuntime(self->rt);
     self->rt = NULL;
