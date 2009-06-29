@@ -34,7 +34,7 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 
   // If this fails, we don't need to worry about cleaning up
   // obj because it'll get cleaned up at the next GC.
-  return (PyObject *) PYM_newJSObject(self->runtime, obj);
+  return (PyObject *) PYM_newJSObject(self, obj);
 }
 
 static PyObject *
@@ -75,7 +75,7 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   }
 
   PyMem_Free(string);
-  return PYM_jsvalToPyObject(self->runtime, val);
+  return PYM_jsvalToPyObject(self, val);
 }
 
 static PyObject *
@@ -118,7 +118,7 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
     return NULL;
   }
 
-  PyObject *pyRval = PYM_jsvalToPyObject(self->runtime, rval);
+  PyObject *pyRval = PYM_jsvalToPyObject(self, rval);
 
   JS_EndRequest(self->cx);
 

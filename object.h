@@ -1,7 +1,7 @@
 #ifndef PYM_OBJECT_H
 #define PYM_OBJECT_H
 
-#include "runtime.h"
+#include "context.h"
 
 #include <jsapi.h>
 #include <Python/Python.h>
@@ -17,6 +17,6 @@ typedef struct {
 extern PyTypeObject PYM_JSObjectType;
 
 extern PYM_JSObject *
-PYM_newJSObject(PYM_JSRuntimeObject *runtime, JSObject *obj);
+PYM_newJSObject(PYM_JSContextObject *context, JSObject *obj);
 
 #endif

@@ -1,4 +1,5 @@
 #include "object.h"
+#include "runtime.h"
 
 JSClass PYM_JS_ObjectClass = {
   "PymonkeyObject", JSCLASS_GLOBAL_FLAGS,
@@ -66,14 +67,14 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /* tp_new */
 };
 
-PYM_JSObject *PYM_newJSObject(PYM_JSRuntimeObject *runtime,
+PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
                               JSObject *obj) {
   PYM_JSObject *object = PyObject_New(PYM_JSObject,
                                       &PYM_JSObjectType);
   if (object == NULL)
     return NULL;
 
-  object->runtime = runtime;
+  object->runtime = context->runtime;
   Py_INCREF(object->runtime);
 
   object->obj = obj;
