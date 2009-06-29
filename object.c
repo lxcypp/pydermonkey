@@ -13,8 +13,13 @@ PYM_JSObjectDealloc(PYM_JSObject *self)
   // JS_RemoveRoot() always returns JS_TRUE, so don't
   // bother checking its return value.
 
-  // Umm, we need a context... Crap.
-  //JS_RemoveRoot(
+  if (self->obj) {
+    JS_RemoveRootRT(self->runtime->rt, &self->obj);
+    self->obj = NULL;
+  }
+
+  Py_DECREF(self->runtime);
+  self->runtime = NULL;
 }
 
 PyTypeObject PYM_JSObjectType = {

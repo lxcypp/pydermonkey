@@ -31,12 +31,18 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
   if (object == NULL)
     return NULL;
 
+  object->runtime = self->runtime;
+  Py_INCREF(object->runtime);
+
   object->obj = JS_NewObject(self->cx, &PYM_JS_ObjectClass, NULL, NULL);
   if (object->obj == NULL) {
     PyErr_SetString(PYM_error, "JS_NewObject() failed");
     Py_DECREF(object);
     return NULL;
   }
+
+  JS_AddNamedRootRT(object->runtime->rt, &object->obj,
+                    "Pymonkey-Generated Object");
 
   return (PyObject *) object;
 }
