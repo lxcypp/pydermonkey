@@ -9,6 +9,10 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(isinstance(cx, pymonkey.Context))
         self.assertEqual(cx.get_runtime(), rt)
 
+        obj = cx.new_object()
+        self.assertRaises(TypeError, pymonkey.Object)
+        self.assertTrue(isinstance(obj, pymonkey.Object))
+
     def testUndefinedCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.undefined)
 

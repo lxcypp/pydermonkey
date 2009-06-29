@@ -24,6 +24,7 @@ def auto(options):
          "-dynamiclib",
          "pymonkey.c",
          "utils.c",
+         "object.c",
          "undefined.c",
          "context.c",
          "runtime.c"]

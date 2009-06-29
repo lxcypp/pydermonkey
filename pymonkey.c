@@ -1,6 +1,7 @@
 #include "undefined.h"
 #include "runtime.h"
 #include "context.h"
+#include "object.h"
 #include "utils.h"
 
 #include <jsapi.h>
@@ -118,4 +119,10 @@ initpymonkey(void)
 
   Py_INCREF(&PYM_JSContextType);
   PyModule_AddObject(module, "Context", (PyObject *) &PYM_JSContextType);
+
+  if (!PyType_Ready(&PYM_JSObjectType) < 0)
+    return;
+
+  Py_INCREF(&PYM_JSObjectType);
+  PyModule_AddObject(module, "Object", (PyObject *) &PYM_JSObjectType);
 }

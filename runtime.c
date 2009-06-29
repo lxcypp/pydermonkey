@@ -37,6 +37,8 @@ PYM_newContext(PYM_JSRuntimeObject *self, PyObject *args)
 {
   PYM_JSContextObject *context = PyObject_New(PYM_JSContextObject,
                                               &PYM_JSContextType);
+  if (context == NULL)
+    return NULL;
 
   context->runtime = self;
   Py_INCREF(self);

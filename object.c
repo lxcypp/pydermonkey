@@ -1,62 +1,30 @@
-#include "context.h"
 #include "object.h"
-#include "utils.h"
 
-static void
-PYM_JSContextDealloc(PYM_JSContextObject *self)
-{
-  if (self->cx) {
-    JS_DestroyContext(self->cx);
-    self->cx = NULL;
-  }
-
-  Py_DECREF(self->runtime);
-  self->runtime = NULL;
-
-  self->ob_type->tp_free((PyObject *) self);
-}
-
-static PyObject *
-PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
-{
-  Py_INCREF(self->runtime);
-  return (PyObject *) self->runtime;
-}
-
-static PyObject *
-PYM_newObject(PYM_JSContextObject *self, PyObject *args)
-{
-  PYM_JSObject *object = PyObject_New(PYM_JSObject,
-                                      &PYM_JSObjectType);
-  if (object == NULL)
-    return NULL;
-
-  object->obj = JS_NewObject(self->cx, &PYM_JS_ObjectClass, NULL, NULL);
-  if (object->obj == NULL) {
-    PyErr_SetString(PYM_error, "JS_NewObject() failed");
-    Py_DECREF(object);
-    return NULL;
-  }
-
-  return (PyObject *) object;
-}
-
-static PyMethodDef PYM_JSContextMethods[] = {
-  {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
-   "Get the JavaScript runtime associated with this context."},
-  {"new_object", (PyCFunction) PYM_newObject, METH_VARARGS,
-   "Create a new JavaScript object."},
-  {NULL, NULL, 0, NULL}
+JSClass PYM_JS_ObjectClass = {
+  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS,
+  JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
+  JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub,
+  JSCLASS_NO_OPTIONAL_MEMBERS
 };
 
-PyTypeObject PYM_JSContextType = {
+static void
+PYM_JSObjectDealloc(PYM_JSObject *self)
+{
+  // JS_RemoveRoot() always returns JS_TRUE, so don't
+  // bother checking its return value.
+
+  // Umm, we need a context... Crap.
+  //JS_RemoveRoot(
+}
+
+PyTypeObject PYM_JSObjectType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.Context",          /*tp_name*/
-  sizeof(PYM_JSContextObject), /*tp_basicsize*/
+  "pymonkey.Object",           /*tp_name*/
+  sizeof(PYM_JSObject),        /*tp_basicsize*/
   0,                           /*tp_itemsize*/
   /*tp_dealloc*/
-  (destructor) PYM_JSContextDealloc,
+  (destructor) PYM_JSObjectDealloc,
   0,                           /*tp_print*/
   0,                           /*tp_getattr*/
   0,                           /*tp_setattr*/
@@ -73,14 +41,14 @@ PyTypeObject PYM_JSContextType = {
   0,                           /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT,          /*tp_flags*/
   /* tp_doc */
-  "JavaScript Context.",
+  "JavaScript Object.",
   0,		               /* tp_traverse */
   0,		               /* tp_clear */
   0,		               /* tp_richcompare */
   0,		               /* tp_weaklistoffset */
   0,		               /* tp_iter */
   0,		               /* tp_iternext */
-  PYM_JSContextMethods,        /* tp_methods */
+  0,                           /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */
   0,                           /* tp_base */
