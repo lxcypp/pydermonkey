@@ -32,6 +32,8 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
     return NULL;
   }
 
+  // If this fails, we don't need to worry about cleaning up
+  // obj because it'll get cleaned up at the next GC.
   return (PyObject *) PYM_newJSObject(self->runtime, obj);
 }
 
@@ -184,3 +186,19 @@ PyTypeObject PYM_JSContextType = {
   0,                           /* tp_alloc */
   0,                           /* tp_new */
 };
+
+extern PYM_JSContextObject *
+PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
+{
+  PYM_JSContextObject *context = PyObject_New(PYM_JSContextObject,
+                                              &PYM_JSContextType);
+  if (context == NULL)
+    return NULL;
+
+  context->runtime = runtime;
+  Py_INCREF(runtime);
+
+  context->cx = cx;
+
+  return context;
+}

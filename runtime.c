@@ -35,25 +35,21 @@ PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
 static PyObject *
 PYM_newContext(PYM_JSRuntimeObject *self, PyObject *args)
 {
-  PYM_JSContextObject *context = PyObject_New(PYM_JSContextObject,
-                                              &PYM_JSContextType);
-  if (context == NULL)
-    return NULL;
-
-  context->runtime = self;
-  Py_INCREF(self);
-
-  context->cx = JS_NewContext(self->rt, 8192);
-  if (context->cx == NULL) {
+  JSContext *cx = JS_NewContext(self->rt, 8192);
+  if (cx == NULL) {
     PyErr_SetString(PYM_error, "JS_NewContext() failed");
-    Py_DECREF(context);
     return NULL;
   }
 
-  JS_SetOptions(context->cx, JSOPTION_VAROBJFIX);
-  JS_SetVersion(context->cx, JSVERSION_LATEST);
+  JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+  JS_SetVersion(cx, JSVERSION_LATEST);
 
-  return (PyObject *) context;
+  PyObject *retval = (PyObject *) PYM_newJSContextObject(self, cx);
+
+  if (retval == NULL)
+    JS_DestroyContext(cx);
+
+  return retval;
 }
 
 static PyMethodDef PYM_JSRuntimeMethods[] = {
