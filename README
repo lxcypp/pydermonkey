@@ -1,0 +1,94 @@
+Pymonkey README
+---------------
+
+Pymonkey is a pure Python CAPI module to expose the Mozilla
+SpiderMonkey engine to Python.
+
+Rationale and Goals:
+
+  * There's an increasing need for being able to run JS on the server
+    side--particularly untrusted JS.  There's Java-based solutions
+    like Rhino out there, but nothing really mature is available for
+    the Python world.  Ideally, Pymonkey should enable a Python
+    programmer to create a custom sandboxed environment for executing
+    JS code without needing to write any C.
+
+  * Pymonkey should have awesome Sphinx documentation with doctests
+    and all the trappings of a model Python package.  Not only should
+    it be easy for Python programmers to learn how to use the module,
+    but it should also be easy for them to learn more about how
+    SpiderMonkey works by reading the docs and playing around with the
+    code.
+
+  * Pymonkey needs to have outstanding developer ergonomics. Full
+    cross-language stack tracebacks should be available, for instance,
+    and developers should be able to easily debug.  Access to memory
+    profiling facilities in JS-land is a must.
+
+  * The module uses the Python CAPI: no SWIG, Pyrex, or other
+    intermediaries. The obvious disadvantage here is that it means
+    more C code, but the advantages are that 
+    
+      (A) contributors don't need to learn anything other than the
+          Python and SpiderMonkey C APIs to contribute, and
+
+      (B) it means one less dependency, which makes the build process
+          easier.
+
+    The module also doesn't use ctypes because using the SpiderMonkey
+    C API requires fairly complex preprocessor macros defined in the
+    engine's header files.
+
+    Finally, Atul has never really made a straight Python CAPI module
+    before, so he wanted to give it a try.
+
+Building and Testing
+--------------------
+
+Right now building is annoying and difficult because Pymonkey wraps
+SpiderMonkey 1.8.1, which doesn't yet exist as standalone code--it's
+only available in the mozilla-central HG repository.  As such,
+Pymonkey currently requires a full build of the Mozilla platform. You
+can find out how to do this here:
+
+  https://developer.mozilla.org/en/Build_Documentation
+
+Once you've built Mozilla, you can build the extension and run the
+tests like this:
+
+  python manage.py build --objdir=PATH_TO_OBJDIR
+
+Where PATH_TO_OBJDIR is the path to your Mozilla build's objdir (if
+you don't know what that is, read the build documentation).
+
+Note that at the moment, the build script is only tested on OS X, and
+even then some things need to be done to the environment in order for
+pymonkey to be loaded properly; look at manage.py if you need more
+specifics on that. Right now this isn't a huge deal because we're only
+really concerned with the test suite, which is run automatically after
+building--but obviously it's something that needs to be fixed in the
+future.
+
+Example Code
+------------
+
+Right now the only example code that exists is in the test suite at
+test_pymonkey.py.  Check it out and feel free to add more.
+
+Challenges
+----------
+
+There's a number of challenges that need to be resolved before
+pymonkey can be really usable. Here's some of them.
+
+Garbage Collection
+
+Python's garbage collection uses reference counting, whereas
+SpiderMonkey's is mark-and-sweep. We'll likely run into situations
+where there are cycles that exist between SpiderMonkey and Python
+objects; this is actually quite similar to the relationship between
+XPCOM and JavaScript in the Mozilla platform--XPCOM uses reference
+counting too--so detecting such cycles will probably involve creating
+something akin to XPCOM's cycle collector [1].
+
+[1] https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector
