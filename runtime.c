@@ -11,9 +11,14 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
   self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
   if (self != NULL) {
     self->rt = NULL;
+    self->objects.ops = NULL;
 
-    self->objects = PyDict_New();
-    if (self->objects == NULL) {
+    if (!JS_DHashTableInit(&self->objects,
+                           JS_DHashGetStubOps(),
+                           NULL,
+                           sizeof(PYM_HashEntry),
+                           JS_DHASH_DEFAULT_CAPACITY(100))) {
+      PyErr_SetString(PYM_error, "JS_DHashTableInit() failed");
       type->tp_dealloc((PyObject *) self);
       self = NULL;
     }
@@ -34,9 +39,9 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 static void
 PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
 {
-  if (self->objects) {
-    Py_DECREF(self->objects);
-    self->objects = NULL;
+  if (self->objects.ops) {
+    JS_DHashTableFinish(&self->objects);
+    self->objects.ops = NULL;
   }
 
   if (self->rt) {

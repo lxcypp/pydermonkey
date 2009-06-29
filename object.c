@@ -12,15 +12,10 @@ JSClass PYM_JS_ObjectClass = {
 static void
 PYM_JSObjectDealloc(PYM_JSObject *self)
 {
-  if (self->weakrefList)
-    PyObject_ClearWeakRefs((PyObject *) self);
-
   if (self->obj) {
-    if (PyDict_DelItem(self->runtime->objects,
-                       self->uniqueId) == -1)
-      PySys_WriteStderr("WARNING: PyDict_DelItem() failed.\n");
-    Py_DECREF(self->uniqueId);
-    self->uniqueId = NULL;
+    JS_DHashTableOperate(&self->runtime->objects,
+                         (void *) self->uniqueId,
+                         JS_DHASH_REMOVE);
 
     // JS_RemoveRoot() always returns JS_TRUE, so don't
     // bother checking its return value.
@@ -62,8 +57,7 @@ PyTypeObject PYM_JSObjectType = {
   0,		               /* tp_traverse */
   0,		               /* tp_clear */
   0,		               /* tp_richcompare */
-  /* tp_weaklistoffset */
-  offsetof(PYM_JSObject, weakrefList),
+  0,                           /* tp_weaklistoffset */
   0,		               /* tp_iter */
   0,		               /* tp_iternext */
   0,                           /* tp_methods */
@@ -86,51 +80,45 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     PyErr_SetString(PYM_error, "JS_GetObjectId() failed");
     return NULL;
   }
-  PyObject *pyUniqueId = PyLong_FromLong(uniqueId);
-  if (pyUniqueId == NULL)
-    return NULL;
 
   PYM_JSRuntimeObject *runtime = context->runtime;
-  PyObject *cachedObject = PyDict_GetItem(runtime->objects,
-                                          pyUniqueId);
-  if (cachedObject) {
-    cachedObject = PyWeakref_GetObject(cachedObject);
-    Py_INCREF(cachedObject);
-    Py_DECREF(pyUniqueId);
-    return (PYM_JSObject *) cachedObject;
+  PYM_HashEntry *cached = (PYM_HashEntry *) JS_DHashTableOperate(
+    &runtime->objects,
+    (void *) uniqueId,
+    JS_DHASH_LOOKUP
+    );
+
+  if (JS_DHASH_ENTRY_IS_BUSY((JSDHashEntryHdr *) cached)) {
+    Py_INCREF((PyObject *) cached->value);
+    return (PYM_JSObject *) cached->value;
   }
 
   PYM_JSObject *object = PyObject_New(PYM_JSObject,
                                       &PYM_JSObjectType);
-  if (object == NULL) {
-    Py_DECREF(pyUniqueId);
+  if (object == NULL)
     return NULL;
-  }
 
   object->runtime = NULL;
   object->obj = NULL;
   object->uniqueId = NULL;
-  object->weakrefList = NULL;
 
-  PyObject *weakref = PyWeakref_NewRef((PyObject *) object, NULL);
-  if (weakref == NULL) {
+  cached = (PYM_HashEntry *) JS_DHashTableOperate(&runtime->objects,
+                                                  (void *) uniqueId,
+                                                  JS_DHASH_ADD);
+  if (cached == NULL) {
     Py_DECREF(object);
-    Py_DECREF(pyUniqueId);
+    PyErr_SetString(PYM_error, "JS_DHashTableOperate() failed");
     return NULL;
   }
 
-  if (PyDict_SetItem(runtime->objects, pyUniqueId, weakref) == -1) {
-    Py_DECREF(weakref);
-    Py_DECREF(object);
-    Py_DECREF(pyUniqueId);
-    return NULL;
-  }
+  cached->base.key = (void *) uniqueId;
+  cached->value = object;
 
   object->runtime = context->runtime;
   Py_INCREF(object->runtime);
 
   object->obj = obj;
-  object->uniqueId = pyUniqueId;
+  object->uniqueId = uniqueId;
 
   JS_AddNamedRootRT(object->runtime->rt, &object->obj,
                     "Pymonkey-Generated Object");
