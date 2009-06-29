@@ -70,7 +70,15 @@ class PymonkeyTests(unittest.TestCase):
         retval = self._evaljs("")
         self.assertTrue(retval is pymonkey.undefined)
 
-    def testEvaluateReturnsUnicode(self):
+    def testEvaluateReturnsSMPUnicode(self):
+        # This is 'LINEAR B SYLLABLE B008 A', in the supplementary
+        # multilingual plane (SMP).
+        retval = self._evaljs("'\uD800\uDC00'")
+        self.assertEqual(retval, u'\U00010000')
+        self.assertEqual(retval.encode('utf-16'),
+                         '\xff\xfe\x00\xd8\x00\xdc')
+
+    def testEvaluateReturnsBMPUnicode(self):
         retval = self._evaljs("'o hai\u2026'")
         self.assertTrue(type(retval) == unicode)
         self.assertEqual(retval, u'o hai\u2026')
