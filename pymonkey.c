@@ -88,6 +88,192 @@ PYM_jsvalToPyObject(jsval value) {
                   "Data type conversion not implemented.");
 }
 
+typedef struct {
+  PyObject_HEAD
+  JSRuntime *rt;
+} PYM_JSRuntimeObject;
+
+static PyObject *
+PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
+                 PyObject *kwds)
+{
+  PYM_JSRuntimeObject *self;
+
+  self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
+  if (self != NULL) {
+    self->rt = JS_NewRuntime(8L * 1024L * 1024L);
+    if (!self->rt) {
+      PyErr_SetString(PYM_error, "JS_NewRuntime() failed");
+      type->tp_dealloc((PyObject *) self);
+      self = NULL;
+    }
+  }
+
+  return (PyObject *) self;
+}
+
+static void
+PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
+{
+  if (self->rt) {
+    JS_DestroyRuntime(self->rt);
+    self->rt = NULL;
+  }
+
+  self->ob_type->tp_free((PyObject *) self);
+}
+
+extern PyTypeObject PYM_JSContextType;
+
+typedef struct {
+  PyObject_HEAD
+  PYM_JSRuntimeObject *runtime;
+  JSContext *cx;
+} PYM_JSContextObject;
+
+static PyObject *
+PYM_newContext(PYM_JSRuntimeObject *self, PyObject *args)
+{
+  PYM_JSContextObject *context = PyObject_New(PYM_JSContextObject,
+                                              &PYM_JSContextType);
+
+  context->runtime = self;
+  Py_INCREF(self);
+
+  context->cx = JS_NewContext(self->rt, 8192);
+  if (context->cx == NULL) {
+    PyErr_SetString(PYM_error, "JS_NewContext() failed");
+    Py_DECREF(context);
+    return NULL;
+  }
+
+  JS_SetOptions(context->cx, JSOPTION_VAROBJFIX);
+  JS_SetVersion(context->cx, JSVERSION_LATEST);
+
+  return (PyObject *) context;
+}
+
+static PyMethodDef PYM_JSRuntimeMethods[] = {
+  {"new_context", (PyCFunction) PYM_newContext, METH_VARARGS,
+   "Create a new JavaScript context."},
+  {NULL, NULL, 0, NULL}
+};
+
+static PyTypeObject PYM_JSRuntimeType = {
+  PyObject_HEAD_INIT(NULL)
+  0,                           /*ob_size*/
+  "pymonkey.Runtime",          /*tp_name*/
+  sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
+  0,                           /*tp_itemsize*/
+  /*tp_dealloc*/
+  (destructor) PYM_JSRuntimeDealloc,
+  0,                           /*tp_print*/
+  0,                           /*tp_getattr*/
+  0,                           /*tp_setattr*/
+  0,                           /*tp_compare*/
+  0,                           /*tp_repr*/
+  0,                           /*tp_as_number*/
+  0,                           /*tp_as_sequence*/
+  0,                           /*tp_as_mapping*/
+  0,                           /*tp_hash */
+  0,                           /*tp_call*/
+  0,                           /*tp_str*/
+  0,                           /*tp_getattro*/
+  0,                           /*tp_setattro*/
+  0,                           /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /* tp_doc */
+  "JavaScript Runtime.",
+  0,		               /* tp_traverse */
+  0,		               /* tp_clear */
+  0,		               /* tp_richcompare */
+  0,		               /* tp_weaklistoffset */
+  0,		               /* tp_iter */
+  0,		               /* tp_iternext */
+  PYM_JSRuntimeMethods,        /* tp_methods */
+  0,                           /* tp_members */
+  0,                           /* tp_getset */
+  0,                           /* tp_base */
+  0,                           /* tp_dict */
+  0,                           /* tp_descr_get */
+  0,                           /* tp_descr_set */
+  0,                           /* tp_dictoffset */
+  0,                           /* tp_init */
+  0,                           /* tp_alloc */
+  PYM_JSRuntimeNew,            /* tp_new */
+};
+
+static void
+PYM_JSContextDealloc(PYM_JSContextObject *self)
+{
+  if (self->cx) {
+    JS_DestroyContext(self->cx);
+    self->cx = NULL;
+  }
+
+  Py_DECREF(self->runtime);
+  self->runtime = NULL;
+
+  self->ob_type->tp_free((PyObject *) self);
+}
+
+static PyObject *
+PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
+{
+  Py_INCREF(self->runtime);
+  return (PyObject *) self->runtime;
+}
+
+static PyMethodDef PYM_JSContextMethods[] = {
+  {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
+   "Get the JavaScript runtime associated with this context."},
+  {NULL, NULL, 0, NULL}
+};
+
+PyTypeObject PYM_JSContextType = {
+  PyObject_HEAD_INIT(NULL)
+  0,                           /*ob_size*/
+  "pymonkey.Context",          /*tp_name*/
+  sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
+  0,                           /*tp_itemsize*/
+  /*tp_dealloc*/
+  (destructor) PYM_JSContextDealloc,
+  0,                           /*tp_print*/
+  0,                           /*tp_getattr*/
+  0,                           /*tp_setattr*/
+  0,                           /*tp_compare*/
+  0,                           /*tp_repr*/
+  0,                           /*tp_as_number*/
+  0,                           /*tp_as_sequence*/
+  0,                           /*tp_as_mapping*/
+  0,                           /*tp_hash */
+  0,                           /*tp_call*/
+  0,                           /*tp_str*/
+  0,                           /*tp_getattro*/
+  0,                           /*tp_setattro*/
+  0,                           /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /* tp_doc */
+  "JavaScript Context.",
+  0,		               /* tp_traverse */
+  0,		               /* tp_clear */
+  0,		               /* tp_richcompare */
+  0,		               /* tp_weaklistoffset */
+  0,		               /* tp_iter */
+  0,		               /* tp_iternext */
+  PYM_JSContextMethods,        /* tp_methods */
+  0,                           /* tp_members */
+  0,                           /* tp_getset */
+  0,                           /* tp_base */
+  0,                           /* tp_dict */
+  0,                           /* tp_descr_get */
+  0,                           /* tp_descr_set */
+  0,                           /* tp_dictoffset */
+  0,                           /* tp_init */
+  0,                           /* tp_alloc */
+  0,                           /* tp_new */
+};
+
 static PyObject *
 PYM_evaluate(PyObject *self, PyObject *args)
 {
@@ -99,9 +285,6 @@ PYM_evaluate(PyObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "s#si", &source, &sourceLen,
                         &filename, &lineNo))
     return NULL;
-
-  if (!JS_CStringsAreUTF8())
-    JS_SetCStringsAreUTF8();
 
   JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
   if (rt == NULL) {
@@ -167,6 +350,9 @@ static PyMethodDef PYM_methods[] = {
 PyMODINIT_FUNC
 initpymonkey(void)
 {
+  if (!JS_CStringsAreUTF8())
+    JS_SetCStringsAreUTF8();
+
   PyObject *module;
 
   module = Py_InitModule("pymonkey", PYM_methods);
@@ -182,4 +368,16 @@ initpymonkey(void)
   PYM_error = PyErr_NewException("pymonkey.error", NULL, NULL);
   Py_INCREF(PYM_error);
   PyModule_AddObject(module, "error", PYM_error);
+
+  if (!PyType_Ready(&PYM_JSRuntimeType) < 0)
+    return;
+
+  Py_INCREF(&PYM_JSRuntimeType);
+  PyModule_AddObject(module, "Runtime", (PyObject *) &PYM_JSRuntimeType);
+
+  if (!PyType_Ready(&PYM_JSContextType) < 0)
+    return;
+
+  Py_INCREF(&PYM_JSContextType);
+  PyModule_AddObject(module, "Context", (PyObject *) &PYM_JSContextType);
 }

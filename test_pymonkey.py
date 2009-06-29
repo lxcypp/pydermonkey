@@ -2,6 +2,13 @@ import unittest
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
+    def testJSRuntimeWorks(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        self.assertRaises(TypeError, pymonkey.Context)
+        self.assertTrue(isinstance(cx, pymonkey.Context))
+        self.assertEqual(cx.get_runtime(), rt)
+
     def testUndefinedCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.undefined)
 
