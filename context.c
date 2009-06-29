@@ -41,11 +41,30 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
   return (PyObject *) object;
 }
 
+static PyObject *
+PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *object;
+
+  if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
+    return NULL;
+
+  if (!JS_InitStandardClasses(self->cx, object->obj)) {
+    PyErr_SetString(PYM_error, "JS_InitStandardClasses() failed");
+    return NULL;
+  }
+
+  Py_RETURN_NONE;
+}
+
 static PyMethodDef PYM_JSContextMethods[] = {
   {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
    "Get the JavaScript runtime associated with this context."},
   {"new_object", (PyCFunction) PYM_newObject, METH_VARARGS,
    "Create a new JavaScript object."},
+  {"init_standard_classes",
+   (PyCFunction) PYM_initStandardClasses, METH_VARARGS,
+   "Add standard classes and functions to the given object."},
   {NULL, NULL, 0, NULL}
 };
 

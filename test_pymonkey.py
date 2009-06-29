@@ -13,6 +13,8 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(TypeError, pymonkey.Object)
         self.assertTrue(isinstance(obj, pymonkey.Object))
 
+        cx.init_standard_classes(obj)
+
     def testUndefinedCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.undefined)
 
