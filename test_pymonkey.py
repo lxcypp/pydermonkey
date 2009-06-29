@@ -9,6 +9,20 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def testDefineFunctionWorks(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+
+        result = {'wasCalled': False}
+
+        def hai2u():
+            result['wasCalled'] = True
+
+        cx.define_function(obj, hai2u, "hai2u")
+        cx.evaluate_script(obj, 'hai2u()', '<string>', 1)
+        self.assertTrue(result['wasCalled'])
+
     def testObjectIsIdentityPreserving(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()

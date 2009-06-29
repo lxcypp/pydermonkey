@@ -125,6 +125,84 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
   return pyRval;
 }
 
+static JSBool dispatchJSFunctionToPython(JSContext *cx,
+                                         JSObject *obj,
+                                         uintN argc,
+                                         jsval *argv,
+                                         jsval *rval)
+{
+  jsval callee = JS_ARGV_CALLEE(argv);
+  jsval jsCallable;
+  if (!JS_GetReservedSlot(cx, JSVAL_TO_OBJECT(callee), 0, &jsCallable)) {
+    JS_ReportError(cx, "JS_GetReservedSlot() failed.");
+    return JS_FALSE;
+  }
+  PyObject *callable = (PyObject *) JSVAL_TO_PRIVATE(jsCallable);
+
+  // TODO: Convert args and 'this' parameter.
+  PyObject *args = PyTuple_New(0);
+  if (args == NULL) {
+    JS_ReportOutOfMemory(cx);
+    return JS_FALSE;
+  }
+
+  PyObject *result = PyObject_Call(callable, args, NULL);
+  if (result == NULL) {
+    // TODO: Get the actual exception.
+    JS_ReportError(cx, "Python function failed.");
+    return JS_FALSE;
+  }
+
+  // TODO: Convert result to JS value.
+  Py_DECREF(result);
+
+  return JS_TRUE;
+}
+
+static PyObject *
+PYM_defineFunction(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *object;
+  PyObject *callable;
+  const char *name;
+
+  if (!PyArg_ParseTuple(args, "O!Os", &PYM_JSObjectType, &object,
+                        &callable, &name))
+    return NULL;
+
+  if (!PyCallable_Check(callable)) {
+    PyErr_SetString(PyExc_TypeError, "Callable must be callable");
+    return NULL;
+  }
+
+  // TODO: Support unicode naming.
+  JSFunction *func = JS_DefineFunction(self->cx, object->obj, name,
+                                       dispatchJSFunctionToPython,
+                                       0, JSPROP_ENUMERATE);
+  if (func == NULL) {
+    PyErr_SetString(PYM_error, "JS_DefineFunction() failed");
+    return NULL;
+  }
+
+  JSObject *funcObj = JS_GetFunctionObject(func);
+
+  if (funcObj == NULL) {
+    PyErr_SetString(PYM_error, "JS_GetFunctionObject() failed");
+    return NULL;
+  }
+
+  if (!JS_SetReservedSlot(self->cx, funcObj, 0,
+                          PRIVATE_TO_JSVAL(callable))) {
+    PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
+    return NULL;
+  }
+
+  // TODO: When to decref?
+  Py_INCREF(callable);
+
+  Py_RETURN_NONE;
+}
+
 static PyMethodDef PYM_JSContextMethods[] = {
   {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
    "Get the JavaScript runtime associated with this context."},
@@ -138,6 +216,9 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Evaluate the given JavaScript code in the context of the given "
    "global object, using the given filename"
    "and line number information."},
+  {"define_function",
+   (PyCFunction) PYM_defineFunction, METH_VARARGS,
+   "Defines a function callable from JS."},
   {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
    "Gets the given property for the given JavaScript object."},
   {NULL, NULL, 0, NULL}
