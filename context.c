@@ -31,7 +31,7 @@ PyTypeObject PYM_JSContextType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
   "pymonkey.Context",          /*tp_name*/
-  sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
+  sizeof(PYM_JSContextObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
   /*tp_dealloc*/
   (destructor) PYM_JSContextDealloc,
