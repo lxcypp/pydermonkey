@@ -63,6 +63,37 @@ PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
   Py_RETURN_NONE;
 }
 
+static PyObject *
+PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *object;
+  const char *source;
+  int sourceLen;
+  const char *filename;
+  int lineNo;
+
+  if (!PyArg_ParseTuple(args, "O!s#si", &PYM_JSObjectType, &object,
+                        &source, &sourceLen, &filename, &lineNo))
+    return NULL;
+
+  JS_BeginRequest(self->cx);
+
+  jsval rval;
+  if (!JS_EvaluateScript(self->cx, object->obj, source, sourceLen,
+                         filename, lineNo, &rval)) {
+    // TODO: Actually get the error that was raised.
+    PyErr_SetString(PYM_error, "Script failed");
+    JS_EndRequest(self->cx);
+    return NULL;
+  }
+
+  PyObject *pyRval = PYM_jsvalToPyObject(rval);
+
+  JS_EndRequest(self->cx);
+
+  return pyRval;
+}
+
 static PyMethodDef PYM_JSContextMethods[] = {
   {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
    "Get the JavaScript runtime associated with this context."},
@@ -71,6 +102,12 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"init_standard_classes",
    (PyCFunction) PYM_initStandardClasses, METH_VARARGS,
    "Add standard classes and functions to the given object."},
+  {"evaluate_script",
+   (PyCFunction) PYM_evaluateScript, METH_VARARGS,
+   "Evaluate the given JavaScript code in the context of the given "
+   "global object, using the given filename"
+   "and line number information."},
+
   {NULL, NULL, 0, NULL}
 };
 

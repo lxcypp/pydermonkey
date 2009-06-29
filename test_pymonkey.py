@@ -2,47 +2,58 @@ import unittest
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
-    def testJSRuntimeWorks(self):
+    def _evaljs(self, code):
         rt = pymonkey.Runtime()
         cx = rt.new_context()
-        self.assertRaises(TypeError, pymonkey.Context)
-        self.assertTrue(isinstance(cx, pymonkey.Context))
-        self.assertEqual(cx.get_runtime(), rt)
-
         obj = cx.new_object()
-        self.assertRaises(TypeError, pymonkey.Object)
+        cx.init_standard_classes(obj)
+        return cx.evaluate_script(obj, code, '<string>', 1)
+
+    def testContextIsInstance(self):
+        cx = pymonkey.Runtime().new_context()
+        self.assertTrue(isinstance(cx, pymonkey.Context))
+
+    def testContextTypeCannotBeInstantiated(self):
+        self.assertRaises(TypeError, pymonkey.Context)
+
+    def testObjectIsInstance(self):
+        obj = pymonkey.Runtime().new_context().new_object()
         self.assertTrue(isinstance(obj, pymonkey.Object))
 
-        cx.init_standard_classes(obj)
+    def testObjectTypeCannotBeInstantiated(self):
+        self.assertRaises(TypeError, pymonkey.Object)
+
+    def testGetRuntimeWorks(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        self.assertEqual(cx.get_runtime(), rt)
 
     def testUndefinedCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.undefined)
 
     def testEvaluateReturnsUndefined(self):
-        retval = pymonkey.evaluate("", '<string>', 1)
+        retval = self._evaljs("")
         self.assertTrue(retval is pymonkey.undefined)
 
     def testEvaluateReturnsUnicode(self):
-        retval = pymonkey.evaluate("'o hai\u2026'", '<string>', 1)
+        retval = self._evaljs("'o hai\u2026'")
         self.assertTrue(type(retval) == unicode)
         self.assertEqual(retval, u'o hai\u2026')
 
     def testEvaluateReturnsTrue(self):
-        self.assertTrue(pymonkey.evaluate('true', '<string>', 1) is True)
+        self.assertTrue(self._evaljs('true') is True)
 
     def testEvaluateReturnsFalse(self):
-        self.assertTrue(pymonkey.evaluate('false', '<string>', 1) is False)
+        self.assertTrue(self._evaljs('false') is False)
 
     def testEvaluateReturnsNone(self):
-        self.assertTrue(pymonkey.evaluate('null', '<string>', 1) is None)
+        self.assertTrue(self._evaljs('null') is None)
 
     def testEvaluateReturnsIntegers(self):
-        self.assertEqual(pymonkey.evaluate('1+3', '<string>', 1),
-                         4)
+        self.assertEqual(self._evaljs('1+3'), 4)
 
     def testEvaluateReturnsFloats(self):
-        self.assertEqual(pymonkey.evaluate('1.1+3', '<string>', 1),
-                         4.1)
+        self.assertEqual(self._evaljs('1.1+3'), 4.1)
 
 if __name__ == '__main__':
     unittest.main()
