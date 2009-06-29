@@ -7,7 +7,7 @@ SpiderMonkey engine to Python.
 Rationale and Goals:
 
   * There's an increasing need for being able to run JS on the server
-    side--particularly untrusted JS.  There's Java-based solutions
+    side--particularly untrusted JS [1].  There's Java-based solutions
     like Rhino out there, but nothing really mature is available for
     the Python world.  Ideally, Pymonkey should enable a Python
     programmer to create a custom sandboxed environment for executing
@@ -41,6 +41,8 @@ Rationale and Goals:
 
     Finally, Atul has never really made a straight Python CAPI module
     before, so he wanted to give it a try.
+
+[1] https://wiki.mozilla.org/ServerJS
 
 Building and Testing
 --------------------
