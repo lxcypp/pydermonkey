@@ -1,3 +1,6 @@
+#ifndef PYM_UNDEFINED_H
+#define PYM_UNDEFINED_H
+
 #include <Python/Python.h>
 
 #define Py_RETURN_UNDEFINED  { Py_INCREF(PYM_undefined);        \
@@ -10,3 +13,5 @@ typedef struct {
 extern PyTypeObject PYM_undefinedType;
 
 extern PyObject *PYM_undefined;
+
+#endif

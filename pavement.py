@@ -23,7 +23,10 @@ def auto(options):
          "-o", "pymonkey.so",
          "-dynamiclib",
          "pymonkey.c",
-         "undefined.c"]
+         "utils.c",
+         "undefined.c",
+         "context.c",
+         "runtime.c"]
         )
 
     if result:
