@@ -11,9 +11,6 @@ static PyMethodDef PYM_methods[] = {
 PyMODINIT_FUNC
 initpymonkey(void)
 {
-  if (!JS_CStringsAreUTF8())
-    JS_SetCStringsAreUTF8();
-
   PyObject *module;
 
   module = Py_InitModule("pymonkey", PYM_methods);

@@ -44,21 +44,15 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   // can't be very efficient.
 
   PYM_JSObject *object;
-  char *string;
+  Py_UNICODE *string;
 
-  if (!JS_CStringsAreUTF8()) {
-    PyErr_SetString(PyExc_NotImplementedError,
-                    "Data type conversion not implemented.");
-    return NULL;
-  }
-
-  if (!PyArg_ParseTuple(args, "O!es", &PYM_JSObjectType, &object,
-                        "utf-8", &string))
+  if (!PyArg_ParseTuple(args, "O!u", &PYM_JSObjectType, &object,
+                        &string))
     return NULL;
 
-  JSString *jsString = JS_NewStringCopyZ(self->cx, string);
+  JSString *jsString = JS_NewUCStringCopyZ(self->cx,
+                                           (const jschar *) string);
   if (jsString == NULL) {
-    PyMem_Free(string);
     PyErr_SetString(PYM_error, "JS_NewStringCopyZ() failed");
     return NULL;
   }
@@ -69,12 +63,10 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
                         JS_GetStringLength(jsString), &val)) {
     // TODO: Get the actual JS exception. Any exception that exists
     // here will probably still be pending on the JS context.
-    PyMem_Free(string);
     PyErr_SetString(PYM_error, "Getting property failed.");
     return NULL;
   }
 
-  PyMem_Free(string);
   return PYM_jsvalToPyObject(self, val);
 }
 

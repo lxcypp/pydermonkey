@@ -27,17 +27,20 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
   if (JSVAL_IS_VOID(value))
     Py_RETURN_UNDEFINED;
 
-  if (JSVAL_IS_STRING(value) && JS_CStringsAreUTF8()) {
-    // TODO: What to do if C strings aren't UTF-8?  The jschar *
-    // type isn't actually UTF-16, it's just "UTF-16-ish", so
-    // there doesn't seem to be any other lossless way of
-    // transferring the string other than perhaps by transmitting
-    // its JSON representation.
+  if (JSVAL_IS_STRING(value)) {
+    // Strings in JS are funky: think of them as 16-bit versions of
+    // Python 2.x's 'str' type.  Whether or not they're valid UTF-16
+    // is entirely up to the client code.
 
+    // TODO: Instead of ignoring errors, consider actually treating
+    // the string as a raw character buffer.
     JSString *str = JSVAL_TO_STRING(value);
-    const char *bytes = JS_GetStringBytes(str);
-    const char *errors;
-    return PyUnicode_DecodeUTF8(bytes, strlen(bytes), errors);
+    const char *chars = (const char *) JS_GetStringChars(str);
+    size_t length = JS_GetStringLength(str);
+
+    // We're multiplying length by two since Python wants the number
+    // of bytes, not the number of 16-bit characters.
+    return PyUnicode_DecodeUTF16(chars, length * 2, "ignore", NULL);
   }
 
   if (JSVAL_IS_OBJECT(value))

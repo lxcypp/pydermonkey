@@ -28,10 +28,10 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         cx.evaluate_script(obj, 'foo = {bar: 1}', '<string>', 1)
-        self.assertTrue(isinstance(cx.get_property(obj, "foo"),
+        self.assertTrue(isinstance(cx.get_property(obj, u"foo"),
                                    pymonkey.Object))
-        self.assertTrue(cx.get_property(obj, "foo") is
-                        cx.get_property(obj, "foo"))
+        self.assertTrue(cx.get_property(obj, u"foo") is
+                        cx.get_property(obj, u"foo"))
 
     def testObjectGetattrWorks(self):
         cx = pymonkey.Runtime().new_context()
@@ -39,10 +39,10 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         cx.evaluate_script(obj, 'boop = 5', '<string>', 1)
         cx.evaluate_script(obj, 'this["blarg\u2026"] = 5', '<string>', 1)
-        self.assertEqual(cx.get_property(obj, "beans"),
+        self.assertEqual(cx.get_property(obj, u"beans"),
                          pymonkey.undefined)
         self.assertEqual(cx.get_property(obj, u"blarg\u2026"), 5)
-        self.assertEqual(cx.get_property(obj, "boop"), 5)
+        self.assertEqual(cx.get_property(obj, u"boop"), 5)
 
     def testContextIsInstance(self):
         cx = pymonkey.Runtime().new_context()
@@ -82,7 +82,7 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         obj = cx.evaluate_script(obj, '({boop: 1})', '<string>', 1)
         self.assertTrue(isinstance(obj, pymonkey.Object))
-        self.assertEqual(cx.get_property(obj, "boop"), 1)
+        self.assertEqual(cx.get_property(obj, u"boop"), 1)
 
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)
