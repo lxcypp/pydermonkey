@@ -22,7 +22,8 @@ def auto(options):
          "-lmozjs",
          "-o", "pymonkey.so",
          "-dynamiclib",
-         "pymonkey.c"]
+         "pymonkey.c",
+         "undefined.c"]
         )
 
     if result:

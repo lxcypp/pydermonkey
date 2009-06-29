@@ -1,43 +1,6 @@
+#include "undefined.h"
+
 #include "jsapi.h"
-#include <Python/Python.h>
-
-#define Py_RETURN_UNDEFINED  { Py_INCREF(PYM_undefined);        \
-                               return PYM_undefined; }
-
-typedef struct {
-  PyObject_HEAD
-} PYM_undefinedObject;
-
-// TODO: We should make this behave as much like JavaScript's
-// "undefined" value as possible; e.g., its string value should
-// be "undefined", the singleton should be falsy, etc.
-static PyTypeObject PYM_undefinedType = {
-  PyObject_HEAD_INIT(NULL)
-  0,                           /*ob_size*/
-  "pymonkey.undefined",        /*tp_name*/
-  sizeof(PYM_undefinedObject), /*tp_basicsize*/
-  0,                           /*tp_itemsize*/
-  0,                           /*tp_dealloc*/
-  0,                           /*tp_print*/
-  0,                           /*tp_getattr*/
-  0,                           /*tp_setattr*/
-  0,                           /*tp_compare*/
-  0,                           /*tp_repr*/
-  0,                           /*tp_as_number*/
-  0,                           /*tp_as_sequence*/
-  0,                           /*tp_as_mapping*/
-  0,                           /*tp_hash */
-  0,                           /*tp_call*/
-  0,                           /*tp_str*/
-  0,                           /*tp_getattro*/
-  0,                           /*tp_setattro*/
-  0,                           /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
-  /* tp_doc */
-  "Pythonic equivalent of JavaScript's 'undefined' value",
-};
-
-static PyObject *PYM_undefined = (PyObject *) &PYM_undefinedType;
 
 static JSClass PYM_jsGlobalClass = {
   "PymonkeyGlobal", JSCLASS_GLOBAL_FLAGS,
