@@ -1,10 +1,12 @@
 #include "utils.h"
 #include "undefined.h"
+#include "object.h"
 
 PyObject *PYM_error;
 
 PyObject *
-PYM_jsvalToPyObject(jsval value) {
+PYM_jsvalToPyObject(PYM_JSRuntimeObject *runtime,
+                    jsval value) {
   if (JSVAL_IS_INT(value))
     return PyInt_FromLong(JSVAL_TO_INT(value));
 
@@ -37,6 +39,9 @@ PYM_jsvalToPyObject(jsval value) {
     const char *errors;
     return PyUnicode_DecodeUTF8(bytes, strlen(bytes), errors);
   }
+
+  if (JSVAL_IS_OBJECT(value))
+    return (PyObject *) PYM_newJSObject(runtime, JSVAL_TO_OBJECT(value));
 
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,

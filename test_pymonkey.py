@@ -51,6 +51,15 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(type(retval) == unicode)
         self.assertEqual(retval, u'o hai\u2026')
 
+    def testEvaluateReturnsObject(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        obj = cx.evaluate_script(obj, '({boop: 1})', '<string>', 1)
+        self.assertTrue(isinstance(obj, pymonkey.Object))
+        self.assertEqual(cx.get_property(obj, "boop"), 1)
+
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)
 

@@ -75,7 +75,7 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   }
 
   PyMem_Free(string);
-  return PYM_jsvalToPyObject(val);
+  return PYM_jsvalToPyObject(self->runtime, val);
 }
 
 static PyObject *
@@ -118,7 +118,7 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
     return NULL;
   }
 
-  PyObject *pyRval = PYM_jsvalToPyObject(rval);
+  PyObject *pyRval = PYM_jsvalToPyObject(self->runtime, rval);
 
   JS_EndRequest(self->cx);
 
