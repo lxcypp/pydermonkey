@@ -149,10 +149,10 @@ static JSBool dispatchJSFunctionToPython(JSContext *cx,
     return JS_FALSE;
   }
 
-  PyObject *success = PYM_pyObjectToJsval(cx, result, rval);
+  int error = PYM_pyObjectToJsval(cx, result, rval);
   Py_DECREF(result);
 
-  if (success == NULL) {
+  if (error) {
     // TODO: Get the actual exception.
     JS_ReportError(cx, "Python function failed.");
     return JS_FALSE;

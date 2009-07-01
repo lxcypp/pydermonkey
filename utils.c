@@ -4,7 +4,7 @@
 
 PyObject *PYM_error;
 
-static PyObject *
+static int
 PYM_doubleToJsval(JSContext *cx,
                   double number,
                   jsval *rval)
@@ -12,13 +12,13 @@ PYM_doubleToJsval(JSContext *cx,
   jsdouble *numberAsJsdouble = JS_NewDouble(cx, number);
   if (numberAsJsdouble == NULL) {
     PyErr_SetString(PYM_error, "JS_NewDouble() failed");
-    return NULL;
+    return -1;
   }
   *rval = DOUBLE_TO_JSVAL(numberAsJsdouble);
-  Py_RETURN_NONE;
+  return 0;
 }
 
-PyObject *
+int
 PYM_pyObjectToJsval(JSContext *cx,
                     PyObject *object,
                     jsval *rval)
@@ -30,11 +30,11 @@ PYM_pyObjectToJsval(JSContext *cx,
                                              (const jschar *) string);
     if (jsString == NULL) {
       PyErr_SetString(PYM_error, "JS_NewUCStringCopyZ() failed");
-      return NULL;
+      return -1;
     }
 
     *rval = STRING_TO_JSVAL(jsString);
-    Py_RETURN_NONE;
+    return 0;
   }
 #endif
 
@@ -42,7 +42,7 @@ PYM_pyObjectToJsval(JSContext *cx,
     long number = PyInt_AS_LONG(object);
     if (INT_FITS_IN_JSVAL(number)) {
       *rval = INT_TO_JSVAL(number);
-      Py_RETURN_NONE;
+      return 0;
     } else
       return PYM_doubleToJsval(cx, number, rval);
   }
@@ -53,7 +53,7 @@ PYM_pyObjectToJsval(JSContext *cx,
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");
-  return NULL;
+  return -1;
 }
 
 PyObject *
