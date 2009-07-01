@@ -9,19 +9,36 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
-    def testJsWrappedPythonFunctionReturnsUnicode(self):
+    def _evalJsWrappedPyFunc(self, func, code):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
+        cx.define_function(obj, func, func.__name__)
+        return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def testJsWrappedPythonFunctionReturnsUnicode(self):
         def hai2u():
             return u"o hai"
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         u"o hai")
 
-        cx.define_function(obj, hai2u, "hai2u")
-        self.assertEqual(
-            cx.evaluate_script(obj, 'hai2u()', '<string>', 1),
-            u"o hai"
-            )
+    def testJsWrappedPythonFunctionReturnsSmallInt(self):
+        def hai2u():
+            return 5
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         5)
+
+    def testJsWrappedPythonFunctionReturnsNegativeInt(self):
+        def hai2u():
+            return -5
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         -5)
+
+    def testJsWrappedPythonFunctionReturnsBigInt(self):
+        def hai2u():
+            return 2147483647
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         2147483647)
 
     def testObjectIsIdentityPreserving(self):
         cx = pymonkey.Runtime().new_context()
@@ -103,6 +120,13 @@ class PymonkeyTests(unittest.TestCase):
 
     def testEvaluateReturnsIntegers(self):
         self.assertEqual(self._evaljs('1+3'), 4)
+
+    def testEvaluateReturnsNegativeIntegers(self):
+        self.assertEqual(self._evaljs('-5'), -5)
+
+    def testEvaluateReturnsBigIntegers(self):
+        self.assertEqual(self._evaljs('2147483647*2'),
+                         2147483647*2)
 
     def testEvaluateReturnsFloats(self):
         self.assertEqual(self._evaljs('1.1+3'), 4.1)

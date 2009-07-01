@@ -51,6 +51,7 @@ def build(options):
          "-framework", "Python",
          "-I%s" % incdir,
          "-L%s" % libdir,
+         "-Wall",
          "-lmozjs",
          "-o", "pymonkey.so",
          "-dynamiclib",

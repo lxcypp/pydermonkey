@@ -24,6 +24,21 @@ PYM_pyObjectToJsval(JSContext *cx,
   }
 #endif
 
+  if (PyInt_Check(object)) {
+    long number = PyInt_AS_LONG(object);
+    if (INT_FITS_IN_JSVAL(number))
+      *rval = INT_TO_JSVAL(number);
+    else {
+      jsdouble *numberAsJsdouble = JS_NewDouble(cx, number);
+      if (numberAsJsdouble == NULL) {
+        PyErr_SetString(PYM_error, "JS_NewDouble() failed");
+        return NULL;
+      }
+      *rval = DOUBLE_TO_JSVAL(numberAsJsdouble);
+    }
+    Py_RETURN_NONE;
+  }
+
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");
