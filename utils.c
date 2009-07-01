@@ -50,6 +50,16 @@ PYM_pyObjectToJsval(JSContext *cx,
   if (PyFloat_Check(object))
     return PYM_doubleToJsval(cx, PyFloat_AS_DOUBLE(object), rval);
 
+  if (object == Py_True) {
+    *rval = JSVAL_TRUE;
+    return 0;
+  }
+
+  if (object == Py_False) {
+    *rval = JSVAL_FALSE;
+    return 0;
+  }
+
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");
