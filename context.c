@@ -40,9 +40,7 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 {
-  // TODO: We're making a lot of copies of the string here, which
-  // can't be very efficient.
-
+#ifndef Py_UNICODE_WIDE
   PYM_JSObject *object;
   Py_UNICODE *string;
 
@@ -68,6 +66,12 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   }
 
   return PYM_jsvalToPyObject(self, val);
+#else
+  PyErr_SetString(PyExc_NotImplementedError,
+                  "This function is not yet implemented for wide "
+                  "unicode builds of Python.");
+  return NULL;
+#endif
 }
 
 static PyObject *
@@ -145,10 +149,9 @@ static JSBool dispatchJSFunctionToPython(JSContext *cx,
     return JS_FALSE;
   }
 
-  // TODO: Convert result to JS value.
+  JSBool success = PYM_pyObjectToJsval(cx, result, rval);
   Py_DECREF(result);
-
-  return JS_TRUE;
+  return success;
 }
 
 static PyObject *

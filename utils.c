@@ -4,6 +4,31 @@
 
 PyObject *PYM_error;
 
+JSBool
+PYM_pyObjectToJsval(JSContext *cx,
+                    PyObject *object,
+                    jsval *rval)
+{
+#ifndef Py_UNICODE_WIDE
+  if (PyUnicode_Check(object)) {
+    Py_UNICODE *string = PyUnicode_AsUnicode(object);
+    JSString *jsString = JS_NewUCStringCopyZ(cx,
+                                             (const jschar *) string);
+    if (jsString == NULL) {
+      JS_ReportError(cx, "JS_NewUCStringCopyZ() failed");
+      return JS_FALSE;
+    }
+
+    *rval = STRING_TO_JSVAL(jsString);
+    return JS_TRUE;
+  }
+#endif
+
+  // TODO: Support more types.
+  JS_ReportError(cx, "Data type conversion not implemented.");
+  return JS_FALSE;
+}
+
 PyObject *
 PYM_jsvalToPyObject(PYM_JSContextObject *context,
                     jsval value) {
@@ -49,4 +74,5 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");
+  return NULL;
 }

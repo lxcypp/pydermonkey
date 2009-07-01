@@ -9,19 +9,19 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
-    def testDefineFunctionWorks(self):
+    def testJsWrappedPythonFunctionReturnsUnicode(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
 
-        result = {'wasCalled': False}
-
         def hai2u():
-            result['wasCalled'] = True
+            return u"o hai"
 
         cx.define_function(obj, hai2u, "hai2u")
-        cx.evaluate_script(obj, 'hai2u()', '<string>', 1)
-        self.assertTrue(result['wasCalled'])
+        self.assertEqual(
+            cx.evaluate_script(obj, 'hai2u()', '<string>', 1),
+            u"o hai"
+            )
 
     def testObjectIsIdentityPreserving(self):
         cx = pymonkey.Runtime().new_context()
