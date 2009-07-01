@@ -4,6 +4,20 @@
 
 PyObject *PYM_error;
 
+static PyObject *
+PYM_doubleToJsval(JSContext *cx,
+                  double number,
+                  jsval *rval)
+{
+  jsdouble *numberAsJsdouble = JS_NewDouble(cx, number);
+  if (numberAsJsdouble == NULL) {
+    PyErr_SetString(PYM_error, "JS_NewDouble() failed");
+    return NULL;
+  }
+  *rval = DOUBLE_TO_JSVAL(numberAsJsdouble);
+  Py_RETURN_NONE;
+}
+
 PyObject *
 PYM_pyObjectToJsval(JSContext *cx,
                     PyObject *object,
@@ -26,18 +40,15 @@ PYM_pyObjectToJsval(JSContext *cx,
 
   if (PyInt_Check(object)) {
     long number = PyInt_AS_LONG(object);
-    if (INT_FITS_IN_JSVAL(number))
+    if (INT_FITS_IN_JSVAL(number)) {
       *rval = INT_TO_JSVAL(number);
-    else {
-      jsdouble *numberAsJsdouble = JS_NewDouble(cx, number);
-      if (numberAsJsdouble == NULL) {
-        PyErr_SetString(PYM_error, "JS_NewDouble() failed");
-        return NULL;
-      }
-      *rval = DOUBLE_TO_JSVAL(numberAsJsdouble);
-    }
-    Py_RETURN_NONE;
+      Py_RETURN_NONE;
+    } else
+      return PYM_doubleToJsval(cx, number, rval);
   }
+
+  if (PyFloat_Check(object))
+    return PYM_doubleToJsval(cx, PyFloat_AS_DOUBLE(object), rval);
 
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,

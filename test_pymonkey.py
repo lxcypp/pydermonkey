@@ -28,6 +28,12 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          5)
 
+    def testJsWrappedPythonFunctionReturnsFloat(self):
+        def hai2u():
+            return 5.1
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         5.1)
+
     def testJsWrappedPythonFunctionReturnsNegativeInt(self):
         def hai2u():
             return -5
