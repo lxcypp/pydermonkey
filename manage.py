@@ -31,7 +31,8 @@ import sys
 from paver.easy import *
 
 @task
-@cmdopts([("objdir=", "o", "The root of your Mozilla objdir")])
+@cmdopts([("objdir=", "o", "The root of your Mozilla objdir"),
+          ("static", "s", "Build against static libraries")])
 def build(options):
     """Build the pymonkey Python C extension."""
 
@@ -46,22 +47,26 @@ def build(options):
 
     print "Building extension."
 
-    result = subprocess.call(
-        ["g++",
-         "-framework", "Python",
-         "-I%s" % incdir,
-         "-L%s" % libdir,
-         "-Wall",
-         "-lmozjs",
-         "-o", "pymonkey.so",
-         "-dynamiclib",
-         "pymonkey.c",
-         "utils.c",
-         "object.c",
-         "undefined.c",
-         "context.c",
-         "runtime.c"]
-        )
+    args = ["g++",
+            "-framework", "Python",
+            "-I%s" % incdir,
+            "-L%s" % libdir,
+            "-Wall",
+            "-o", "pymonkey.so",
+            "-dynamiclib",
+            "pymonkey.c",
+            "utils.c",
+            "object.c",
+            "undefined.c",
+            "context.c",
+            "runtime.c"]
+
+    if options.get("static"):
+        args.append(os.path.join(objdir, "libjs_static.a"))
+    else:
+        args.append("-lmozjs")
+
+    result = subprocess.call(args)
 
     if result:
         sys.exit(result)
@@ -70,7 +75,13 @@ def build(options):
 
     new_env = {}
     new_env.update(os.environ)
-    new_env['DYLD_LIBRARY_PATH'] = libdir
+    if not options.get("static"):
+        print("NOTE: Because you're linking dynamically to the "
+              "SpiderMonkey shared library, you'll need to make sure "
+              "that it's on your library load path. You may need to "
+              "add %s to your library load path to do this." %
+              libdir)
+        new_env['DYLD_LIBRARY_PATH'] = libdir
 
     result = subprocess.call(
         [sys.executable,

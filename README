@@ -47,29 +47,23 @@ Rationale and Goals:
 Building and Testing
 --------------------
 
-Right now building is annoying and difficult because Pymonkey wraps
-SpiderMonkey 1.8.1, which doesn't yet exist as standalone code--it's
-only available in the mozilla-central HG repository.  As such,
-Pymonkey currently requires a full build of the Mozilla platform. You
-can find out how to do this here:
+You can either build SpiderMonkey off the mozilla-central HG
+repository, or off a mirror I made of its SpiderMonkey directory. The
+latter can be obtained here:
 
-  https://developer.mozilla.org/en/Build_Documentation
+  http://hg.toolness.com/spidermonkey/
 
-Once you've built Mozilla, you can build the extension and run the
-tests like this:
+Just HG clone that repository and read the instructions in the README
+to build SpiderMonkey.
 
-  python manage.py build --objdir=PATH_TO_OBJDIR
+Then come back to the root of your pymonkey repository and run:
 
-Where PATH_TO_OBJDIR is the path to your Mozilla build's objdir (if
-you don't know what that is, read the build documentation).
+  python manage.py build --static --objdir=PATH_TO_OBJDIR
 
-Note that at the moment, the build script is only tested on OS X, and
-even then some things need to be done to the environment in order for
-pymonkey to be loaded properly; look at manage.py if you need more
-specifics on that. Right now this isn't a huge deal because we're only
-really concerned with the test suite, which is run automatically after
-building--but obviously it's something that needs to be fixed in the
-future.
+Where PATH_TO_OBJDIR is the path to your Mozilla/SpiderMonkey build's
+objdir.
+
+Note that at the moment, the build script is only tested on OS X.
 
 Example Code
 ------------
