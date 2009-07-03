@@ -13,7 +13,8 @@ class PymonkeyTests(unittest.TestCase):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
-        cx.define_function(obj, func, func.__name__)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
     def testJsWrappedPythonFunctionReturnsUnicode(self):
@@ -58,6 +59,28 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)
 
+    def testDefinePropertyWorksWithObject(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        foo = cx.new_object()
+        cx.define_property(obj, "foo", foo)
+        self.assertEqual(
+            cx.evaluate_script(obj, 'foo', '<string>', 1),
+            foo
+            )
+
+    def testDefinePropertyWorksWithString(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        foo = cx.new_object()
+        cx.define_property(obj, "foo", u"hello")
+        self.assertEqual(
+            cx.evaluate_script(obj, 'foo', '<string>', 1),
+            u"hello"
+            )
+
     def testObjectIsIdentityPreserving(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
@@ -89,9 +112,20 @@ class PymonkeyTests(unittest.TestCase):
     def testObjectIsInstance(self):
         obj = pymonkey.Runtime().new_context().new_object()
         self.assertTrue(isinstance(obj, pymonkey.Object))
+        self.assertFalse(isinstance(obj, pymonkey.Function))
 
     def testObjectTypeCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.Object)
+
+    def testFunctionIsInstance(self):
+        def boop():
+            pass
+        obj = pymonkey.Runtime().new_context().new_function(boop, "boop")
+        self.assertTrue(isinstance(obj, pymonkey.Object))
+        self.assertTrue(isinstance(obj, pymonkey.Function))
+
+    def testFunctionTypeCannotBeInstantiated(self):
+        self.assertRaises(TypeError, pymonkey.Function)
 
     def testGetRuntimeWorks(self):
         rt = pymonkey.Runtime()

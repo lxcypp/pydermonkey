@@ -2,6 +2,7 @@
 #include "runtime.h"
 #include "context.h"
 #include "object.h"
+#include "function.h"
 #include "utils.h"
 
 static PyMethodDef PYM_methods[] = {
@@ -44,4 +45,11 @@ initpymonkey(void)
 
   Py_INCREF(&PYM_JSObjectType);
   PyModule_AddObject(module, "Object", (PyObject *) &PYM_JSObjectType);
+
+  PYM_JSFunctionType.tp_base = &PYM_JSObjectType;
+  if (!PyType_Ready(&PYM_JSFunctionType) < 0)
+    return;
+
+  Py_INCREF(&PYM_JSFunctionType);
+  PyModule_AddObject(module, "Function", (PyObject *) &PYM_JSFunctionType);
 }

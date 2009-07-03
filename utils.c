@@ -50,6 +50,19 @@ PYM_pyObjectToJsval(JSContext *cx,
   if (PyFloat_Check(object))
     return PYM_doubleToJsval(cx, PyFloat_AS_DOUBLE(object), rval);
 
+  if (PyObject_TypeCheck(object, &PYM_JSObjectType)) {
+    PYM_JSObject *jsObject = (PYM_JSObject *) object;
+    JSRuntime *rt = JS_GetRuntime(cx);
+    if (rt != jsObject->runtime->rt) {
+      PyErr_SetString(PyExc_ValueError,
+                      "JS object and JS context are from different "
+                      "JS runtimes");
+      return -1;
+    }
+    *rval = OBJECT_TO_JSVAL(jsObject->obj);
+    return 0;
+  }
+
   if (object == Py_True) {
     *rval = JSVAL_TRUE;
     return 0;
@@ -106,7 +119,8 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
   }
 
   if (JSVAL_IS_OBJECT(value))
-    return (PyObject *) PYM_newJSObject(context, JSVAL_TO_OBJECT(value));
+    return (PyObject *) PYM_newJSObject(context, JSVAL_TO_OBJECT(value),
+                                        NULL);
 
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,

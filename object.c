@@ -27,6 +27,8 @@ PYM_JSObjectDealloc(PYM_JSObject *self)
     Py_DECREF(self->runtime);
     self->runtime = NULL;
   }
+
+  self->ob_type->tp_free((PyObject *) self);
 }
 
 PyTypeObject PYM_JSObjectType = {
@@ -51,7 +53,8 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /*tp_flags*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
   /* tp_doc */
   "JavaScript Object.",
   0,		               /* tp_traverse */
@@ -74,7 +77,8 @@ PyTypeObject PYM_JSObjectType = {
 };
 
 PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
-                              JSObject *obj) {
+                              JSObject *obj,
+                              PYM_JSObject *subclass) {
   jsid uniqueId;
   if (!JS_GetObjectId(context->cx, obj, &uniqueId)) {
     PyErr_SetString(PYM_error, "JS_GetObjectId() failed");
@@ -93,8 +97,14 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     return (PYM_JSObject *) cached->value;
   }
 
-  PYM_JSObject *object = PyObject_New(PYM_JSObject,
-                                      &PYM_JSObjectType);
+  PYM_JSObject *object;
+
+  if (subclass)
+    object = subclass;
+  else
+    object = PyObject_New(PYM_JSObject,
+                          &PYM_JSObjectType);
+
   if (object == NULL)
     return NULL;
 

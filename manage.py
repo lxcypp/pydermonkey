@@ -57,6 +57,7 @@ def build(options):
             "pymonkey.c",
             "utils.c",
             "object.c",
+            "function.c",
             "undefined.c",
             "context.c",
             "runtime.c"]

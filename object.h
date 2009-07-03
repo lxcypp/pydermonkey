@@ -18,6 +18,7 @@ typedef struct {
 extern PyTypeObject PYM_JSObjectType;
 
 extern PYM_JSObject *
-PYM_newJSObject(PYM_JSContextObject *context, JSObject *obj);
+PYM_newJSObject(PYM_JSContextObject *context, JSObject *obj,
+                PYM_JSObject *subclass);
 
 #endif
