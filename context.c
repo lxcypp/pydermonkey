@@ -183,6 +183,8 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
                        argc, argv, &rval)) {
     // TODO: There's a pending exception on the JS context, should we
     // do something about it?
+
+    // TODO: Convert the JS exception to a Python one.
     PyErr_SetString(PYM_error, "Function failed");
     return NULL;
   }
