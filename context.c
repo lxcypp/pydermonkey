@@ -151,6 +151,46 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *obj;
+  PYM_JSFunction *fun;
+  PyObject *funcArgs;
+
+  if (!PyArg_ParseTuple(args, "O!O!O!", &PYM_JSObjectType, &obj,
+                        &PYM_JSFunctionType, &fun,
+                        &PyTuple_Type, &funcArgs))
+    return NULL;
+
+  uintN argc = PyTuple_Size(funcArgs);
+  jsval argv[argc];
+  jsval *currArg = argv;
+
+  for (unsigned int i = 0; i < argc; i++) {
+    PyObject *item = PyTuple_GET_ITEM(funcArgs, i);
+    if (item == NULL ||
+        PYM_pyObjectToJsval(self->cx, item, currArg) == -1)
+      return NULL;
+    currArg++;
+  }
+
+  jsval rval;
+
+  // TODO: This assumes that a JSFunction * is actually a subclass of
+  // a JSObject *, which may or may not be regarded as an implementation
+  // detail.
+  if (!JS_CallFunction(self->cx, obj->obj, (JSFunction *) fun->base.obj,
+                       argc, argv, &rval)) {
+    // TODO: There's a pending exception on the JS context, should we
+    // do something about it?
+    PyErr_SetString(PYM_error, "Function failed");
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, rval);
+}
+
+static PyObject *
 PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
 {
   PyObject *callable;
@@ -175,6 +215,9 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Evaluate the given JavaScript code in the context of the given "
    "global object, using the given filename"
    "and line number information."},
+  {"call_function",
+   (PyCFunction) PYM_callFunction, METH_VARARGS,
+   "Calls a JS function."},
   {"new_function",
    (PyCFunction) PYM_newFunction, METH_VARARGS,
    "Creates a new function callable from JS."},

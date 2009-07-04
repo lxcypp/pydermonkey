@@ -153,8 +153,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(retval, u'o hai\u2026')
 
     def testEvaluateReturnsObject(self):
-        rt = pymonkey.Runtime()
-        cx = rt.new_context()
+        cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         obj = cx.evaluate_script(obj, '({boop: 1})', '<string>', 1)
@@ -162,13 +161,53 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(cx.get_property(obj, u"boop"), 1)
 
     def testEvaluateReturnsFunction(self):
-        rt = pymonkey.Runtime()
-        cx = rt.new_context()
+        cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         obj = cx.evaluate_script(obj, '(function boop() { return 1; })',
                                  '<string>', 1)
         self.assertTrue(isinstance(obj, pymonkey.Function))
+
+    def testCallFunctionRaisesErrorOnBadFuncArgs(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        obj = cx.evaluate_script(
+            obj,
+            '(function boop(a, b) { return a+b+this.c; })',
+            '<string>', 1
+            )
+        self.assertRaises(
+            NotImplementedError,
+            cx.call_function,
+            obj, obj, (1, self)
+            )
+
+    def testCallFunctionRaisesErrorFromJS(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        obj = cx.evaluate_script(
+            obj,
+            '(function boop(a, b) { blarg(); })',
+            '<string>', 1
+            )
+        self.assertRaises(
+            pymonkey.error,
+            cx.call_function,
+            obj, obj, (1,)
+            )
+
+    def testCallFunctionWorks(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        thisArg = cx.new_object()
+        cx.define_property(thisArg, "c", 3)
+        cx.init_standard_classes(obj)
+        obj = cx.evaluate_script(
+            obj,
+            '(function boop(a, b) { return a+b+this.c; })',
+            '<string>', 1
+            )
+        self.assertEqual(cx.call_function(thisArg, obj, (1,2)), 6)
 
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)
