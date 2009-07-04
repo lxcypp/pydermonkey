@@ -159,7 +159,7 @@ PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "Os", &callable, &name))
     return NULL;
 
-  return (PyObject *) PYM_newJSFunction(self, callable, name);
+  return (PyObject *) PYM_newJSFunctionFromCallable(self, callable, name);
 }
 
 static PyMethodDef PYM_JSContextMethods[] = {

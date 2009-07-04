@@ -161,6 +161,15 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(isinstance(obj, pymonkey.Object))
         self.assertEqual(cx.get_property(obj, u"boop"), 1)
 
+    def testEvaluateReturnsFunction(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        obj = cx.evaluate_script(obj, '(function boop() { return 1; })',
+                                 '<string>', 1)
+        self.assertTrue(isinstance(obj, pymonkey.Function))
+
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)
 

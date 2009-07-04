@@ -1,4 +1,5 @@
 #include "object.h"
+#include "function.h"
 #include "runtime.h"
 #include "utils.h"
 
@@ -101,9 +102,17 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
 
   if (subclass)
     object = subclass;
-  else
-    object = PyObject_New(PYM_JSObject,
-                          &PYM_JSObjectType);
+  else {
+    if (JS_ObjectIsFunction(context->cx, obj)) {
+      PYM_JSFunction *func = PyObject_New(PYM_JSFunction,
+                                          &PYM_JSFunctionType);
+      if (func != NULL)
+        func->callable = NULL;
+      object = (PYM_JSObject *) func;
+    } else
+      object = PyObject_New(PYM_JSObject,
+                            &PYM_JSObjectType);
+  }
 
   if (object == NULL)
     return NULL;

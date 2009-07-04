@@ -99,9 +99,9 @@ PyTypeObject PYM_JSFunctionType = {
 };
 
 PYM_JSFunction *
-PYM_newJSFunction(PYM_JSContextObject *context,
-                  PyObject *callable,
-                  const char *name)
+PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
+                              PyObject *callable,
+                              const char *name)
 {
   if (!PyCallable_Check(callable)) {
     PyErr_SetString(PyExc_TypeError, "Callable must be callable");
