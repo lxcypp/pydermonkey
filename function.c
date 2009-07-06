@@ -47,7 +47,7 @@ dispatchJSFunctionToPython(JSContext *cx,
     return JS_FALSE;
   }
 
-  int error = PYM_pyObjectToJsval(cx, result, rval);
+  int error = PYM_pyObjectToJsval(context, result, rval);
   Py_DECREF(result);
 
   if (error) {

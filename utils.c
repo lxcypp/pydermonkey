@@ -5,11 +5,11 @@
 PyObject *PYM_error;
 
 static int
-PYM_doubleToJsval(JSContext *cx,
+PYM_doubleToJsval(PYM_JSContextObject *context,
                   double number,
                   jsval *rval)
 {
-  jsdouble *numberAsJsdouble = JS_NewDouble(cx, number);
+  jsdouble *numberAsJsdouble = JS_NewDouble(context->cx, number);
   if (numberAsJsdouble == NULL) {
     PyErr_SetString(PYM_error, "JS_NewDouble() failed");
     return -1;
@@ -19,14 +19,14 @@ PYM_doubleToJsval(JSContext *cx,
 }
 
 int
-PYM_pyObjectToJsval(JSContext *cx,
+PYM_pyObjectToJsval(PYM_JSContextObject *context,
                     PyObject *object,
                     jsval *rval)
 {
 #ifndef Py_UNICODE_WIDE
   if (PyUnicode_Check(object)) {
     Py_UNICODE *string = PyUnicode_AsUnicode(object);
-    JSString *jsString = JS_NewUCStringCopyZ(cx,
+    JSString *jsString = JS_NewUCStringCopyZ(context->cx,
                                              (const jschar *) string);
     if (jsString == NULL) {
       PyErr_SetString(PYM_error, "JS_NewUCStringCopyZ() failed");
@@ -44,15 +44,15 @@ PYM_pyObjectToJsval(JSContext *cx,
       *rval = INT_TO_JSVAL(number);
       return 0;
     } else
-      return PYM_doubleToJsval(cx, number, rval);
+      return PYM_doubleToJsval(context, number, rval);
   }
 
   if (PyFloat_Check(object))
-    return PYM_doubleToJsval(cx, PyFloat_AS_DOUBLE(object), rval);
+    return PYM_doubleToJsval(context, PyFloat_AS_DOUBLE(object), rval);
 
   if (PyObject_TypeCheck(object, &PYM_JSObjectType)) {
     PYM_JSObject *jsObject = (PYM_JSObject *) object;
-    JSRuntime *rt = JS_GetRuntime(cx);
+    JSRuntime *rt = JS_GetRuntime(context->cx);
     if (rt != jsObject->runtime->rt) {
       PyErr_SetString(PyExc_ValueError,
                       "JS object and JS context are from different "

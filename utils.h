@@ -15,7 +15,7 @@ typedef struct {
 extern PyObject *PYM_error;
 
 extern int
-PYM_pyObjectToJsval(JSContext *cx,
+PYM_pyObjectToJsval(PYM_JSContextObject *context,
                     PyObject *object,
                     jsval *rval);
 

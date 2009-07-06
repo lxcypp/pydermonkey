@@ -135,7 +135,7 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 
   jsval jsValue;
 
-  if (PYM_pyObjectToJsval(self->cx, value, &jsValue) == -1)
+  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
     return NULL;
 
   // TODO: Support unicode naming.
@@ -169,7 +169,7 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
   for (unsigned int i = 0; i < argc; i++) {
     PyObject *item = PyTuple_GET_ITEM(funcArgs, i);
     if (item == NULL ||
-        PYM_pyObjectToJsval(self->cx, item, currArg) == -1)
+        PYM_pyObjectToJsval(self, item, currArg) == -1)
       return NULL;
     currArg++;
   }
