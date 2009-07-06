@@ -73,6 +73,11 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
     return 0;
   }
 
+  if (object == Py_None) {
+    *rval = JSVAL_NULL;
+    return 0;
+  }
+
   // TODO: Support more types.
   PyErr_SetString(PyExc_NotImplementedError,
                   "Data type conversion not implemented.");

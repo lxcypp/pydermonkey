@@ -39,6 +39,12 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          u"o hai")
 
+    def testJsWrappedPythonFunctionReturnsNone(self):
+        def hai2u(cx):
+            pass
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         None)
+
     def testJsWrappedPythonFunctionReturnsTrue(self):
         def hai2u(cx):
             return True
