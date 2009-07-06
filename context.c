@@ -3,16 +3,20 @@
 #include "function.h"
 #include "utils.h"
 
-// Default JSErrorReporter for pymonkey-owned JS contexts. We just throw an
-// appropriate exception into Python-space.
 static void
 PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
 {
-  if (report->filename)
-    PyErr_Format(PYM_error, "File \"%s\", line %d: %s",
-                 report->filename, report->lineno, message);
-  else
-    PyErr_SetString(PYM_error, message);
+  // Convert JS warnings into Python warnings.
+  if (JSREPORT_IS_WARNING(report->flags)) {
+    if (report->filename)
+      PyErr_WarnExplicit(NULL, message, report->filename, report->lineno,
+                         NULL, NULL);
+    else
+      PyErr_Warn(NULL, message);
+  } else
+    // TODO: Not sure if this will ever get called, but we should know
+    // if it is.
+    PyErr_Warn(NULL, "A JS error was reported.");
 }
 
 static void

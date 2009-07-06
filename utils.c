@@ -146,10 +146,11 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
     JS_ReportError(context->cx, "Python exception occurred");
   else {
     jsval val;
-    if (PYM_pyObjectToJsval(context, str, &val) == 0)
-      // TODO: Include filename/line information.
+    if (PYM_pyObjectToJsval(context, str, &val) == 0) {
+      // TODO: Wrap Python traceback info in JS exception so the client
+      // can examine it.
       JS_SetPendingException(context->cx, val);
-    else
+    } else
       JS_ReportError(context->cx, "Python exception occurred");
   }
 
@@ -169,6 +170,8 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
   if (JS_GetPendingException(context->cx, &val)) {
     JSString *str = JS_ValueToString(context->cx, val);
     if (str != NULL) {
+      // TODO: Wrap the original JS exception so that the client can
+      // examine it.
       const char *chars = JS_GetStringBytes(str);
       PyErr_SetString(PYM_error, chars);
     } else

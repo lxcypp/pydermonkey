@@ -57,7 +57,7 @@ class PymonkeyTests(unittest.TestCase):
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
         self.assertEqual(self.last_exception.message,
-                         "uncaught exception: hello")
+                         "hello")
 
     def testJsWrappedPythonFunctionReturnsNone(self):
         def hai2u(cx):
@@ -127,7 +127,7 @@ class PymonkeyTests(unittest.TestCase):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
-        cx.evaluate_script(obj, 'foo = {bar: 1}', '<string>', 1)
+        cx.evaluate_script(obj, 'var foo = {bar: 1}', '<string>', 1)
         self.assertTrue(isinstance(cx.get_property(obj, u"foo"),
                                    pymonkey.Object))
         self.assertTrue(cx.get_property(obj, u"foo") is
@@ -137,7 +137,7 @@ class PymonkeyTests(unittest.TestCase):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
-        cx.evaluate_script(obj, 'boop = 5', '<string>', 1)
+        cx.evaluate_script(obj, 'var boop = 5', '<string>', 1)
         cx.evaluate_script(obj, 'this["blarg\u2026"] = 5', '<string>', 1)
         self.assertEqual(cx.get_property(obj, u"beans"),
                          pymonkey.undefined)
@@ -181,8 +181,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(pymonkey.error,
                           self._evaljs, 'hai2u()')
         self.assertEqual(self.last_exception.message,
-                         'File "<string>", line 1: ReferenceError: '
-                         'hai2u is not defined')
+                         'ReferenceError: hai2u is not defined')
 
     def testEvaluateReturnsUndefined(self):
         retval = self._evaljs("")
@@ -243,8 +242,7 @@ class PymonkeyTests(unittest.TestCase):
                           cx.call_function,
                           obj, obj, (1,))
         self.assertEqual(self.last_exception.message,
-                         'File "<string>", line 1: ReferenceError: '
-                         'blarg is not defined')
+                         'ReferenceError: blarg is not defined')
 
     def testCallFunctionWorks(self):
         cx = pymonkey.Runtime().new_context()

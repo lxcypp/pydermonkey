@@ -61,7 +61,8 @@ PYM_newContext(PYM_JSRuntimeObject *self, PyObject *args)
     return NULL;
   }
 
-  JS_SetOptions(cx, JSOPTION_VAROBJFIX);
+  JS_SetOptions(cx, JSOPTION_VAROBJFIX | JSOPTION_DONT_REPORT_UNCAUGHT |
+                JSOPTION_ATLINE | JSOPTION_STRICT);
   JS_SetVersion(cx, JSVERSION_LATEST);
 
   PyObject *retval = (PyObject *) PYM_newJSContextObject(self, cx);
