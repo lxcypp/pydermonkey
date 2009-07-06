@@ -17,44 +17,60 @@ class PymonkeyTests(unittest.TestCase):
         cx.define_property(obj, func.__name__, jsfunc)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def testJsWrappedPythonFuncPassesContext(self):
+        contexts = []
+
+        def func(cx):
+            contexts.append(cx)
+            return True
+
+        code = "func()"
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
+        cx.evaluate_script(obj, code, '<string>', 1)
+        self.assertEqual(contexts[0], cx)
+
     def testJsWrappedPythonFunctionReturnsUnicode(self):
-        def hai2u():
+        def hai2u(cx):
             return u"o hai"
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          u"o hai")
 
     def testJsWrappedPythonFunctionReturnsTrue(self):
-        def hai2u():
+        def hai2u(cx):
             return True
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          True)
 
     def testJsWrappedPythonFunctionReturnsFalse(self):
-        def hai2u():
+        def hai2u(cx):
             return False
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          False)
 
     def testJsWrappedPythonFunctionReturnsSmallInt(self):
-        def hai2u():
+        def hai2u(cx):
             return 5
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          5)
 
     def testJsWrappedPythonFunctionReturnsFloat(self):
-        def hai2u():
+        def hai2u(cx):
             return 5.1
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          5.1)
 
     def testJsWrappedPythonFunctionReturnsNegativeInt(self):
-        def hai2u():
+        def hai2u(cx):
             return -5
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          -5)
 
     def testJsWrappedPythonFunctionReturnsBigInt(self):
-        def hai2u():
+        def hai2u(cx):
             return 2147483647
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)

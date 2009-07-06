@@ -287,6 +287,7 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   Py_INCREF(runtime);
 
   context->cx = cx;
+  JS_SetContextPrivate(cx, context);
 
 #ifdef JS_GC_ZEAL
   // TODO: Consider exposing JS_SetGCZeal() to Python instead of

@@ -29,11 +29,16 @@ dispatchJSFunctionToPython(JSContext *cx,
   PyObject *callable = (PyObject *) JSVAL_TO_PRIVATE(jsCallable);
 
   // TODO: Convert args and 'this' parameter.
-  PyObject *args = PyTuple_New(0);
+  PyObject *args = PyTuple_New(1);
   if (args == NULL) {
     JS_ReportOutOfMemory(cx);
     return JS_FALSE;
   }
+
+  PYM_JSContextObject *context = (PYM_JSContextObject *)
+    JS_GetContextPrivate(cx);
+  Py_INCREF(context);
+  PyTuple_SET_ITEM(args, 0, (PyObject *) context);
 
   PyObject *result = PyObject_Call(callable, args, NULL);
   if (result == NULL) {
