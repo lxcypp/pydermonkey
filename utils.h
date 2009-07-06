@@ -22,4 +22,10 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
 extern PyObject *
 PYM_jsvalToPyObject(PYM_JSContextObject *context, jsval value);
 
+extern void
+PYM_pythonExceptionToJs(PYM_JSContextObject *context);
+
+void
+PYM_jsExceptionToPython(PYM_JSContextObject *context);
+
 #endif

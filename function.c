@@ -42,8 +42,7 @@ dispatchJSFunctionToPython(JSContext *cx,
 
   PyObject *result = PyObject_Call(callable, args, NULL);
   if (result == NULL) {
-    // TODO: Get the actual exception.
-    JS_ReportError(cx, "Python function failed.");
+    PYM_pythonExceptionToJs(context);
     return JS_FALSE;
   }
 
@@ -51,8 +50,7 @@ dispatchJSFunctionToPython(JSContext *cx,
   Py_DECREF(result);
 
   if (error) {
-    // TODO: Get the actual exception.
-    JS_ReportError(cx, "Python function failed.");
+    PYM_pythonExceptionToJs(context);
     return JS_FALSE;
   }
   return JS_TRUE;

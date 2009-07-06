@@ -3,6 +3,18 @@
 #include "function.h"
 #include "utils.h"
 
+// Default JSErrorReporter for pymonkey-owned JS contexts. We just throw an
+// appropriate exception into Python-space.
+static void
+PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
+{
+  if (report->filename)
+    PyErr_Format(PYM_error, "File \"%s\", line %d: %s",
+                 report->filename, report->lineno, message);
+  else
+    PyErr_SetString(PYM_error, message);
+}
+
 static void
 PYM_JSContextDealloc(PYM_JSContextObject *self)
 {
@@ -109,8 +121,7 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
   jsval rval;
   if (!JS_EvaluateScript(self->cx, object->obj, source, sourceLen,
                          filename, lineNo, &rval)) {
-    // TODO: Actually get the error that was raised.
-    PyErr_SetString(PYM_error, "Script failed");
+    PYM_jsExceptionToPython(self);
     JS_EndRequest(self->cx);
     return NULL;
   }
@@ -181,11 +192,7 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
   // detail.
   if (!JS_CallFunction(self->cx, obj->obj, (JSFunction *) fun->base.obj,
                        argc, argv, &rval)) {
-    // TODO: There's a pending exception on the JS context, should we
-    // do something about it?
-
-    // TODO: Convert the JS exception to a Python one.
-    PyErr_SetString(PYM_error, "Function failed");
+    PYM_jsExceptionToPython(self);
     return NULL;
   }
 
@@ -288,6 +295,7 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
 
   context->cx = cx;
   JS_SetContextPrivate(cx, context);
+  JS_SetErrorReporter(cx, PYM_reportError);
 
 #ifdef JS_GC_ZEAL
   // TODO: Consider exposing JS_SetGCZeal() to Python instead of

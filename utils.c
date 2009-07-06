@@ -132,3 +132,47 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
                   "Data type conversion not implemented.");
   return NULL;
 }
+
+void
+PYM_pythonExceptionToJs(PYM_JSContextObject *context)
+{
+  PyObject *type;
+  PyObject *value;
+  PyObject *traceback;
+
+  PyErr_Fetch(&type, &value, &traceback);
+  PyObject *str = PyObject_Unicode(value);
+  if (str == NULL)
+    JS_ReportError(context->cx, "Python exception occurred");
+  else {
+    jsval val;
+    if (PYM_pyObjectToJsval(context, str, &val) == 0)
+      // TODO: Include filename/line information.
+      JS_SetPendingException(context->cx, val);
+    else
+      JS_ReportError(context->cx, "Python exception occurred");
+  }
+
+  Py_DECREF(type);
+  Py_DECREF(value);
+  Py_DECREF(traceback);
+}
+
+void
+PYM_jsExceptionToPython(PYM_JSContextObject *context)
+{
+  if (!JS_IsExceptionPending(context->cx) &&
+      PyErr_Occurred())
+    return;
+
+  jsval val;
+  if (JS_GetPendingException(context->cx, &val)) {
+    JSString *str = JS_ValueToString(context->cx, val);
+    if (str != NULL) {
+      const char *chars = JS_GetStringBytes(str);
+      PyErr_SetString(PYM_error, chars);
+    } else
+      PyErr_SetString(PYM_error, "JS exception occurred");
+  } else
+    PyErr_SetString(PYM_error, "JS_GetPendingException() failed");
+}
