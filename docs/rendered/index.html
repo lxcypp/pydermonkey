@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pymonkey Documentation &mdash; Pymonkey v0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Pymonkey v0.0.1 documentation" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pymonkey-documentation">
+<h1>Pymonkey Documentation<a class="headerlink" href="#pymonkey-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Pymonkey is a Python C extension module to expose the <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey">Mozilla
+SpiderMonkey</a> engine
+to Python.</p>
+<ul class="simple">
+</ul>
+<p>Rationale and Goals:</p>
+<ul>
+<li><p class="first">Python and JS are fairly complementary languages. Python provides
+tremendous developer productivity via its dynamic language
+features, its vibrant library of third-party client-side code, and
+its ease of readability. JavaScript, on the other hand, is widely
+known by a vast number of casual programmers due to its
+availability in web browsers; it was also envisioned from its
+conception to be executed as untrusted code, which gives it a lot
+of security features that Python has always lacked.</p>
+</li>
+<li><p class="first">There&#8217;s an increasing need for being able to run JS on the server
+side&#8211;particularly untrusted JS. For instance, being able to
+duplicate business logic on the server and client (i.e., browser)
+would be very useful. Standards-based solutions like <a class="reference" href="https://wiki.mozilla.org/ServerJS">ServerJS</a> are currently paving the way
+in this field. There&#8217;s Java-based solutions like Rhino out there,
+but nothing really mature is available for the Python
+world. Ideally, Pymonkey should enable a Python programmer to create
+a custom sandboxed environment for executing JS code without needing
+to write any C.</p>
+</li>
+<li><p class="first">Pymonkey should have awesome Sphinx documentation with doctests and
+all the trappings of a model Python package. Not only should it be
+easy for Python programmers to learn how to use the module, but it
+should also be easy for them to learn more about how SpiderMonkey
+works by reading the documentation and playing around with the code.</p>
+</li>
+<li><p class="first">Pymonkey needs to have outstanding developer ergonomics. Full
+cross-language stack tracebacks should be available, for instance,
+and developers should be able to easily debug. Access to memory
+profiling facilities in JS-land is a must.</p>
+</li>
+<li><p class="first">The module uses the Python C API: no SWIG, Pyrex, or other
+intermediaries. The obvious disadvantage here is that it means more
+C code, but the advantages are that</p>
+<ol class="arabic simple">
+<li>contributors don&#8217;t need to learn anything other than the
+Python and SpiderMonkey C APIs to contribute, and</li>
+<li>it means one less dependency, which makes the build process
+easier.</li>
+</ol>
+<p>The module also doesn&#8217;t use ctypes because using the SpiderMonkey
+C API requires fairly complex preprocessor macros defined in the
+engine&#8217;s header files.</p>
+</li>
+<li><p class="first">Finally, Atul has never really made a straight Python CAPI module
+before, so he wanted to give it a try.</p>
+</li>
+</ul>
+<div class="section" id="building-and-testing">
+<h2>Building and Testing<a class="headerlink" href="#building-and-testing" title="Permalink to this headline">¶</a></h2>
+<p>You can either build SpiderMonkey off the mozilla-central HG
+repository, or off a mirror I made of its SpiderMonkey directory. The
+latter can be obtained here:</p>
+<blockquote>
+<a class="reference" href="http://hg.toolness.com/spidermonkey/">http://hg.toolness.com/spidermonkey/</a></blockquote>
+<p>Just HG clone that repository and read the instructions in the README
+to build SpiderMonkey.</p>
+<p>Then come back to the root of your pymonkey repository and run:</p>
+<div class="highlight-python"><pre>python manage.py build --static --objdir=PATH_TO_OBJDIR</pre>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">PATH_TO_OBJDIR</span></tt> is the path to your Mozilla/SpiderMonkey build&#8217;s
+objdir.</p>
+<p>Note that at the moment, the build script is only tested on OS X.</p>
+</div>
+<div class="section" id="example-code">
+<h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
+<p>Right now the only example code that exists is in the test suite at
+<tt class="docutils literal"><span class="pre">test_pymonkey.py</span></tt>. Check it out and feel free to add more.</p>
+</div>
+<div class="section" id="challenges">
+<h2>Challenges<a class="headerlink" href="#challenges" title="Permalink to this headline">¶</a></h2>
+<p>There&#8217;s a number of challenges that need to be resolved before
+pymonkey can be really usable. Here&#8217;s some of them.</p>
+<p><strong>Garbage Collection</strong></p>
+<p>Python&#8217;s garbage collection uses reference counting, whereas
+SpiderMonkey&#8217;s is mark-and-sweep. We&#8217;ll likely run into situations
+where there are cycles that exist between SpiderMonkey and Python
+objects; this is actually quite similar to the relationship between
+XPCOM and JavaScript in the Mozilla platform&#8211;XPCOM uses reference
+counting too&#8211;so detecting such cycles will probably involve creating
+something akin to <a class="reference" href="https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector">XPCOM&#8217;s cycle collector</a>.</p>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference" href="modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference" href="">Pymonkey Documentation</a><ul>
+<li><a class="reference" href="#building-and-testing">Building and Testing</a></li>
+<li><a class="reference" href="#example-code">Example Code</a></li>
+<li><a class="reference" href="#challenges">Challenges</a></li>
+<li><a class="reference" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/index.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, Atul Varma.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

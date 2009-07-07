@@ -27,14 +27,35 @@ import os
 import subprocess
 import shutil
 import sys
+import webbrowser
+import urllib
 
 from paver.easy import *
+
+@task
+def docs(options):
+    """Open the Pymonkey documentation in your web browser."""
+
+    url = os.path.abspath(os.path.join("docs", "rendered", "index.html"))
+    url = urllib.pathname2url(url)
+    webbrowser.open(url)
+
+@task
+def build_docs(options):
+    """Build the Pymonkey documentation (requires Sphinx)."""
+
+    retval = subprocess.call(["sphinx-build",
+                              "-b", "html",
+                              os.path.join("docs", "src"),
+                              os.path.join("docs", "rendered")])
+    if retval:
+        sys.exit(1)
 
 @task
 @cmdopts([("objdir=", "o", "The root of your Mozilla objdir"),
           ("static", "s", "Build against static libraries")])
 def build(options):
-    """Build the pymonkey Python C extension."""
+    """Build the Pymonkey Python C extension."""
 
     objdir = options.get("objdir")
     if not objdir:
