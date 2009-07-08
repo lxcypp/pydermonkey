@@ -49,7 +49,7 @@ def build_docs(options):
                               os.path.join("docs", "src"),
                               os.path.join("docs", "rendered")])
     if retval:
-        sys.exit(1)
+        sys.exit(retval)
 
 @task
 @cmdopts([("objdir=", "o", "The root of your Mozilla objdir"),
@@ -113,3 +113,16 @@ def build(options):
 
     if result:
         sys.exit(result)
+
+    print "Running doctests."
+
+    # We have to add our current directory to the python path so that
+    # our doctests can find the pymonkey module.
+    new_env['PYTHONPATH'] = os.path.abspath('.')
+    retval = subprocess.call(["sphinx-build",
+                              "-b", "doctest",
+                              os.path.join("docs", "src"),
+                              "_doctest_output"],
+                             env = new_env)
+    if retval:
+        sys.exit(retval)

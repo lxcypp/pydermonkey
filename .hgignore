@@ -2,6 +2,6 @@ syntax: glob
 *.so
 *.pyc
 docs/rendered/.buildinfo
-docs/rendered/.doctrees/environment.pickle
-docs/rendered/.doctrees/index.doctree
+docs/rendered/.doctrees
 docs/rendered/objects.inv
+_doctest_output

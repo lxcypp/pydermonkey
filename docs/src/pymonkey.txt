@@ -1,0 +1,42 @@
+:mod:`pymonkey` --- Access SpiderMonkey from Python
+===================================================
+
+.. module:: pymonkey
+   :synopsis: Access SpiderMonkey from Python
+
+.. testsetup:: *
+
+   import pymonkey
+
+This module offers a low-level interface to the `Mozilla SpiderMonkey
+<https://developer.mozilla.org/en/SpiderMonkey>`_ JavaScript engine.
+
+.. exception:: error
+
+   This is the type of any SpiderMonkey-related errors thrown by this
+   module.
+
+.. class:: Context
+
+   This is the type of JavaScript context objects. Contexts can only
+   be created via a call to :meth:`Runtime.new_context()`, but this
+   type object can be used with Python's built-in :func:`isinstance()`
+   to verify that an object is a context, like so:
+
+     >>> cx = pymonkey.Runtime().new_context()
+     >>> isinstance(cx, pymonkey.Context)
+     True
+
+.. class:: Runtime()
+
+   Creates a new JavaScript runtime. JS objects created by the
+   runtime may interact with other JS objects of the runtime, but
+   they can't interact with objects from other runtimes.
+
+   .. method:: new_context()
+
+      Creates a new Context object and returns it. Contexts are best
+      conceptualized as threads of execution in a JS runtme; each one
+      has a program counter, a current exception state, and so
+      forth. JS objects may be freely accessed and changed by contexts
+      that are associated with the same JS runtime as the objects.

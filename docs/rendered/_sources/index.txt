@@ -14,6 +14,8 @@ to Python.
 .. toctree::
    :maxdepth: 2
 
+   pymonkey
+
 Rationale and Goals:
 
 * Python and JS are fairly complementary languages. Python provides
@@ -84,12 +86,6 @@ Where ``PATH_TO_OBJDIR`` is the path to your Mozilla/SpiderMonkey build's
 objdir.
 
 Note that at the moment, the build script is only tested on OS X.
-
-Example Code
-============
-
-Right now the only example code that exists is in the test suite at
-``test_pymonkey.py``. Check it out and feel free to add more.
 
 Challenges
 ==========
