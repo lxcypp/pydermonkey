@@ -31,7 +31,7 @@ class PymonkeyTests(unittest.TestCase):
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []
 
-        def func(cx):
+        def func(cx, this, args):
             contexts.append(cx)
             return True
 
@@ -44,14 +44,52 @@ class PymonkeyTests(unittest.TestCase):
         cx.evaluate_script(obj, code, '<string>', 1)
         self.assertEqual(contexts[0], cx)
 
+    def testJsWrappedPythonFuncPassesThisArg(self):
+        thisObjs = []
+
+        def func(cx, this, args):
+            thisObjs.append(this)
+            return True
+
+        code = "func()"
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
+        cx.evaluate_script(obj, code, '<string>', 1)
+        self.assertEqual(thisObjs[0], obj)
+
+    def testJsWrappedPythonFuncPassesFuncArgs(self):
+        funcArgs = []
+
+        def func(cx, this, args):
+            funcArgs.append(args)
+            return True
+
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
+
+        cx.evaluate_script(obj, "func()", '<string>', 1)
+        self.assertEqual(len(funcArgs[0]), 0)
+        self.assertTrue(isinstance(funcArgs[0], tuple))
+
+        cx.evaluate_script(obj, "func(1, 'foo')", '<string>', 1)
+        self.assertEqual(len(funcArgs[1]), 2)
+        self.assertEqual(funcArgs[1][0], 1)
+        self.assertEqual(funcArgs[1][1], u'foo')
+
     def testJsWrappedPythonFunctionReturnsUnicode(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return u"o hai"
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          u"o hai")
 
     def testJsWrappedPythonFunctionThrowsException(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             raise Exception("hello")
         self.assertRaises(pymonkey.error,
                           self._evalJsWrappedPyFunc,
@@ -60,43 +98,43 @@ class PymonkeyTests(unittest.TestCase):
                          "hello")
 
     def testJsWrappedPythonFunctionReturnsNone(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             pass
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          None)
 
     def testJsWrappedPythonFunctionReturnsTrue(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return True
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          True)
 
     def testJsWrappedPythonFunctionReturnsFalse(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return False
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          False)
 
     def testJsWrappedPythonFunctionReturnsSmallInt(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return 5
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          5)
 
     def testJsWrappedPythonFunctionReturnsFloat(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return 5.1
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          5.1)
 
     def testJsWrappedPythonFunctionReturnsNegativeInt(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return -5
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          -5)
 
     def testJsWrappedPythonFunctionReturnsBigInt(self):
-        def hai2u(cx):
+        def hai2u(cx, this, args):
             return 2147483647
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)

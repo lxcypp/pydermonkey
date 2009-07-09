@@ -188,11 +188,12 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
       JS_SetPendingException(context->cx, val);
     } else
       JS_ReportError(context->cx, "Python exception occurred");
+    Py_DECREF(str);
   }
 
-  Py_DECREF(type);
-  Py_DECREF(value);
-  Py_DECREF(traceback);
+  Py_XDECREF(type);
+  Py_XDECREF(value);
+  Py_XDECREF(traceback);
 }
 
 void

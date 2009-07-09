@@ -64,19 +64,48 @@ dispatchJSFunctionToPython(JSContext *cx,
   }
   PyObject *callable = (PyObject *) JSVAL_TO_PRIVATE(jsCallable);
 
-  // TODO: Convert args and 'this' parameter.
-  PyObject *args = PyTuple_New(1);
+  PYM_JSContextObject *context = (PYM_JSContextObject *)
+    JS_GetContextPrivate(cx);
+
+  jsval thisArg = OBJECT_TO_JSVAL(obj);
+  PyObject *pyThisArg = PYM_jsvalToPyObject(context, thisArg);
+  if (pyThisArg == NULL) {
+    PYM_pythonExceptionToJs(context);
+    return JS_FALSE;
+  }
+
+  PyObject *funcArgs = PyTuple_New(argc);
+  if (funcArgs == NULL) {
+    Py_DECREF(pyThisArg);
+    JS_ReportOutOfMemory(cx);
+    return JS_FALSE;
+  }
+
+  for (unsigned int i = 0; i < argc; i++) {
+    PyObject *arg = PYM_jsvalToPyObject(context, argv[i]);
+    if (arg == NULL || PyTuple_SetItem(funcArgs, i, arg)) {
+      if (arg)
+        Py_DECREF(arg);
+      Py_DECREF(funcArgs);
+      Py_DECREF(pyThisArg);
+      PYM_pythonExceptionToJs(context);
+      return JS_FALSE;
+    }
+  }
+
+  PyObject *args = PyTuple_Pack(3,
+                                (PyObject *) context,
+                                pyThisArg,
+                                funcArgs);
+  Py_DECREF(pyThisArg);
+  Py_DECREF(funcArgs);
   if (args == NULL) {
     JS_ReportOutOfMemory(cx);
     return JS_FALSE;
   }
 
-  PYM_JSContextObject *context = (PYM_JSContextObject *)
-    JS_GetContextPrivate(cx);
-  Py_INCREF(context);
-  PyTuple_SET_ITEM(args, 0, (PyObject *) context);
-
   PyObject *result = PyObject_Call(callable, args, NULL);
+  Py_DECREF(args);
   if (result == NULL) {
     PYM_pythonExceptionToJs(context);
     return JS_FALSE;
@@ -89,6 +118,7 @@ dispatchJSFunctionToPython(JSContext *cx,
     PYM_pythonExceptionToJs(context);
     return JS_FALSE;
   }
+
   return JS_TRUE;
 }
 
