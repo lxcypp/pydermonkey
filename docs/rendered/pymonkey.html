@@ -55,6 +55,22 @@ exception </em><tt class="descclassname">pymonkey.</tt><tt class="descname">erro
 module.</dd></dl>
 
 <dl class="class">
+<dt id="pymonkey.Object">
+<em class="property">
+class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Object</tt><a class="headerlink" href="#pymonkey.Object" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the type of JavaScript objects. Such objects can only be
+created via Pymonkey calls like <tt class="xref docutils literal"><span class="pre">Context.new_object()</span></tt> or
+through the execution of JS code, but this type object can be used
+with Python&#8217;s built-in <tt class="xref docutils literal"><span class="pre">isinstance()</span></tt> to verify that an
+object is a JS object, like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
 <dt id="pymonkey.Context">
 <em class="property">
 class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Context</tt><a class="headerlink" href="#pymonkey.Context" title="Permalink to this definition">¶</a></dt>
@@ -73,9 +89,8 @@ to verify that an object is a context, like so:</p>
 <dt id="pymonkey.Runtime">
 <em class="property">
 class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Runtime</tt><a class="headerlink" href="#pymonkey.Runtime" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new JavaScript runtime. JS objects created by the
-runtime may interact with other JS objects of the runtime, but
-they can&#8217;t interact with objects from other runtimes.</p>
+<dd><p>Creates a new JavaScript runtime. JS objects created by the runtime
+may only interact with other JS objects of the same runtime.</p>
 <dl class="method">
 <dt id="pymonkey.Runtime.new_context">
 <tt class="descname">new_context</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Runtime.new_context" title="Permalink to this definition">¶</a></dt>

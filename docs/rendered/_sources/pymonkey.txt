@@ -16,6 +16,18 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    This is the type of any SpiderMonkey-related errors thrown by this
    module.
 
+.. class:: Object
+
+   This is the type of JavaScript objects. Such objects can only be
+   created via Pymonkey calls like :meth:`Context.new_object()` or
+   through the execution of JS code, but this type object can be used
+   with Python's built-in :func:`isinstance()` to verify that an
+   object is a JS object, like so:
+
+     >>> obj = pymonkey.Runtime().new_context().new_object()
+     >>> isinstance(obj, pymonkey.Object)
+     True
+
 .. class:: Context
 
    This is the type of JavaScript context objects. Contexts can only
@@ -29,9 +41,8 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
 .. class:: Runtime()
 
-   Creates a new JavaScript runtime. JS objects created by the
-   runtime may interact with other JS objects of the runtime, but
-   they can't interact with objects from other runtimes.
+   Creates a new JavaScript runtime. JS objects created by the runtime
+   may only interact with other JS objects of the same runtime.
 
    .. method:: new_context()
 
