@@ -31,7 +31,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    Unfortunately, this object currently does not have a "falsy" value,
    e.g.:
 
-     >>> if (pymonkey.undefined):
+     >>> if pymonkey.undefined:
      ...   print 'Huh, this is kind of unintuitive.'
      Huh, this is kind of unintuitive.
 
