@@ -25,17 +25,13 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
      >>> cx = pymonkey.Runtime().new_context()
      >>> cx.evaluate_script(cx.new_object(), '', '<string>', 1)
-     <type 'pymonkey.undefined'>
+     pymonkey.undefined
 
-   Unfortunately, this object currently does not have a "falsy" value,
-   e.g.:
+   This object also has a "falsy" value:
 
-     >>> if pymonkey.undefined:
-     ...   print 'Huh, this is kind of unintuitive.'
-     Huh, this is kind of unintuitive.
-
-   The reason for this is simply that we don't currently know how to
-   make this object have a falsy value, if it's even possible.
+     >>> if not pymonkey.undefined:
+     ...   print "See, it's falsy!"
+     See, it's falsy!
 
 .. class:: Object
 

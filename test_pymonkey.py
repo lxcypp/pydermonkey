@@ -28,6 +28,10 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testUndefinedStrIsUndefined(self):
+        self.assertEqual(str(pymonkey.undefined),
+                         "pymonkey.undefined")
+
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []
 

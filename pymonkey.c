@@ -57,8 +57,11 @@ initpymonkey(void)
   if (PyType_Ready(&PYM_undefinedType) < 0)
     return;
 
+  PYM_undefined = PyObject_New(PYM_undefinedObject, &PYM_undefinedType);
+  if (PYM_undefined == NULL)
+    return;
   Py_INCREF(PYM_undefined);
-  PyModule_AddObject(module, "undefined", PYM_undefined);
+  PyModule_AddObject(module, "undefined", (PyObject *) PYM_undefined);
 
   PYM_error = PyErr_NewException("pymonkey.error", NULL, NULL);
   Py_INCREF(PYM_error);
