@@ -16,6 +16,28 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    This is the type of any SpiderMonkey-related errors thrown by this
    module.
 
+.. data:: undefined
+
+   This is the singleton that represents the JavaScript value
+   ``undefined``, as Python has no equivalent representation
+   (JavaScript's ``null`` is mapped to Python's ``None`` object).
+   For instance:
+
+     >>> cx = pymonkey.Runtime().new_context()
+     >>> obj = cx.new_object()
+     >>> cx.evaluate_script(obj, '', '<string>', 1)
+     <type 'pymonkey.undefined'>
+
+   Unfortunately, this object currently does not have a "falsy" value,
+   e.g.:
+
+     >>> if (pymonkey.undefined):
+     ...   print 'Huh, this is kind of unintuitive.'
+     Huh, this is kind of unintuitive.
+
+   The reason for this is simply that we don't currently know how to
+   make this object have a falsy value, if it's even possible.
+
 .. class:: Object
 
    This is the type of JavaScript objects. Such objects can only be
