@@ -24,8 +24,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    For instance:
 
      >>> cx = pymonkey.Runtime().new_context()
-     >>> obj = cx.new_object()
-     >>> cx.evaluate_script(obj, '', '<string>', 1)
+     >>> cx.evaluate_script(cx.new_object(), '', '<string>', 1)
      <type 'pymonkey.undefined'>
 
    Unfortunately, this object currently does not have a "falsy" value,

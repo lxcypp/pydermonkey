@@ -62,8 +62,7 @@ module.</dd></dl>
 (JavaScript&#8217;s <tt class="docutils literal"><span class="pre">null</span></tt> is mapped to Python&#8217;s <tt class="xref docutils literal"><span class="pre">None</span></tt> object).
 For instance:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="go">&lt;type &#39;pymonkey.undefined&#39;&gt;</span>
 </pre></div>
 </div>
