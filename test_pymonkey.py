@@ -1,5 +1,6 @@
 import sys
 import unittest
+import weakref
 
 import pymonkey
 
@@ -31,6 +32,22 @@ class PymonkeyTests(unittest.TestCase):
     def testUndefinedStrIsUndefined(self):
         self.assertEqual(str(pymonkey.undefined),
                          "pymonkey.undefined")
+
+    def testJsWrappedPythonFuncIsNotGCd(self):
+        # TODO: Make this test pass.
+        def define(cx, obj):
+            def func(cx, this, args):
+                return u'func was called'
+            jsfunc = cx.new_function(func, func.__name__)
+            cx.define_property(obj, func.__name__, jsfunc)
+            return weakref.ref(func)
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        ref = define(cx, obj)
+        self.assertNotEqual(ref(), None)
+        result = cx.evaluate_script(obj, 'func()', '<string>', 1)
+        self.assertEqual(result, u'func was called')
 
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []
