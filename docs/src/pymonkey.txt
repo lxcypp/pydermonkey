@@ -56,6 +56,23 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      >>> isinstance(cx, pymonkey.Context)
      True
 
+   .. method:: get_runtime()
+
+      Returns the :class:`Runtime` that the context belongs to.
+
+   .. method:: new_object()
+
+      Creates a new :class:`Object` instance and returns it.
+
+   .. method:: init_standard_classes(object)
+
+      Defines the standard JavaScript classes on the given
+      :class:`Object`, such as ``Array``, ``eval``, ``undefined``, and
+      so forth. For more information, see the documentation to
+      `JS_InitStandardClasses()
+      <https://developer.mozilla.org/en/SpiderMonkey/JSAPI_Reference/JS_InitStandardClasses>`_,
+      which this method wraps.
+
 .. class:: Runtime()
 
    Creates a new JavaScript runtime. JS objects created by the runtime
