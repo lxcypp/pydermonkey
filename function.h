@@ -45,7 +45,6 @@
 
 typedef struct {
   PYM_JSObject base;
-  PyObject *callable;
 } PYM_JSFunction;
 
 extern PyTypeObject PYM_JSFunctionType;

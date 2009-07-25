@@ -142,8 +142,6 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     if (JS_ObjectIsFunction(context->cx, obj)) {
       PYM_JSFunction *func = PyObject_New(PYM_JSFunction,
                                           &PYM_JSFunctionType);
-      if (func != NULL)
-        func->callable = NULL;
       object = (PYM_JSObject *) func;
     } else
       object = PyObject_New(PYM_JSObject,

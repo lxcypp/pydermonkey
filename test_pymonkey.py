@@ -34,20 +34,27 @@ class PymonkeyTests(unittest.TestCase):
                          "pymonkey.undefined")
 
     def testJsWrappedPythonFuncIsNotGCd(self):
-        # TODO: Make this test pass.
         def define(cx, obj):
             def func(cx, this, args):
                 return u'func was called'
             jsfunc = cx.new_function(func, func.__name__)
             cx.define_property(obj, func.__name__, jsfunc)
             return weakref.ref(func)
-        cx = pymonkey.Runtime().new_context()
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         ref = define(cx, obj)
+        cx.gc()
         self.assertNotEqual(ref(), None)
         result = cx.evaluate_script(obj, 'func()', '<string>', 1)
         self.assertEqual(result, u'func was called')
+
+        # Now ensure that the wrapped function is GC'd when it's
+        # no longer reachable from JS space.
+        cx.define_property(obj, 'func', 0)
+        cx.gc()
+        self.assertEqual(ref(), None)
 
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []

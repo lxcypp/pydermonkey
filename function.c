@@ -37,15 +37,54 @@
 #include "function.h"
 #include "utils.h"
 
+static JSBool
+getHeldFunction(JSContext *cx, JSObject *obj, PyObject **callable)
+{
+  jsval jsCallable;
+  if (!JS_GetReservedSlot(cx, obj, 0, &jsCallable)) {
+    JS_ReportError(cx, "JS_GetReservedSlot() failed.");
+    return JS_FALSE;
+  }
+  *callable = (PyObject *) JSVAL_TO_PRIVATE(jsCallable);
+  return JS_TRUE;
+}
+
+static void
+finalizeFunctionHolder(JSContext *cx, JSObject *obj)
+{
+  PyObject *callable;
+  if (getHeldFunction(cx, obj, &callable))
+    Py_DECREF(callable);
+}
+
+JSClass PYM_JS_FunctionHolderClass = {
+  "PymonkeyFunctionHolder", JSCLASS_HAS_RESERVED_SLOTS(1),
+  JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
+  JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub,
+  finalizeFunctionHolder,
+  JSCLASS_NO_OPTIONAL_MEMBERS
+};
+
+static JSObject *
+newFunctionHolder(JSContext *cx, PyObject *callable)
+{
+  JSObject *obj = JS_NewObject(cx, &PYM_JS_FunctionHolderClass, NULL, NULL);
+  if (obj) {
+    if (JS_SetReservedSlot(cx, obj, 0, PRIVATE_TO_JSVAL(callable)))
+      Py_INCREF(callable);
+    else {
+      obj = NULL;
+      PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
+    }
+  } else {
+    PyErr_SetString(PYM_error, "JS_NewObject() failed");
+  }
+  return obj;
+}
+
 static void
 PYM_JSFunctionDealloc(PYM_JSFunction *self)
 {
-  // TODO: What if there's still a reference to the callable in
-  // JS-land?
-  if (self->callable) {
-    Py_DECREF(self->callable);
-    self->callable = NULL;
-  }
   PYM_JSObjectType.tp_dealloc((PyObject *) self);
 }
 
@@ -57,12 +96,15 @@ dispatchJSFunctionToPython(JSContext *cx,
                            jsval *rval)
 {
   jsval callee = JS_ARGV_CALLEE(argv);
-  jsval jsCallable;
-  if (!JS_GetReservedSlot(cx, JSVAL_TO_OBJECT(callee), 0, &jsCallable)) {
+  jsval functionHolder;
+  if (!JS_GetReservedSlot(cx, JSVAL_TO_OBJECT(callee), 0, &functionHolder)) {
     JS_ReportError(cx, "JS_GetReservedSlot() failed.");
     return JS_FALSE;
   }
-  PyObject *callable = (PyObject *) JSVAL_TO_PRIVATE(jsCallable);
+
+  PyObject *callable;
+  if (!getHeldFunction(cx, JSVAL_TO_OBJECT(functionHolder), &callable))
+    return JS_FALSE;
 
   PYM_JSContextObject *context = (PYM_JSContextObject *)
     JS_GetContextPrivate(cx);
@@ -193,26 +235,29 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     return NULL;
   }
 
-  if (!JS_SetReservedSlot(context->cx, funcObj, 0,
-                          PRIVATE_TO_JSVAL(callable))) {
-    PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
-    return NULL;
-  }
-
   PYM_JSFunction *object = PyObject_New(PYM_JSFunction,
                                         &PYM_JSFunctionType);
   if (object == NULL)
     return NULL;
 
-  object->callable = NULL;
   if (PYM_newJSObject(context, funcObj,
                       (PYM_JSObject *) object) == NULL)
     // Note that our object's reference count will have already
     // been decremented by PYM_newJSObject().
     return NULL;
 
-  object->callable = callable;
-  Py_INCREF(callable);
+  JSObject *functionHolder = newFunctionHolder(context->cx, callable);
+  if (functionHolder == NULL) {
+    Py_DECREF((PyObject *) object);
+    return NULL;
+  }
+
+  if (!JS_SetReservedSlot(context->cx, funcObj, 0,
+                          OBJECT_TO_JSVAL(functionHolder))) {
+    Py_DECREF((PyObject *) object);
+    PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
+    return NULL;
+  }
 
   return object;
 }
