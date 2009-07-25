@@ -129,6 +129,13 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_gc(PYM_JSContextObject *self, PyObject *args)
+{
+  JS_GC(self->cx);
+  Py_RETURN_NONE;
+}
+
+static PyObject *
 PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_JSObject *object;
@@ -276,6 +283,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Defines a property on an object."},
   {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
    "Gets the given property for the given JavaScript object."},
+  {"gc", (PyCFunction) PYM_gc, METH_VARARGS,
+   "Performs garbage collection on the context's runtime."},
   {NULL, NULL, 0, NULL}
 };
 
