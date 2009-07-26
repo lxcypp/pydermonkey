@@ -52,6 +52,7 @@ PYM_getHeldFunction(JSContext *cx, JSObject *obj, PyObject **callable)
 static void
 PYM_finalizeFunctionHolder(JSContext *cx, JSObject *obj)
 {
+  PYM_PyAutoEnsureGIL gil;
   PyObject *callable;
   if (PYM_getHeldFunction(cx, obj, &callable))
     Py_DECREF(callable);
@@ -95,6 +96,7 @@ PYM_dispatchJSFunctionToPython(JSContext *cx,
                                jsval *argv,
                                jsval *rval)
 {
+  PYM_PyAutoEnsureGIL gil;
   jsval callee = JS_ARGV_CALLEE(argv);
   jsval functionHolder;
   if (!JS_GetReservedSlot(cx, JSVAL_TO_OBJECT(callee), 0, &functionHolder)) {

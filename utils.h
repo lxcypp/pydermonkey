@@ -43,6 +43,20 @@
 #include <jsdhash.h>
 #include <Python/Python.h>
 
+class PYM_PyAutoEnsureGIL {
+public:
+  PYM_PyAutoEnsureGIL() {
+    state = PyGILState_Ensure();
+  }
+
+  ~PYM_PyAutoEnsureGIL() {
+    PyGILState_Release(state);
+  }
+
+protected:
+  PyGILState_STATE state;
+};
+
 typedef struct {
   JSDHashEntryStub base;
   void *value;

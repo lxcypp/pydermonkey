@@ -1,6 +1,8 @@
 import sys
 import unittest
 import weakref
+import time
+import threading
 
 import pymonkey
 
@@ -38,12 +40,12 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
 
-        # TODO: This isn't a very good test; we need to actually
-        # set up a signal or launch a separate thread to call
-        # this method as though it were a watchdog to limit the
-        # amount of time the JS can run. However, Pymonkey doesn't
-        # yet handle the GIL properly so this isn't possible.
-        cx.trigger_operation_callback()
+        def watchdog():
+            time.sleep(0.1)
+            cx.trigger_operation_callback()
+
+        thread = threading.Thread(target = watchdog)
+        thread.start()
 
         self.assertRaises(
             pymonkey.error,

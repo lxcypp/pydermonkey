@@ -42,6 +42,7 @@
 static JSBool
 PYM_operationCallback(JSContext *cx)
 {
+  PYM_PyAutoEnsureGIL gil;
   PYM_JSContextObject *context = (PYM_JSContextObject *)
     JS_GetContextPrivate(cx);
 
@@ -66,6 +67,8 @@ PYM_operationCallback(JSContext *cx)
 static void
 PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
 {
+  PYM_PyAutoEnsureGIL gil;
+
   // Convert JS warnings into Python warnings.
   if (JSREPORT_IS_WARNING(report->flags)) {
     if (report->filename)
@@ -138,9 +141,14 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   }
 
   jsval val;
-  if (!JS_GetUCProperty(self->cx, object->obj,
-                        JS_GetStringChars(jsString),
-                        JS_GetStringLength(jsString), &val)) {
+  JSBool result;
+  Py_BEGIN_ALLOW_THREADS;
+  result = JS_GetUCProperty(self->cx, object->obj,
+                            JS_GetStringChars(jsString),
+                            JS_GetStringLength(jsString), &val);
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
     // TODO: Get the actual JS exception. Any exception that exists
     // here will probably still be pending on the JS context.
     PyErr_SetString(PYM_error, "Getting property failed.");
@@ -195,8 +203,13 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
   JS_BeginRequest(self->cx);
 
   jsval rval;
-  if (!JS_EvaluateScript(self->cx, object->obj, source, sourceLen,
-                         filename, lineNo, &rval)) {
+  JSBool result;
+  Py_BEGIN_ALLOW_THREADS;
+  result = JS_EvaluateScript(self->cx, object->obj, source, sourceLen,
+                             filename, lineNo, &rval);
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
     PYM_jsExceptionToPython(self);
     JS_EndRequest(self->cx);
     return NULL;
@@ -266,8 +279,14 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
   // TODO: This assumes that a JSFunction * is actually a subclass of
   // a JSObject *, which may or may not be regarded as an implementation
   // detail.
-  if (!JS_CallFunction(self->cx, obj->obj, (JSFunction *) fun->base.obj,
-                       argc, argv, &rval)) {
+  JSBool result;
+  Py_BEGIN_ALLOW_THREADS;
+  result = JS_CallFunction(self->cx, obj->obj,
+                           (JSFunction *) fun->base.obj,
+                           argc, argv, &rval);
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
     PYM_jsExceptionToPython(self);
     return NULL;
   }
