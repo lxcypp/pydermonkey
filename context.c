@@ -39,6 +39,8 @@
 #include "function.h"
 #include "utils.h"
 
+// This is the default JSOperationCallback for pymonkey-owned JS contexts,
+// when they've defined one in Python.
 static JSBool
 PYM_operationCallback(JSContext *cx)
 {
