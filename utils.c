@@ -205,7 +205,12 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
 
   jsval val;
   if (JS_GetPendingException(context->cx, &val)) {
-    JSString *str = JS_ValueToString(context->cx, val);
+    JSString *str = NULL;
+
+    Py_BEGIN_ALLOW_THREADS;
+    str = JS_ValueToString(context->cx, val);
+    Py_END_ALLOW_THREADS;
+
     if (str != NULL) {
       // TODO: Wrap the original JS exception so that the client can
       // examine it.
