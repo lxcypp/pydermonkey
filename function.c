@@ -38,7 +38,7 @@
 #include "utils.h"
 
 static JSBool
-getHeldFunction(JSContext *cx, JSObject *obj, PyObject **callable)
+PYM_getHeldFunction(JSContext *cx, JSObject *obj, PyObject **callable)
 {
   jsval jsCallable;
   if (!JS_GetReservedSlot(cx, obj, 0, &jsCallable)) {
@@ -50,23 +50,23 @@ getHeldFunction(JSContext *cx, JSObject *obj, PyObject **callable)
 }
 
 static void
-finalizeFunctionHolder(JSContext *cx, JSObject *obj)
+PYM_finalizeFunctionHolder(JSContext *cx, JSObject *obj)
 {
   PyObject *callable;
-  if (getHeldFunction(cx, obj, &callable))
+  if (PYM_getHeldFunction(cx, obj, &callable))
     Py_DECREF(callable);
 }
 
-JSClass PYM_JS_FunctionHolderClass = {
+static JSClass PYM_JS_FunctionHolderClass = {
   "PymonkeyFunctionHolder", JSCLASS_HAS_RESERVED_SLOTS(1),
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
   JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub,
-  finalizeFunctionHolder,
+  PYM_finalizeFunctionHolder,
   JSCLASS_NO_OPTIONAL_MEMBERS
 };
 
 static JSObject *
-newFunctionHolder(JSContext *cx, PyObject *callable)
+PYM_newFunctionHolder(JSContext *cx, PyObject *callable)
 {
   JSObject *obj = JS_NewObject(cx, &PYM_JS_FunctionHolderClass, NULL, NULL);
   if (obj) {
@@ -89,11 +89,11 @@ PYM_JSFunctionDealloc(PYM_JSFunction *self)
 }
 
 static JSBool
-dispatchJSFunctionToPython(JSContext *cx,
-                           JSObject *obj,
-                           uintN argc,
-                           jsval *argv,
-                           jsval *rval)
+PYM_dispatchJSFunctionToPython(JSContext *cx,
+                               JSObject *obj,
+                               uintN argc,
+                               jsval *argv,
+                               jsval *rval)
 {
   jsval callee = JS_ARGV_CALLEE(argv);
   jsval functionHolder;
@@ -103,7 +103,7 @@ dispatchJSFunctionToPython(JSContext *cx,
   }
 
   PyObject *callable;
-  if (!getHeldFunction(cx, JSVAL_TO_OBJECT(functionHolder), &callable))
+  if (!PYM_getHeldFunction(cx, JSVAL_TO_OBJECT(functionHolder), &callable))
     return JS_FALSE;
 
   PYM_JSContextObject *context = (PYM_JSContextObject *)
@@ -220,7 +220,7 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
   }
 
   JSFunction *func = JS_NewFunction(context->cx,
-                                    dispatchJSFunctionToPython, 0,
+                                    PYM_dispatchJSFunctionToPython, 0,
                                     0, NULL, name);
 
   if (func == NULL) {
@@ -246,7 +246,7 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     // been decremented by PYM_newJSObject().
     return NULL;
 
-  JSObject *functionHolder = newFunctionHolder(context->cx, callable);
+  JSObject *functionHolder = PYM_newFunctionHolder(context->cx, callable);
   if (functionHolder == NULL) {
     Py_DECREF((PyObject *) object);
     return NULL;
