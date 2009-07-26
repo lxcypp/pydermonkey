@@ -46,6 +46,7 @@ typedef struct {
   PyObject_HEAD
   PYM_JSRuntimeObject *runtime;
   JSContext *cx;
+  PyObject *opCallback;
 } PYM_JSContextObject;
 
 extern PyTypeObject PYM_JSContextType;

@@ -29,6 +29,30 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testOperationCallbackIsCalled(self):
+        def opcb(cx):
+            raise Exception("stop eet!")
+
+        cx = pymonkey.Runtime().new_context()
+        cx.set_operation_callback(opcb)
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+
+        # TODO: This isn't a very good test; we need to actually
+        # set up a signal or launch a separate thread to call
+        # this method as though it were a watchdog to limit the
+        # amount of time the JS can run. However, Pymonkey doesn't
+        # yet handle the GIL properly so this isn't possible.
+        cx.trigger_operation_callback()
+
+        self.assertRaises(
+            pymonkey.error,
+            cx.evaluate_script,
+            obj, 'while (1) {}', '<string>', 1
+            )
+        self.assertEqual(self.last_exception.message,
+                         "stop eet!")
+
     def testUndefinedStrIsUndefined(self):
         self.assertEqual(str(pymonkey.undefined),
                          "pymonkey.undefined")

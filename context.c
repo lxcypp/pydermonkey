@@ -39,6 +39,29 @@
 #include "function.h"
 #include "utils.h"
 
+static JSBool
+PYM_operationCallback(JSContext *cx)
+{
+  PYM_JSContextObject *context = (PYM_JSContextObject *)
+    JS_GetContextPrivate(cx);
+
+  PyObject *callable = context->opCallback;
+  PyObject *args = PyTuple_Pack(1, (PyObject *) context);
+  if (args == NULL) {
+    JS_ReportOutOfMemory(cx);
+    return JS_FALSE;
+  }
+  PyObject *result = PyObject_Call(callable, args, NULL);
+  Py_DECREF(args);
+  if (result == NULL) {
+    PYM_pythonExceptionToJs(context);
+    return JS_FALSE;
+  }
+
+  Py_DECREF(result);
+  return JS_TRUE;
+}
+
 // This is the default JSErrorReporter for pymonkey-owned JS contexts.
 static void
 PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
@@ -59,6 +82,11 @@ PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
 static void
 PYM_JSContextDealloc(PYM_JSContextObject *self)
 {
+  if (self->opCallback) {
+    Py_DECREF(self->opCallback);
+    self->opCallback = NULL;
+  }
+
   if (self->cx) {
     JS_DestroyContext(self->cx);
     self->cx = NULL;
@@ -259,6 +287,36 @@ PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
   return (PyObject *) PYM_newJSFunctionFromCallable(self, callable, name);
 }
 
+static PyObject *
+PYM_setOperationCallback(PYM_JSContextObject *self, PyObject *args)
+{
+  PyObject *callable;
+
+  if (!PyArg_ParseTuple(args, "O", &callable))
+    return NULL;
+
+  if (!PyCallable_Check(callable)) {
+    PyErr_SetString(PyExc_TypeError, "Callable must be callable");
+    return NULL;
+  }
+
+  JS_SetOperationCallback(self->cx, PYM_operationCallback);
+
+  Py_INCREF(callable);
+  if (self->opCallback)
+    Py_DECREF(self->opCallback);
+  self->opCallback = callable;
+
+  Py_RETURN_NONE;
+}
+
+static PyObject *
+PYM_triggerOperationCallback(PYM_JSContextObject *self, PyObject *args)
+{
+  JS_TriggerOperationCallback(self->cx);
+  Py_RETURN_NONE;
+}
+
 static PyMethodDef PYM_JSContextMethods[] = {
   {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
    "Get the JavaScript runtime associated with this context."},
@@ -285,6 +343,12 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Gets the given property for the given JavaScript object."},
   {"gc", (PyCFunction) PYM_gc, METH_VARARGS,
    "Performs garbage collection on the context's runtime."},
+  {"set_operation_callback", (PyCFunction) PYM_setOperationCallback,
+   METH_VARARGS,
+   "Sets the operation callback for the context."},
+  {"trigger_operation_callback", (PyCFunction) PYM_triggerOperationCallback,
+   METH_VARARGS,
+   "Triggers the operation callback for the context."},
   {NULL, NULL, 0, NULL}
 };
 
@@ -340,6 +404,7 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   if (context == NULL)
     return NULL;
 
+  context->opCallback = NULL;
   context->runtime = runtime;
   Py_INCREF(runtime);
 
