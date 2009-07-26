@@ -58,6 +58,10 @@ PYM_finalizeFunctionHolder(JSContext *cx, JSObject *obj)
     Py_DECREF(callable);
 }
 
+// This "Python function holder" JSClass just exists so that it can hold
+// a reference to a Python function for as long as the Python function is
+// callable from JS-land. As soon as it's garbage collected by the JS
+// interpreter, it releases its reference on the Python function.
 static JSClass PYM_JS_FunctionHolderClass = {
   "PymonkeyFunctionHolder", JSCLASS_HAS_RESERVED_SLOTS(1),
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
