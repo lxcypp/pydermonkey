@@ -51,7 +51,7 @@ PYM_JSObjectDealloc(PYM_JSObject *self)
 {
   if (self->obj) {
     JS_DHashTableOperate(&self->runtime->objects,
-                         (void *) self->uniqueId,
+                         (void *) self->obj,
                          JS_DHASH_REMOVE);
 
     // JS_RemoveRoot() always returns JS_TRUE, so don't
@@ -116,16 +116,10 @@ PyTypeObject PYM_JSObjectType = {
 PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
                               JSObject *obj,
                               PYM_JSObject *subclass) {
-  jsid uniqueId;
-  if (!JS_GetObjectId(context->cx, obj, &uniqueId)) {
-    PyErr_SetString(PYM_error, "JS_GetObjectId() failed");
-    return NULL;
-  }
-
   PYM_JSRuntimeObject *runtime = context->runtime;
   PYM_HashEntry *cached = (PYM_HashEntry *) JS_DHashTableOperate(
     &runtime->objects,
-    (void *) uniqueId,
+    (void *) obj,
     JS_DHASH_LOOKUP
     );
 
@@ -153,10 +147,9 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
 
   object->runtime = NULL;
   object->obj = NULL;
-  object->uniqueId = NULL;
 
   cached = (PYM_HashEntry *) JS_DHashTableOperate(&runtime->objects,
-                                                  (void *) uniqueId,
+                                                  (void *) obj,
                                                   JS_DHASH_ADD);
   if (cached == NULL) {
     Py_DECREF(object);
@@ -164,14 +157,13 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     return NULL;
   }
 
-  cached->base.key = (void *) uniqueId;
+  cached->base.key = (void *) obj;
   cached->value = object;
 
   object->runtime = context->runtime;
   Py_INCREF(object->runtime);
 
   object->obj = obj;
-  object->uniqueId = uniqueId;
 
   JS_AddNamedRootRT(object->runtime->rt, &object->obj,
                     "Pymonkey-Generated Object");
