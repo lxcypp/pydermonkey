@@ -44,6 +44,7 @@
 typedef struct {
   PyObject_HEAD
   JSRuntime *rt;
+  JSContext *cx;
   JSDHashTable objects;
 } PYM_JSRuntimeObject;
 

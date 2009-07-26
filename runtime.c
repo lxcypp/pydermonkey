@@ -47,6 +47,7 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
   self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
   if (self != NULL) {
     self->rt = NULL;
+    self->cx = NULL;
     self->objects.ops = NULL;
 
     if (!JS_DHashTableInit(&self->objects,
@@ -65,6 +66,13 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
         PyErr_SetString(PYM_error, "JS_NewRuntime() failed");
         type->tp_dealloc((PyObject *) self);
         self = NULL;
+      } else {
+        self->cx = JS_NewContext(self->rt, 8192);
+        if (!self->cx) {
+          PyErr_SetString(PYM_error, "JS_NewContext() failed");
+          type->tp_dealloc((PyObject *) self);
+          self = NULL;
+        }
       }
     }
   }
@@ -78,6 +86,13 @@ PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
   if (self->objects.ops) {
     JS_DHashTableFinish(&self->objects);
     self->objects.ops = NULL;
+  }
+
+  if (self->cx) {
+    // Note that this will also force GC of any remaining objects
+    // in the runtime.
+    JS_DestroyContext(self->cx);
+    self->cx = NULL;
   }
 
   if (self->rt) {

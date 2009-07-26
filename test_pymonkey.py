@@ -56,6 +56,23 @@ class PymonkeyTests(unittest.TestCase):
         cx.gc()
         self.assertEqual(ref(), None)
 
+    def testJsWrappedPythonFuncIsGCdAtRuntimeDestruction(self):
+        def define(cx, obj):
+            def func(cx, this, args):
+                return u'func was called'
+            jsfunc = cx.new_function(func, func.__name__)
+            cx.define_property(obj, func.__name__, jsfunc)
+            return weakref.ref(func)
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        ref = define(cx, obj)
+        del rt
+        del cx
+        del obj
+        self.assertEqual(ref(), None)
+
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []
 
