@@ -42,6 +42,15 @@
 #include <jsapi.h>
 #include <Python/Python.h>
 
+extern JSObject *
+PYM_JS_newObject(JSContext *cx, PyObject *pyObject);
+
+extern JSBool
+PYM_JS_setPrivatePyObject(JSContext *cx, JSObject *obj, PyObject *pyObject);
+
+extern JSBool
+PYM_JS_getPrivatePyObject(JSContext *cx, JSObject *obj, PyObject **pyObject);
+
 extern JSClass PYM_JS_ObjectClass;
 
 typedef struct {

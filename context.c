@@ -113,9 +113,9 @@ PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
-  JSObject *obj = JS_NewObject(self->cx, &PYM_JS_ObjectClass, NULL, NULL);
+  JSObject *obj = PYM_JS_newObject(self->cx, NULL);
   if (obj == NULL) {
-    PyErr_SetString(PYM_error, "JS_NewObject() failed");
+    PyErr_SetString(PYM_error, "PYM_JS_newObject() failed");
     return NULL;
   }
 

@@ -39,10 +39,72 @@
 #include "runtime.h"
 #include "utils.h"
 
+JSObject *
+PYM_JS_newObject(JSContext *cx, PyObject *pyObject)
+{
+  JSObject *obj = JS_NewObject(cx, &PYM_JS_ObjectClass, NULL, NULL);
+  if (obj) {
+    if (!JS_SetReservedSlot(cx, obj, 0, PRIVATE_TO_JSVAL(pyObject)))
+      return NULL;
+    Py_XINCREF(pyObject);
+  }
+  return obj;
+}
+
+JSBool
+PYM_JS_setPrivatePyObject(JSContext *cx, JSObject *obj, PyObject *pyObject)
+{
+  JSClass *klass = JS_GET_CLASS(cx, obj);
+  if (klass != &PYM_JS_ObjectClass) {
+    JS_ReportError(cx, "Object is not an instance of PymonkeyObject");
+    return JS_FALSE;
+  }
+
+  PyObject *old;
+  if (!PYM_JS_getPrivatePyObject(cx, obj, &old))
+    return JS_FALSE;
+  if (!JS_SetReservedSlot(cx, obj, 0, PRIVATE_TO_JSVAL(pyObject)))
+    return JS_FALSE;
+  Py_INCREF(pyObject);
+  Py_XDECREF(old);
+  return JS_TRUE;
+}
+
+JSBool
+PYM_JS_getPrivatePyObject(JSContext *cx, JSObject *obj, PyObject **pyObject)
+{
+  JSClass *klass = JS_GET_CLASS(cx, obj);
+  if (klass != &PYM_JS_ObjectClass) {
+    JS_ReportError(cx, "Object is not an instance of PymonkeyObject");
+    return JS_FALSE;
+  }
+
+  jsval val;
+  if (!JS_GetReservedSlot(cx, obj, 0, &val))
+    return JS_FALSE;
+  *pyObject = (PyObject *) JSVAL_TO_PRIVATE(val);
+  return JS_TRUE;
+}
+
+static void
+PYM_JS_finalizeObject(JSContext *cx, JSObject *obj)
+{
+  PYM_PyAutoEnsureGIL gil;
+  PyObject *pyObject;
+  // TODO: What if this fails?
+  if (PYM_JS_getPrivatePyObject(cx, obj, &pyObject))
+    Py_XDECREF(pyObject);
+}
+
+// This one-size-fits-all JSClass is used for any JS objects created
+// in Python.  It can hold a reference to a Python object for as long as
+// its parent JS object is accessible from JS-land. As soon as it's
+// garbage collected by the JS interpreter, it releases its reference on
+// the Python object.
 JSClass PYM_JS_ObjectClass = {
-  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS,
+  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS | JSCLASS_HAS_RESERVED_SLOTS(1),
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
-  JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub,
+  JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, PYM_JS_finalizeObject,
   JSCLASS_NO_OPTIONAL_MEMBERS
 };
 
