@@ -111,9 +111,42 @@ PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *object;
+
+  if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
+    return NULL;
+
+  JSClass *klass = JS_GET_CLASS(cx, object->obj);
+  if (klass != &PYM_JS_ObjectClass)
+    Py_RETURN_NONE;
+
+  PyObject *pyObject;
+
+  if (!PYM_JS_getPrivatePyObject(self->cx, object->obj, &pyObject)) {
+    // TODO: Get the actual JS exception. Any exception that exists
+    // here will probably still be pending on the JS context.
+    PyErr_SetString(PYM_error, "Getting private failed.");
+    return NULL;
+  }
+
+  if (pyObject == NULL)
+    pyObject = Py_None;
+
+  Py_INCREF(pyObject);
+  return pyObject;
+}
+
+static PyObject *
 PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
-  JSObject *obj = PYM_JS_newObject(self->cx, NULL);
+  PyObject *privateObj = NULL;
+
+  if (!PyArg_ParseTuple(args, "|O", &privateObj))
+    return NULL;
+
+  JSObject *obj = PYM_JS_newObject(self->cx, privateObj);
   if (obj == NULL) {
     PyErr_SetString(PYM_error, "PYM_JS_newObject() failed");
     return NULL;
@@ -370,6 +403,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"trigger_operation_callback", (PyCFunction) PYM_triggerOperationCallback,
    METH_VARARGS,
    "Triggers the operation callback for the context."},
+  {"get_object_private", (PyCFunction) PYM_getObjectPrivate, METH_VARARGS,
+   "Returns the private Python object stored in the JavaScript object."},
   {NULL, NULL, 0, NULL}
 };
 

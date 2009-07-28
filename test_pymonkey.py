@@ -31,6 +31,18 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testGetObjectPrivateWorks(self):
+        class Foo(object):
+            pass
+        pyobj = Foo()
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object(pyobj)
+        pyobj = weakref.ref(pyobj)
+        self.assertEqual(pyobj(), cx.get_object_private(obj))
+        del obj
+        del cx
+        self.assertEqual(pyobj(), None)
+
     def testOperationCallbackIsCalled(self):
         def opcb(cx):
             raise Exception("stop eet!")
