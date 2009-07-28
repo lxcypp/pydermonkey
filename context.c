@@ -235,8 +235,6 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
                         &source, &sourceLen, &filename, &lineNo))
     return NULL;
 
-  JS_BeginRequest(self->cx);
-
   jsval rval;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
@@ -246,14 +244,10 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 
   if (!result) {
     PYM_jsExceptionToPython(self);
-    JS_EndRequest(self->cx);
     return NULL;
   }
 
   PyObject *pyRval = PYM_jsvalToPyObject(self, rval);
-
-  JS_EndRequest(self->cx);
-
   return pyRval;
 }
 
