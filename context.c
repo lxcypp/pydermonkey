@@ -125,9 +125,7 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   PyObject *pyObject;
 
   if (!PYM_JS_getPrivatePyObject(self->cx, object->obj, &pyObject)) {
-    // TODO: Get the actual JS exception. Any exception that exists
-    // here will probably still be pending on the JS context.
-    PyErr_SetString(PYM_error, "Getting private failed.");
+    PYM_jsExceptionToPython(self);
     return NULL;
   }
 
@@ -184,9 +182,7 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   Py_END_ALLOW_THREADS;
 
   if (!result) {
-    // TODO: Get the actual JS exception. Any exception that exists
-    // here will probably still be pending on the JS context.
-    PyErr_SetString(PYM_error, "Getting property failed.");
+    PYM_jsExceptionToPython(self);
     return NULL;
   }
 

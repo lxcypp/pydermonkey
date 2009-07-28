@@ -254,6 +254,18 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(cx.get_property(obj, u"foo") is
                         cx.get_property(obj, u"foo"))
 
+    def testObjectGetattrThrowsException(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        result = cx.evaluate_script(obj, '({get foo() { throw "blah"; }})',
+                                    '<string>', 1)
+        self.assertRaises(pymonkey.error,
+                          cx.get_property,
+                          result,
+                          u"foo")
+        self.assertEqual(self.last_exception.message, u"blah")
+
     def testObjectGetattrWorks(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
