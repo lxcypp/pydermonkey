@@ -311,9 +311,13 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(TypeError, pymonkey.undefined)
 
     def testEvaluateThrowsException(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
         self.assertRaises(pymonkey.error,
-                          self._evaljs, 'hai2u()')
-        self.assertEqual(self.last_exception.message,
+                          cx.evaluate_script,
+                          obj, 'hai2u()', '<string>', 1)
+        self.assertEqual(self._tostring(cx,
+                                        self.last_exception.message),
                          'ReferenceError: hai2u is not defined')
 
     def testEvaluateReturnsUndefined(self):
@@ -363,6 +367,11 @@ class PymonkeyTests(unittest.TestCase):
             obj, obj, (1, self)
             )
 
+    def _tostring(self, cx, obj):
+        return cx.call_function(obj,
+                                cx.get_property(obj, u"toString"),
+                                ())
+
     def testCallFunctionRaisesErrorFromJS(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
@@ -374,7 +383,8 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(pymonkey.error,
                           cx.call_function,
                           obj, obj, (1,))
-        self.assertEqual(self.last_exception.message,
+        self.assertEqual(self._tostring(cx,
+                                        self.last_exception.message),
                          'ReferenceError: blarg is not defined')
 
     def testCallFunctionWorks(self):

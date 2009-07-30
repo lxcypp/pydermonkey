@@ -205,19 +205,25 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
 
   jsval val;
   if (JS_GetPendingException(context->cx, &val)) {
-    JSString *str = NULL;
+    PyObject *obj = PYM_jsvalToPyObject(context, val);
+    if (obj) {
+      PyErr_SetObject(PYM_error, obj);
+      Py_DECREF(obj);
+    } else {
+      PyErr_Clear();
 
-    Py_BEGIN_ALLOW_THREADS;
-    str = JS_ValueToString(context->cx, val);
-    Py_END_ALLOW_THREADS;
+      JSString *str = NULL;
 
-    if (str != NULL) {
-      // TODO: Wrap the original JS exception so that the client can
-      // examine it.
-      const char *chars = JS_GetStringBytes(str);
-      PyErr_SetString(PYM_error, chars);
-    } else
-      PyErr_SetString(PYM_error, "JS exception occurred");
+      Py_BEGIN_ALLOW_THREADS;
+      str = JS_ValueToString(context->cx, val);
+      Py_END_ALLOW_THREADS;
+
+      if (str != NULL) {
+        const char *chars = JS_GetStringBytes(str);
+        PyErr_SetString(PYM_error, chars);
+      } else
+        PyErr_SetString(PYM_error, "JS exception occurred");
+    }
   } else
     PyErr_SetString(PYM_error, "JS_GetPendingException() failed");
 }
