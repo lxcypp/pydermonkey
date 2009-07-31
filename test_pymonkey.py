@@ -64,8 +64,6 @@ class PymonkeyTests(unittest.TestCase):
             cx.evaluate_script,
             obj, 'while (1) {}', '<string>', 1
             )
-        self.assertEqual(self.last_exception.message,
-                         "stop eet!")
 
     def testUndefinedStrIsUndefined(self):
         self.assertEqual(str(pymonkey.undefined),
@@ -171,14 +169,24 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          u"o hai")
 
-    def testJsWrappedPythonFunctionThrowsException(self):
+    def testJsWrappedPythonFunctionThrowsJsException(self):
         def hai2u(cx, this, args):
+            raise pymonkey.error(u"blarg")
+        self.assertRaises(pymonkey.error,
+                          self._evalJsWrappedPyFunc,
+                          hai2u, 'hai2u()')
+        self.assertEqual(self.last_exception.message, u"blarg")
+
+    def testJsWrappedPythonFunctionThrowsPyException(self):
+        thecx = []
+        def hai2u(cx, this, args):
+            thecx.append(cx)
             raise Exception("hello")
         self.assertRaises(pymonkey.error,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
-        self.assertEqual(self.last_exception.message,
-                         "hello")
+        exc = thecx[0].get_object_private(self.last_exception.message)
+        self.assertEqual(exc.message, "hello")
 
     def testJsWrappedPythonFunctionReturnsNone(self):
         def hai2u(cx, this, args):

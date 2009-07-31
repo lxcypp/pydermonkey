@@ -177,18 +177,27 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
   PyObject *traceback;
 
   PyErr_Fetch(&type, &value, &traceback);
-  PyObject *str = PyObject_Unicode(value);
-  if (str == NULL)
-    JS_ReportError(context->cx, "Python exception occurred");
-  else {
+
+  if (type == PYM_error && value &&
+      PyObject_HasAttrString(value, "message")) {
     jsval val;
-    if (PYM_pyObjectToJsval(context, str, &val) == 0) {
-      // TODO: Wrap Python traceback info in JS exception so the client
-      // can examine it.
+    PyObject *message = PyObject_GetAttrString(value, "message");
+    if (message && PYM_pyObjectToJsval(context, message, &val) == 0) {
       JS_SetPendingException(context->cx, val);
     } else
+      JS_ReportError(context->cx,
+                     "Python exception occurred, but exception "
+                     "couldn't be converted");
+    Py_XDECREF(message);
+  } else {
+    if (value) {
+      JSObject *exception = PYM_JS_newObject(context->cx, value);
+      if (exception)
+        JS_SetPendingException(context->cx, OBJECT_TO_JSVAL(exception));
+      else
+        JS_ReportOutOfMemory(context->cx);
+    } else
       JS_ReportError(context->cx, "Python exception occurred");
-    Py_DECREF(str);
   }
 
   Py_XDECREF(type);
