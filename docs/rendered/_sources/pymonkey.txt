@@ -45,6 +45,10 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      >>> isinstance(obj, pymonkey.Object)
      True
 
+   .. method:: get_runtime()
+
+      Returns the :class:`Runtime` that the object belongs to.
+
 .. class:: Context
 
    This is the type of JavaScript context objects. Contexts can only
