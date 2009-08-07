@@ -324,7 +324,12 @@ class PymonkeyTests(unittest.TestCase):
     def testFunctionTypeCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.Function)
 
-    def testGetRuntimeWorks(self):
+    def testObjectGetRuntimeWorks(self):
+        rt = pymonkey.Runtime()
+        obj = rt.new_context().new_object()
+        self.assertEqual(obj.get_runtime(), rt)
+
+    def testContextGetRuntimeWorks(self):
         rt = pymonkey.Runtime()
         cx = rt.new_context()
         self.assertEqual(cx.get_runtime(), rt)

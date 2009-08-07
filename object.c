@@ -130,6 +130,19 @@ PYM_JSObjectDealloc(PYM_JSObject *self)
   self->ob_type->tp_free((PyObject *) self);
 }
 
+static PyObject *
+PYM_getRuntime(PYM_JSObject *self, PyObject *args)
+{
+  Py_INCREF(self->runtime);
+  return (PyObject *) self->runtime;
+}
+
+static PyMethodDef PYM_JSObjectMethods[] = {
+  {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
+   "Get the JavaScript runtime associated with this object."},
+  {NULL, NULL, 0, NULL}
+};
+
 PyTypeObject PYM_JSObjectType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
@@ -162,7 +175,7 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /* tp_weaklistoffset */
   0,		               /* tp_iter */
   0,		               /* tp_iternext */
-  0,                           /* tp_methods */
+  PYM_JSObjectMethods,         /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */
   0,                           /* tp_base */
