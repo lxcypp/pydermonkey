@@ -274,6 +274,20 @@ class PymonkeyTests(unittest.TestCase):
                           u"foo")
         self.assertEqual(self.last_exception.message, u"blah")
 
+    def testInfiniteRecursionRaisesError(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        self.assertRaises(
+            pymonkey.error,
+            cx.evaluate_script,
+            obj, '(function foo() { foo(); })();', '<string>', 1
+            )
+        self.assertEqual(
+            self._tostring(cx, self.last_exception.message),
+            "InternalError: too much recursion"
+            )
+
     def testObjectGetattrWorks(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
