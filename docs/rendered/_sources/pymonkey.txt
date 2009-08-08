@@ -64,9 +64,21 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Returns the :class:`Runtime` that the context belongs to.
 
-   .. method:: new_object()
+   .. method:: new_object([private_obj])
 
-      Creates a new :class:`Object` instance and returns it.
+      Creates a new :class:`Object` instance and returns
+      it. ``private_obj`` is any Python object that is privately
+      stored within the new JS object; it can be retrieved using
+      :func:`.get_object_private()`.
+
+   .. method:: get_object_private(object)
+
+      Returns the ``private_obj`` passed to :func:`.new_object()`
+      when `object` was first created. If it doesn't exist, ``None``
+      is returned.
+
+      This functionality is useful if you want to represent Python
+      objects in JS-land.
 
    .. method:: init_standard_classes(object)
 

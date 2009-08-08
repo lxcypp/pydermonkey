@@ -115,8 +115,21 @@ to verify that an object is a context, like so:</p>
 
 <dl class="method">
 <dt id="pymonkey.Context.new_object">
-<tt class="descname">new_object</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
-<dd>Creates a new <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns it.</dd></dl>
+<tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pymonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
+<dd>Creates a new <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
+it. <tt class="docutils literal"><span class="pre">private_obj</span></tt> is any Python object that is privately
+stored within the new JS object; it can be retrieved using
+<a title="pymonkey.Context.get_object_private" class="reference" href="#pymonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">get_object_private()</span></tt></a>.</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.get_object_private">
+<tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pymonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pymonkey.Context.new_object" class="reference" href="#pymonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
+when <cite>object</cite> was first created. If it doesn&#8217;t exist, <tt class="xref docutils literal"><span class="pre">None</span></tt>
+is returned.</p>
+<p>This functionality is useful if you want to represent Python
+objects in JS-land.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pymonkey.Context.init_standard_classes">
