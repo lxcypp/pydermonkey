@@ -69,11 +69,11 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       Creates a new :class:`Object` instance and returns
       it. ``private_obj`` is any Python object that is privately
       stored within the new JS object; it can be retrieved using
-      :func:`.get_object_private()`.
+      :meth:`get_object_private()`.
 
    .. method:: get_object_private(object)
 
-      Returns the ``private_obj`` passed to :func:`.new_object()`
+      Returns the ``private_obj`` passed to :meth:`new_object()`
       when `object` was first created. If it doesn't exist, ``None``
       is returned.
 
