@@ -118,7 +118,7 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
-  JSClass *klass = JS_GET_CLASS(cx, object->obj);
+  JSClass *klass = JS_GET_CLASS(self->cx, object->obj);
   if (klass != &PYM_JS_ObjectClass)
     Py_RETURN_NONE;
 
@@ -144,7 +144,7 @@ PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
-  JSClass *klass = JS_GET_CLASS(cx, object->obj);
+  JSClass *klass = JS_GET_CLASS(self->cx, object->obj);
   if (klass != &PYM_JS_ObjectClass)
     Py_RETURN_NONE;
 
