@@ -153,6 +153,25 @@ class PymonkeyTests(unittest.TestCase):
         del obj
         self.assertEqual(ref(), None)
 
+    def testJsWrappedPythonFuncThrowsExcIfPrivateCleared(self):
+        def func(cx, this, args):
+            return True
+
+        code = "func()"
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
+        cx.clear_object_private(jsfunc)
+        self.assertRaises(pymonkey.error,
+                          cx.evaluate_script,
+                          obj, code, '<string>', 1)
+        self.assertEqual(
+            self._tostring(cx, self.last_exception.message),
+            "Error: Wrapped Python function no longer exists"
+            )
+
     def testJsWrappedPythonFuncPassesContext(self):
         contexts = []
 

@@ -61,6 +61,11 @@ PYM_dispatchJSFunctionToPython(JSContext *cx,
                                  &callable))
     return JS_FALSE;
 
+  if (callable == Py_None) {
+    JS_ReportError(cx, "Wrapped Python function no longer exists");
+    return JS_FALSE;
+  }
+
   PYM_JSContextObject *context = (PYM_JSContextObject *)
     JS_GetContextPrivate(cx);
 
