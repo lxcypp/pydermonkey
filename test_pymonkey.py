@@ -81,6 +81,14 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(str(pymonkey.undefined),
                          "pymonkey.undefined")
 
+    def testJsWrappedPythonFuncHasPrivate(self):
+        def foo(cx, this, args):
+            pass
+
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.new_function(foo, foo.__name__)
+        self.assertEqual(cx.get_object_private(jsfunc), foo)
+
     def testJsWrappedPythonFuncIsNotGCd(self):
         def define(cx, obj):
             def func(cx, this, args):
@@ -102,6 +110,30 @@ class PymonkeyTests(unittest.TestCase):
         # no longer reachable from JS space.
         cx.define_property(obj, 'func', 0)
         cx.gc()
+        self.assertEqual(ref(), None)
+
+    def testCircularJsWrappedPythonFuncIsGCdIfPrivateCleared(self):
+        def define(cx, obj):
+            rt = cx.get_runtime()
+            def func(cx, this, args):
+                # Oh noes, a circular reference is born!
+                rt
+            jsfunc = cx.new_function(func, func.__name__)
+            cx.define_property(obj, func.__name__, jsfunc)
+            return (jsfunc, weakref.ref(func))
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc, ref = define(cx, obj)
+
+        # This will break the circular reference.
+        cx.clear_object_private(jsfunc)
+
+        del jsfunc
+        del rt
+        del cx
+        del obj
         self.assertEqual(ref(), None)
 
     def testJsWrappedPythonFuncIsGCdAtRuntimeDestruction(self):

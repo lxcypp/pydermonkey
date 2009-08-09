@@ -118,13 +118,26 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
-  JSClass *klass = JS_GET_CLASS(self->cx, object->obj);
+  JSObject *obj = object->obj;
+
+  if (JS_ObjectIsFunction(self->cx, obj)) {
+    jsval functionHolder;
+    if (!JS_GetReservedSlot(self->cx, obj, 0, &functionHolder)) {
+      JS_ClearPendingException(self->cx);
+      Py_RETURN_NONE;
+    }
+    if (!JSVAL_IS_OBJECT(functionHolder))
+      Py_RETURN_NONE;
+    obj = JSVAL_TO_OBJECT(functionHolder);
+  }
+
+  JSClass *klass = JS_GET_CLASS(self->cx, obj);
   if (klass != &PYM_JS_ObjectClass)
     Py_RETURN_NONE;
 
   PyObject *pyObject;
 
-  if (!PYM_JS_getPrivatePyObject(self->cx, object->obj, &pyObject)) {
+  if (!PYM_JS_getPrivatePyObject(self->cx, obj, &pyObject)) {
     PYM_jsExceptionToPython(self);
     return NULL;
   }
@@ -144,11 +157,24 @@ PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
-  JSClass *klass = JS_GET_CLASS(self->cx, object->obj);
+  JSObject *obj = object->obj;
+
+  if (JS_ObjectIsFunction(self->cx, obj)) {
+    jsval functionHolder;
+    if (!JS_GetReservedSlot(self->cx, obj, 0, &functionHolder)) {
+      JS_ClearPendingException(self->cx);
+      Py_RETURN_NONE;
+    }
+    if (!JSVAL_IS_OBJECT(functionHolder))
+      Py_RETURN_NONE;
+    obj = JSVAL_TO_OBJECT(functionHolder);
+  }
+
+  JSClass *klass = JS_GET_CLASS(self->cx, obj);
   if (klass != &PYM_JS_ObjectClass)
     Py_RETURN_NONE;
 
-  if (!PYM_JS_setPrivatePyObject(self->cx, object->obj, Py_None)) {
+  if (!PYM_JS_setPrivatePyObject(self->cx, obj, Py_None)) {
     PYM_jsExceptionToPython(self);
     return NULL;
   }
