@@ -31,6 +31,18 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testClearObjectPrivateWorks(self):
+        class Foo(object):
+            pass
+        pyobj = Foo()
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object(pyobj)
+        pyobj = weakref.ref(pyobj)
+        self.assertEqual(pyobj(), cx.get_object_private(obj))
+        cx.clear_object_private(obj)
+        self.assertEqual(cx.get_object_private(obj), None)
+        self.assertEqual(pyobj(), None)
+
     def testGetObjectPrivateWorks(self):
         class Foo(object):
             pass

@@ -137,6 +137,26 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_JSObject *object;
+
+  if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
+    return NULL;
+
+  JSClass *klass = JS_GET_CLASS(cx, object->obj);
+  if (klass != &PYM_JS_ObjectClass)
+    Py_RETURN_NONE;
+
+  if (!PYM_JS_setPrivatePyObject(self->cx, object->obj, Py_None)) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  Py_RETURN_NONE;
+}
+
+static PyObject *
 PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
   PyObject *privateObj = NULL;
@@ -395,6 +415,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Triggers the operation callback for the context."},
   {"get_object_private", (PyCFunction) PYM_getObjectPrivate, METH_VARARGS,
    "Returns the private Python object stored in the JavaScript object."},
+  {"clear_object_private", (PyCFunction) PYM_clearObjectPrivate, METH_VARARGS,
+   "Clears any private Python object stored in the JavaScript object."},
   {NULL, NULL, 0, NULL}
 };
 
