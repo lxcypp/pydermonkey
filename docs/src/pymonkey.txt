@@ -49,6 +49,11 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Returns the :class:`Runtime` that the object belongs to.
 
+.. class:: Function
+
+   This is the type of JavaScript functions, which is a subtype of
+   :class:`Object`.
+
 .. class:: Context
 
    This is the type of JavaScript context objects. Contexts can only
@@ -71,14 +76,34 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       stored within the new JS object; it can be retrieved using
       :meth:`get_object_private()`.
 
+   .. method:: new_function(callable, name)
+
+      Creates a new :class:`Function` instance that wraps the
+      given Python callable.  In JS-land, the callable will
+      have the given name.
+
    .. method:: get_object_private(object)
 
       Returns the ``private_obj`` passed to :meth:`new_object()`
       when `object` was first created. If it doesn't exist, ``None``
       is returned.
 
+      If `object` was created with :meth:`new_function()`, then this
+      method returns the Python callable wrapped by `object`.
+
       This functionality is useful if you want to represent Python
       objects in JS-land.
+
+   .. method:: clear_object_private(object)
+
+      Clears the ``private_obj`` passed to :meth:`new_object()`
+      when `object` was first created. If it doesn't exist, this
+      function returns nothing.
+
+      If `object` was created with :meth:`new_function()`, then this
+      method effectively "unbinds" the Python callable wrapped by
+      `object`. If `object` is later called, an exception will be
+      raised.
 
    .. method:: init_standard_classes(object)
 

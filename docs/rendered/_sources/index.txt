@@ -96,13 +96,16 @@ pymonkey can be really usable. Here's some of them.
 **Garbage Collection**
 
 Python's garbage collection uses reference counting, whereas
-SpiderMonkey's is mark-and-sweep. We'll likely run into situations
-where there are cycles that exist between SpiderMonkey and Python
-objects; this is actually quite similar to the relationship between
-XPCOM and JavaScript in the Mozilla platform--XPCOM uses reference
-counting too--so detecting such cycles will probably involve creating
-something akin to `XPCOM's cycle collector
+SpiderMonkey's is mark-and-sweep. It's possible for there to be
+situations where there are cycles that exist between SpiderMonkey and
+Python objects; this is actually quite similar to the relationship
+between XPCOM and JavaScript in the Mozilla platform--XPCOM uses
+reference counting too--so detecting such cycles will probably involve
+creating something akin to `XPCOM's cycle collector
 <https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector>`_.
+
+For the time being, however, such cycles can be manually broken via
+:meth:`pymonkey.Context.clear_object_private()` on valid objects and functions.
 
 Indices and Tables
 ==================
