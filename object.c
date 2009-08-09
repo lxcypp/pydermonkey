@@ -44,7 +44,7 @@ PYM_JS_newObject(JSContext *cx, PyObject *pyObject)
 {
   JSObject *obj = JS_NewObject(cx, &PYM_JS_ObjectClass, NULL, NULL);
   if (obj) {
-    if (!JS_SetReservedSlot(cx, obj, 0, PRIVATE_TO_JSVAL(pyObject)))
+    if (!JS_SetPrivate(cx, obj, pyObject))
       return NULL;
     Py_XINCREF(pyObject);
   }
@@ -54,16 +54,10 @@ PYM_JS_newObject(JSContext *cx, PyObject *pyObject)
 JSBool
 PYM_JS_setPrivatePyObject(JSContext *cx, JSObject *obj, PyObject *pyObject)
 {
-  JSClass *klass = JS_GET_CLASS(cx, obj);
-  if (klass != &PYM_JS_ObjectClass) {
-    JS_ReportError(cx, "Object is not an instance of PymonkeyObject");
-    return JS_FALSE;
-  }
-
   PyObject *old;
   if (!PYM_JS_getPrivatePyObject(cx, obj, &old))
     return JS_FALSE;
-  if (!JS_SetReservedSlot(cx, obj, 0, PRIVATE_TO_JSVAL(pyObject)))
+  if (!JS_SetPrivate(cx, obj, pyObject))
     return JS_FALSE;
   Py_INCREF(pyObject);
   Py_XDECREF(old);
@@ -79,10 +73,7 @@ PYM_JS_getPrivatePyObject(JSContext *cx, JSObject *obj, PyObject **pyObject)
     return JS_FALSE;
   }
 
-  jsval val;
-  if (!JS_GetReservedSlot(cx, obj, 0, &val))
-    return JS_FALSE;
-  *pyObject = (PyObject *) JSVAL_TO_PRIVATE(val);
+  *pyObject = (PyObject *) JS_GetPrivate(cx, obj);
   return JS_TRUE;
 }
 
@@ -102,7 +93,7 @@ PYM_JS_finalizeObject(JSContext *cx, JSObject *obj)
 // garbage collected by the JS interpreter, it releases its reference on
 // the Python object.
 JSClass PYM_JS_ObjectClass = {
-  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS | JSCLASS_HAS_RESERVED_SLOTS(1),
+  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS | JSCLASS_HAS_PRIVATE,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
   JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, PYM_JS_finalizeObject,
   JSCLASS_NO_OPTIONAL_MEMBERS
