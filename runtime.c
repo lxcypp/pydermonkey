@@ -46,6 +46,7 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 
   self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
   if (self != NULL) {
+    self->thread = PyThread_get_thread_ident();
     self->rt = NULL;
     self->cx = NULL;
     self->objects.ops = NULL;
@@ -106,6 +107,7 @@ PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
 static PyObject *
 PYM_newContext(PYM_JSRuntimeObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self);
   JSContext *cx = JS_NewContext(self->rt, 8192);
   if (cx == NULL) {
     PyErr_SetString(PYM_error, "JS_NewContext() failed");

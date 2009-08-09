@@ -40,12 +40,20 @@
 #include <jsapi.h>
 #include <jsdhash.h>
 #include <Python/Python.h>
+#include <Python/pythread.h>
+
+#define PYM_SANITY_CHECK(runtime) \
+  if (PyThread_get_thread_ident() != runtime->thread) {               \
+    PyErr_SetString(PYM_error, "Function called from wrong thread"); \
+    return NULL; \
+  }
 
 typedef struct {
   PyObject_HEAD
   JSRuntime *rt;
   JSContext *cx;
   JSDHashTable objects;
+  long thread;
 } PYM_JSRuntimeObject;
 
 extern PyTypeObject PYM_JSRuntimeType;

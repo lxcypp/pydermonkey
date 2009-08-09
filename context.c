@@ -113,6 +113,7 @@ PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
 
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
@@ -152,6 +153,7 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
 
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
@@ -185,6 +187,7 @@ PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PyObject *privateObj = NULL;
 
   if (!PyArg_ParseTuple(args, "|O", &privateObj))
@@ -204,6 +207,7 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
 #ifndef Py_UNICODE_WIDE
   PYM_JSObject *object;
   Py_UNICODE *string;
@@ -244,6 +248,7 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_gc(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   JS_GC(self->cx);
   Py_RETURN_NONE;
 }
@@ -251,6 +256,7 @@ PYM_gc(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
 
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
@@ -267,6 +273,7 @@ PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
   const char *source;
   int sourceLen;
@@ -296,6 +303,7 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
   PyObject *value;
   const char *name;
@@ -324,6 +332,7 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *obj;
   PYM_JSFunction *fun;
   PyObject *funcArgs;
@@ -368,6 +377,7 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PyObject *callable;
   const char *name;
 
@@ -380,6 +390,7 @@ PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
 static PyObject *
 PYM_setOperationCallback(PYM_JSContextObject *self, PyObject *args)
 {
+  PYM_SANITY_CHECK(self->runtime);
   PyObject *callable;
 
   if (!PyArg_ParseTuple(args, "O", &callable))

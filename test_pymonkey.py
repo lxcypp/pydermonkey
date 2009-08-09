@@ -31,6 +31,18 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testThreadSafetyExceptionIsRaised(self):
+        stuff = {}
+        def make_runtime():
+            stuff['rt'] = pymonkey.Runtime()
+        thread = threading.Thread(target = make_runtime)
+        thread.start()
+        thread.join()
+        self.assertRaises(pymonkey.error,
+                          stuff['rt'].new_context)
+        self.assertEqual(self.last_exception.message,
+                         'Function called from wrong thread')
+
     def testClearObjectPrivateWorks(self):
         class Foo(object):
             pass
