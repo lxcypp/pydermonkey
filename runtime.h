@@ -48,6 +48,12 @@
     return NULL; \
   }
 
+#define PYM_ENSURE_RUNTIME_MATCH(runtime1, runtime2) \
+  if (runtime1 != runtime2) { \
+    PyErr_SetString(PyExc_ValueError, "JS runtime mismatch"); \
+    return NULL; \
+  }
+
 typedef struct {
   PyObject_HEAD
   JSRuntime *rt;

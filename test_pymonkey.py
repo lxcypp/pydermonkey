@@ -498,6 +498,16 @@ class PymonkeyTests(unittest.TestCase):
                                         self.last_exception.message),
                          'ReferenceError: blarg is not defined')
 
+    def testInitStandardClassesRaisesExcOnRuntimeMismatch(self):
+        cx2 = pymonkey.Runtime().new_context()
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(ValueError,
+                          cx2.init_standard_classes,
+                          obj)
+        self.assertEqual(self.last_exception.message,
+                         'JS runtime mismatch')
+
     def testCallFunctionWorks(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()

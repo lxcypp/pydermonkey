@@ -119,6 +119,8 @@ PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
   JSObject *obj = object->obj;
 
   if (JS_ObjectIsFunction(self->cx, obj)) {
@@ -158,6 +160,8 @@ PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
   JSObject *obj = object->obj;
 
@@ -216,6 +220,8 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
                         &string))
     return NULL;
 
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
   JSString *jsString = JS_NewUCStringCopyZ(self->cx,
                                            (const jschar *) string);
   if (jsString == NULL) {
@@ -262,6 +268,8 @@ PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
     return NULL;
 
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
   if (!JS_InitStandardClasses(self->cx, object->obj)) {
     PyErr_SetString(PYM_error, "JS_InitStandardClasses() failed");
     return NULL;
@@ -283,6 +291,8 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "O!s#si", &PYM_JSObjectType, &object,
                         &source, &sourceLen, &filename, &lineNo))
     return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
   jsval rval;
   JSBool result;
@@ -312,6 +322,7 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
                         &name, &value))
     return NULL;
 
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
   jsval jsValue;
 
   if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
@@ -341,6 +352,9 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
                         &PYM_JSFunctionType, &fun,
                         &PyTuple_Type, &funcArgs))
     return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, obj->runtime);
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, fun->base.runtime);
 
   uintN argc = PyTuple_Size(funcArgs);
   jsval argv[argc];
