@@ -455,6 +455,15 @@ class PymonkeyTests(unittest.TestCase):
                                  '<string>', 1)
         self.assertTrue(isinstance(obj, pymonkey.Function))
 
+    def testJsExceptionStateIsClearedAfterExceptionIsCaught(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(pymonkey.error,
+                          cx.evaluate_script,
+                          obj, 'blah()', '<string>', 1)
+        self.assertEqual(cx.evaluate_script(obj, '5+3', '<string>', 1),
+                         8)
+
     def testCallFunctionRaisesErrorOnBadFuncArgs(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
