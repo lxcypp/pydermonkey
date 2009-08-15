@@ -59,11 +59,20 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
                     PyObject *object,
                     jsval *rval)
 {
-#ifndef Py_UNICODE_WIDE
   if (PyUnicode_Check(object)) {
-    Py_UNICODE *string = PyUnicode_AsUnicode(object);
-    JSString *jsString = JS_NewUCStringCopyZ(context->cx,
-                                             (const jschar *) string);
+    PyObject *string = PyUnicode_AsUTF16String(object);
+    if (string == NULL)
+      return -1;
+
+    char *buffer = PyString_AS_STRING(string);
+    Py_ssize_t size = PyString_GET_SIZE(string);
+
+    // Note that we're manipulating buffer and size here to get rid of
+    // the BOM.
+    JSString *jsString = JS_NewUCStringCopyN(context->cx,
+                                             (const jschar *) (buffer + 2),
+                                             (size / 2) - 1);
+    Py_DECREF(string);
     if (jsString == NULL) {
       PyErr_SetString(PYM_error, "JS_NewUCStringCopyZ() failed");
       return -1;
@@ -72,7 +81,6 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
     *rval = STRING_TO_JSVAL(jsString);
     return 0;
   }
-#endif
 
   if (PyInt_Check(object)) {
     long number = PyInt_AS_LONG(object);

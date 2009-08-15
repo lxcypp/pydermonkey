@@ -212,30 +212,29 @@ static PyObject *
 PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
-#ifndef Py_UNICODE_WIDE
   PYM_JSObject *object;
-  Py_UNICODE *string;
+  char *buffer = NULL;
+  int size;
 
-  if (!PyArg_ParseTuple(args, "O!u", &PYM_JSObjectType, &object,
-                        &string))
+  if (!PyArg_ParseTuple(args, "O!es#", &PYM_JSObjectType, &object,
+                        "utf-16", &buffer, &size))
     return NULL;
 
-  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-
-  JSString *jsString = JS_NewUCStringCopyZ(self->cx,
-                                           (const jschar *) string);
-  if (jsString == NULL) {
-    PyErr_SetString(PYM_error, "JS_NewStringCopyZ() failed");
-    return NULL;
+  if (self->runtime != object->runtime) {
+    PyMem_Free(buffer);
+    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
   }
 
   jsval val;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  result = JS_GetUCProperty(self->cx, object->obj,
-                            JS_GetStringChars(jsString),
-                            JS_GetStringLength(jsString), &val);
+  // Note that we're manipulating buffer and size here to get rid of
+  // the BOM.
+  result = JS_GetUCProperty(self->cx, object->obj, (jschar *) (buffer + 2),
+                            (size / 2) - 1, &val);
   Py_END_ALLOW_THREADS;
+
+  PyMem_Free(buffer);
 
   if (!result) {
     PYM_jsExceptionToPython(self);
@@ -243,12 +242,6 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   }
 
   return PYM_jsvalToPyObject(self, val);
-#else
-  PyErr_SetString(PyExc_NotImplementedError,
-                  "This function is not yet implemented for wide "
-                  "unicode builds of Python.");
-  return NULL;
-#endif
 }
 
 static PyObject *
