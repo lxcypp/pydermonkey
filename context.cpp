@@ -350,14 +350,20 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, fun->base.runtime);
 
   uintN argc = PyTuple_Size(funcArgs);
-  jsval argv[argc];
+
+  jsval *argv = (jsval *) PyMem_Malloc(sizeof(jsval) * argc);
+  if (argv == NULL)
+    return PyErr_NoMemory();
+
   jsval *currArg = argv;
 
   for (unsigned int i = 0; i < argc; i++) {
     PyObject *item = PyTuple_GET_ITEM(funcArgs, i);
     if (item == NULL ||
-        PYM_pyObjectToJsval(self, item, currArg) == -1)
+        PYM_pyObjectToJsval(self, item, currArg) == -1) {
+      PyMem_Free(argv);
       return NULL;
+    }
     currArg++;
   }
 
@@ -372,6 +378,8 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
                            (JSFunction *) fun->base.obj,
                            argc, argv, &rval);
   Py_END_ALLOW_THREADS;
+
+  PyMem_Free(argv);
 
   if (!result) {
     PYM_jsExceptionToPython(self);
