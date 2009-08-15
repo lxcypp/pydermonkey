@@ -41,7 +41,7 @@
 #include "context.h"
 
 #include <jsapi.h>
-#include <Python/Python.h>
+#include <Python.h>
 
 typedef struct {
   PYM_JSObject base;

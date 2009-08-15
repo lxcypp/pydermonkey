@@ -37,7 +37,7 @@
 #ifndef PYM_UNDEFINED_H
 #define PYM_UNDEFINED_H
 
-#include <Python/Python.h>
+#include <Python.h>
 
 #define Py_RETURN_UNDEFINED  { Py_INCREF(PYM_undefined);        \
                                return (PyObject *) PYM_undefined; }

@@ -39,8 +39,8 @@
 
 #include <jsapi.h>
 #include <jsdhash.h>
-#include <Python/Python.h>
-#include <Python/pythread.h>
+#include <Python.h>
+#include <pythread.h>
 
 #define PYM_SANITY_CHECK(runtime) \
   if (PyThread_get_thread_ident() != runtime->thread) {               \

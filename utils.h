@@ -41,7 +41,7 @@
 
 #include <jsapi.h>
 #include <jsdhash.h>
-#include <Python/Python.h>
+#include <Python.h>
 
 class PYM_PyAutoEnsureGIL {
 public:

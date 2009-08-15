@@ -40,7 +40,7 @@
 #include "context.h"
 
 #include <jsapi.h>
-#include <Python/Python.h>
+#include <Python.h>
 
 extern JSObject *
 PYM_JS_newObject(JSContext *cx, PyObject *pyObject);

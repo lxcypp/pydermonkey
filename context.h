@@ -40,7 +40,7 @@
 #include "runtime.h"
 
 #include <jsapi.h>
-#include <Python/Python.h>
+#include <Python.h>
 
 typedef struct {
   PyObject_HEAD
