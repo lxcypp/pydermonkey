@@ -131,9 +131,18 @@ stored within the new JS object; it can be retrieved using
 <dl class="method">
 <dt id="pymonkey.Context.new_function">
 <tt class="descname">new_function</tt><big>(</big><em>callable</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.new_function" title="Permalink to this definition">¶</a></dt>
-<dd>Creates a new <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> instance that wraps the
-given Python callable.  In JS-land, the callable will
-have the given name.</dd></dl>
+<dd><p>Creates a new <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> instance that wraps the
+given Python callable.  In JS-land, the function will
+have the given name.</p>
+<p>When the function is executed from JavaScript, <cite>callable</cite>
+will be passed three positional arguments.</p>
+<p>The first argument is a <a title="pymonkey.Context" class="reference" href="#pymonkey.Context"><tt class="xref docutils literal"><span class="pre">Context</span></tt></a> that represents the
+JS context which is calling the function.</p>
+<p>The second argument is an <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that represents the
+value of <tt class="docutils literal"><span class="pre">this</span></tt> for the duration of the call.</p>
+<p>The third argument is a tuple containing the arguments
+passed to the function.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pymonkey.Context.get_object_private">
@@ -143,8 +152,8 @@ when <cite>object</cite> was first created. If it doesn&#8217;t exist, <tt class
 is returned.</p>
 <p>If <cite>object</cite> was created with <a title="pymonkey.Context.new_function" class="reference" href="#pymonkey.Context.new_function"><tt class="xref docutils literal"><span class="pre">new_function()</span></tt></a>, then this
 method returns the Python callable wrapped by <cite>object</cite>.</p>
-<p>This functionality is useful if you want to represent Python
-objects in JS-land.</p>
+<p>This functionality is useful if you want to securely represent
+Python objects in JS-land.</p>
 </dd></dl>
 
 <dl class="method">
@@ -157,6 +166,27 @@ function returns nothing.</p>
 method effectively &#8220;unbinds&#8221; the Python callable wrapped by
 <cite>object</cite>. If <cite>object</cite> is later called, an exception will be
 raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.evaluate_script">
+<tt class="descname">evaluate_script</tt><big>(</big><em>globalobj</em>, <em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pymonkey.Context.evaluate_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the text <cite>code</cite> using <cite>globalobj</cite> as the global
+object/scope.</p>
+<p>It&#8217;s assumed that <cite>code</cite> is coming from the file named by <cite>filename</cite>;
+the first line of <cite>code</cite> is assumed to be line number <cite>lineno</cite> of
+<cite>filename</cite>. This metadata is very useful for debugging stack traces,
+exceptions, and so forth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.call_function">
+<tt class="descname">call_function</tt><big>(</big><em>thisobj</em>, <em>func</em>, <em>args</em><big>)</big><a class="headerlink" href="#pymonkey.Context.call_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls a JavaScript function.</p>
+<p><cite>thisobj</cite> is an <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that will be used as the value
+of <tt class="docutils literal"><span class="pre">this</span></tt> when the function executes, <cite>func</cite> is the
+<a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> to execute, and <cite>args</cite> is a tuple of arguments
+to pass to the function.</p>
 </dd></dl>
 
 <dl class="method">

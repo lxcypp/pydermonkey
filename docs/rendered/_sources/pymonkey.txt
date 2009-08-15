@@ -79,8 +79,20 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    .. method:: new_function(callable, name)
 
       Creates a new :class:`Function` instance that wraps the
-      given Python callable.  In JS-land, the callable will
+      given Python callable.  In JS-land, the function will
       have the given name.
+
+      When the function is executed from JavaScript, `callable`
+      will be passed three positional arguments.
+
+      The first argument is a :class:`Context` that represents the
+      JS context which is calling the function.
+
+      The second argument is an :class:`Object` that represents the
+      value of ``this`` for the duration of the call.
+
+      The third argument is a tuple containing the arguments
+      passed to the function.
 
    .. method:: get_object_private(object)
 
@@ -91,8 +103,8 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       If `object` was created with :meth:`new_function()`, then this
       method returns the Python callable wrapped by `object`.
 
-      This functionality is useful if you want to represent Python
-      objects in JS-land.
+      This functionality is useful if you want to securely represent
+      Python objects in JS-land.
 
    .. method:: clear_object_private(object)
 
@@ -104,6 +116,25 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       method effectively "unbinds" the Python callable wrapped by
       `object`. If `object` is later called, an exception will be
       raised.
+
+   .. method:: evaluate_script(globalobj, code, filename, lineno)
+
+      Evaluates the text `code` using `globalobj` as the global
+      object/scope.
+
+      It's assumed that `code` is coming from the file named by `filename`;
+      the first line of `code` is assumed to be line number `lineno` of
+      `filename`. This metadata is very useful for debugging stack traces,
+      exceptions, and so forth.
+
+   .. method:: call_function(thisobj, func, args)
+
+      Calls a JavaScript function.
+
+      `thisobj` is an :class:`Object` that will be used as the value
+      of ``this`` when the function executes, `func` is the
+      :class:`Function` to execute, and `args` is a tuple of arguments
+      to pass to the function.
 
    .. method:: init_standard_classes(object)
 
