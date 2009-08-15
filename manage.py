@@ -31,6 +31,38 @@ import webbrowser
 import urllib
 
 from paver.easy import *
+from paver.setuputils import setup
+from distutils.core import Extension
+
+SOURCE_FILES = ['pymonkey.cpp',
+                'utils.cpp',
+                'object.cpp',
+                'function.cpp',
+                'undefined.cpp',
+                'context.cpp',
+                'runtime.cpp']
+
+SPIDERMONKEY_DIR = os.path.abspath(os.path.join('spidermonkey', 'obj'))
+
+if not os.path.exists(SPIDERMONKEY_DIR):
+    print('WARNING: Spidermonkey objdir not found at %s.' % SPIDERMONKEY_DIR)
+    print('Some build tasks may not run properly.\n')
+
+INCLUDE_DIRS = [os.path.join(SPIDERMONKEY_DIR, 'dist', 'include')]
+LIB_DIRS = [os.path.join(SPIDERMONKEY_DIR)]
+
+setup(name='pymonkey',
+      version='0.0.1',
+      description='Access SpiderMonkey from Python',
+      author='Atul Varma',
+      author_email='atul@mozilla.com',
+      url='http://www.toolness.com',
+      ext_modules=[Extension('pymonkey',
+                             SOURCE_FILES,
+                             include_dirs = INCLUDE_DIRS,
+                             library_dirs = LIB_DIRS,
+                             libraries = ['js_static'])]
+     )
 
 @task
 def docs(options):
@@ -52,58 +84,13 @@ def build_docs(options):
         sys.exit(retval)
 
 @task
-@cmdopts([("objdir=", "o", "The root of your Mozilla objdir"),
-          ("static", "s", "Build against static libraries")])
-def build(options):
-    """Build the Pymonkey Python C extension."""
-
-    objdir = options.get("objdir")
-    if not objdir:
-        print("Objdir not specified! Please specify one with "
-              "the --objdir option.")
-        sys.exit(1)
-    objdir = os.path.abspath(objdir)
-    incdir = os.path.join(objdir, "dist", "include")
-    libdir = os.path.join(objdir, "dist", "lib")
-
-    print "Building extension."
-
-    args = ["g++",
-            "-framework", "Python",
-            "-I%s" % incdir,
-            "-L%s" % libdir,
-            "-Wall",
-            "-o", "pymonkey.so",
-            "-dynamiclib",
-            "pymonkey.cpp",
-            "utils.cpp",
-            "object.cpp",
-            "function.cpp",
-            "undefined.cpp",
-            "context.cpp",
-            "runtime.cpp"]
-
-    if options.get("static"):
-        args.append(os.path.join(objdir, "libjs_static.a"))
-    else:
-        args.append("-lmozjs")
-
-    result = subprocess.call(args)
-
-    if result:
-        sys.exit(result)
+def test(options):
+    """Test the Pymonkey Python C extension."""
 
     print "Running test suite."
 
     new_env = {}
     new_env.update(os.environ)
-    if not options.get("static"):
-        print("NOTE: Because you're linking dynamically to the "
-              "SpiderMonkey shared library, you'll need to make sure "
-              "that it's on your library load path. You may need to "
-              "add %s to your library load path to do this." %
-              libdir)
-        new_env['DYLD_LIBRARY_PATH'] = libdir
 
     result = subprocess.call(
         [sys.executable,
