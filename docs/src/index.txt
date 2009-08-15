@@ -75,17 +75,22 @@ latter can be obtained here:
 
   http://hg.toolness.com/spidermonkey/
 
-Just HG clone that repository and read the instructions in the README
-to build SpiderMonkey.
+Just HG clone that repository in the root of your pymonkey repository
+and read the instructions in the ``README`` file to build SpiderMonkey.
 
 Then come back to the root of your pymonkey repository and run::
 
-  python manage.py build --static --objdir=PATH_TO_OBJDIR
+  python setup.py build
 
-Where ``PATH_TO_OBJDIR`` is the path to your Mozilla/SpiderMonkey build's
-objdir.
+Then run::
 
-Note that at the moment, the build script is only tested on OS X.
+  sudo python setup.py install
+
+Note that if you're on Windows, you won't need the ``sudo`` bit.
+
+You can run the test suite by entering::
+
+  python setup.py test
 
 Challenges
 ==========

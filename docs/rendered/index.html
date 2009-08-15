@@ -108,14 +108,18 @@ repository, or off a mirror I made of its SpiderMonkey directory. The
 latter can be obtained here:</p>
 <blockquote>
 <a class="reference" href="http://hg.toolness.com/spidermonkey/">http://hg.toolness.com/spidermonkey/</a></blockquote>
-<p>Just HG clone that repository and read the instructions in the README
-to build SpiderMonkey.</p>
+<p>Just HG clone that repository in the root of your pymonkey repository
+and read the instructions in the <tt class="docutils literal"><span class="pre">README</span></tt> file to build SpiderMonkey.</p>
 <p>Then come back to the root of your pymonkey repository and run:</p>
-<div class="highlight-python"><pre>python manage.py build --static --objdir=PATH_TO_OBJDIR</pre>
+<div class="highlight-python"><pre>python setup.py build</pre>
 </div>
-<p>Where <tt class="docutils literal"><span class="pre">PATH_TO_OBJDIR</span></tt> is the path to your Mozilla/SpiderMonkey build&#8217;s
-objdir.</p>
-<p>Note that at the moment, the build script is only tested on OS X.</p>
+<p>Then run:</p>
+<div class="highlight-python"><pre>sudo python setup.py install</pre>
+</div>
+<p>Note that if you&#8217;re on Windows, you won&#8217;t need the <tt class="docutils literal"><span class="pre">sudo</span></tt> bit.</p>
+<p>You can run the test suite by entering:</p>
+<div class="highlight-python"><pre>python setup.py test</pre>
+</div>
 </div>
 <div class="section" id="challenges">
 <h2>Challenges<a class="headerlink" href="#challenges" title="Permalink to this headline">¶</a></h2>

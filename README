@@ -4,5 +4,5 @@ Pymonkey README
 Pymonkey is a Python C extension module to expose the Mozilla
 SpiderMonkey engine to Python.
 
-Please run "python manage.py docs" to open the full Pymonkey
+Please run "python setup.py docs" to open the full Pymonkey
 documentation in your web browser.
