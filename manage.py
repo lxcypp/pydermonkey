@@ -75,13 +75,13 @@ def build(options):
             "-Wall",
             "-o", "pymonkey.so",
             "-dynamiclib",
-            "pymonkey.c",
-            "utils.c",
-            "object.c",
-            "function.c",
-            "undefined.c",
-            "context.c",
-            "runtime.c"]
+            "pymonkey.cpp",
+            "utils.cpp",
+            "object.cpp",
+            "function.cpp",
+            "undefined.cpp",
+            "context.cpp",
+            "runtime.cpp"]
 
     if options.get("static"):
         args.append(os.path.join(objdir, "libjs_static.a"))
