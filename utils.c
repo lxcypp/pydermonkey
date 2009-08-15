@@ -59,8 +59,19 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
                     PyObject *object,
                     jsval *rval)
 {
-  if (PyUnicode_Check(object)) {
-    PyObject *string = PyUnicode_AsUTF16String(object);
+  if (PyString_Check(object) || PyUnicode_Check(object)) {
+    PyObject *unicode;
+    if (PyString_Check(object)) {
+      unicode = PyUnicode_FromObject(object);
+      if (unicode == NULL)
+        return -1;
+    } else {
+      unicode = object;
+      Py_INCREF(unicode);
+    }
+
+    PyObject *string = PyUnicode_AsUTF16String(unicode);
+    Py_DECREF(unicode);
     if (string == NULL)
       return -1;
 

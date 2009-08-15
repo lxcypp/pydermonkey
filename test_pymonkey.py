@@ -245,11 +245,17 @@ class PymonkeyTests(unittest.TestCase):
                                                    'hai2u("blah\x00 ")'),
                          u"blah\x00 o hai")
 
+    def testJsWrappedPythonFunctionReturnsString(self):
+        def hai2u(cx, this, args):
+            return "o hai"
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         "o hai")
+
     def testJsWrappedPythonFunctionReturnsUnicode(self):
         def hai2u(cx, this, args):
-            return u"o hai"
+            return u"o hai\u2026"
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
-                         u"o hai")
+                         u"o hai\u2026")
 
     def testJsWrappedPythonFunctionThrowsJsException(self):
         def hai2u(cx, this, args):
