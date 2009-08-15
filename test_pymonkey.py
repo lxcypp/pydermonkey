@@ -238,6 +238,13 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(funcArgs[1][0], 1)
         self.assertEqual(funcArgs[1][1], u'foo')
 
+    def testJsWrappedPythonFunctionReturnsUnicodeWithEmbeddedNULs(self):
+        def hai2u(cx, this, args):
+            return args[0] + u"o hai"
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u,
+                                                   'hai2u("blah\x00 ")'),
+                         u"blah\x00 o hai")
+
     def testJsWrappedPythonFunctionReturnsUnicode(self):
         def hai2u(cx, this, args):
             return u"o hai"
@@ -425,6 +432,10 @@ class PymonkeyTests(unittest.TestCase):
     def testEvaluateReturnsUndefined(self):
         retval = self._evaljs("")
         self.assertTrue(retval is pymonkey.undefined)
+
+    def testEvaludateReturnsUnicodeWithEmbeddedNULs(self):
+        retval = self._evaljs("'\x00hi'")
+        self.assertEqual(retval, u'\x00hi')
 
     def testEvaluateReturnsSMPUnicode(self):
         # This is 'LINEAR B SYLLABLE B008 A', in the supplementary
