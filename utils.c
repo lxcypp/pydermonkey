@@ -74,7 +74,7 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
                                              (size / 2) - 1);
     Py_DECREF(string);
     if (jsString == NULL) {
-      PyErr_SetString(PYM_error, "JS_NewUCStringCopyZ() failed");
+      PyErr_SetString(PYM_error, "JS_NewUCStringCopyN() failed");
       return -1;
     }
 
