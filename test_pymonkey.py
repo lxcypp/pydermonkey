@@ -342,7 +342,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(isinstance(cx.get_property(obj, u"foo"),
                                    pymonkey.Object))
         self.assertTrue(cx.get_property(obj, u"foo") is
-                        cx.get_property(obj, u"foo"))
+                        cx.get_property(obj, "foo"))
 
     def testObjectGetattrThrowsException(self):
         cx = pymonkey.Runtime().new_context()
