@@ -40,7 +40,7 @@ class PymonkeyTests(unittest.TestCase):
         thread.join()
         self.assertRaises(pymonkey.error,
                           stuff['rt'].new_context)
-        self.assertEqual(self.last_exception.message,
+        self.assertEqual(self.last_exception.args[0],
                          'Function called from wrong thread')
 
     def testClearObjectPrivateWorks(self):
@@ -180,7 +180,7 @@ class PymonkeyTests(unittest.TestCase):
                           cx.evaluate_script,
                           obj, code, '<string>', 1)
         self.assertEqual(
-            self._tostring(cx, self.last_exception.message),
+            self._tostring(cx, self.last_exception.args[0]),
             "Error: Wrapped Python function no longer exists"
             )
 
@@ -263,7 +263,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(pymonkey.error,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
-        self.assertEqual(self.last_exception.message, u"blarg")
+        self.assertEqual(self.last_exception.args[0], u"blarg")
 
     def testJsWrappedPythonFunctionThrowsPyException(self):
         thecx = []
@@ -273,8 +273,8 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(pymonkey.error,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
-        exc = thecx[0].get_object_private(self.last_exception.message)
-        self.assertEqual(exc.message, "hello")
+        exc = thecx[0].get_object_private(self.last_exception.args[0])
+        self.assertEqual(exc.args[0], "hello")
 
     def testJsWrappedPythonFunctionReturnsNone(self):
         def hai2u(cx, this, args):
@@ -360,7 +360,7 @@ class PymonkeyTests(unittest.TestCase):
                           cx.get_property,
                           result,
                           u"foo")
-        self.assertEqual(self.last_exception.message, u"blah")
+        self.assertEqual(self.last_exception.args[0], u"blah")
 
     def testInfiniteRecursionRaisesError(self):
         cx = pymonkey.Runtime().new_context()
@@ -372,7 +372,7 @@ class PymonkeyTests(unittest.TestCase):
             obj, '(function foo() { foo(); })();', '<string>', 1
             )
         self.assertEqual(
-            self._tostring(cx, self.last_exception.message),
+            self._tostring(cx, self.last_exception.args[0]),
             "InternalError: too much recursion"
             )
 
@@ -432,7 +432,7 @@ class PymonkeyTests(unittest.TestCase):
                           cx.evaluate_script,
                           obj, 'hai2u()', '<string>', 1)
         self.assertEqual(self._tostring(cx,
-                                        self.last_exception.message),
+                                        self.last_exception.args[0]),
                          'ReferenceError: hai2u is not defined')
 
     def testEvaluateReturnsUndefined(self):
@@ -512,7 +512,7 @@ class PymonkeyTests(unittest.TestCase):
                           cx.call_function,
                           obj, obj, (1,))
         self.assertEqual(self._tostring(cx,
-                                        self.last_exception.message),
+                                        self.last_exception.args[0]),
                          'ReferenceError: blarg is not defined')
 
     def testInitStandardClassesRaisesExcOnRuntimeMismatch(self):
@@ -522,7 +522,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertRaises(ValueError,
                           cx2.init_standard_classes,
                           obj)
-        self.assertEqual(self.last_exception.message,
+        self.assertEqual(self.last_exception.args[0],
                          'JS runtime mismatch')
 
     def testCallFunctionWorks(self):
