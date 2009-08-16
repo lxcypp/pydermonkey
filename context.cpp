@@ -309,27 +309,38 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
   PyObject *value;
-  const char *name;
+  char *name = NULL;
+  int namelen;
 
-  if (!PyArg_ParseTuple(args, "O!sO", &PYM_JSObjectType, &object,
-                        &name, &value))
+  if (!PyArg_ParseTuple(args, "O!es#O", &PYM_JSObjectType, &object,
+                        "utf-16", &name, &namelen, &value))
     return NULL;
 
-  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+  if (self->runtime != object->runtime) {
+    PyMem_Free(name);
+    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+  }
+
   jsval jsValue;
 
-  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
+  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1) {
+    PyMem_Free(name);
     return NULL;
+  }
 
-  // TODO: Support unicode naming.
-  if (!JS_DefineProperty(self->cx, object->obj, name, jsValue,
-                         NULL, NULL, JSPROP_ENUMERATE)) {
+  // Note that we're manipulating buffer and size here to get rid of
+  // the BOM.
+  if (!JS_DefineUCProperty(self->cx, object->obj, (jschar *) (name + 2),
+                           (namelen / 2) - 1, jsValue, NULL, NULL,
+                           JSPROP_ENUMERATE)) {
     // TODO: There's probably an exception pending on self->cx,
     // what should we do about it?
+    PyMem_Free(name);
     PyErr_SetString(PYM_error, "JS_DefineProperty() failed");
     return NULL;
   }
 
+  PyMem_Free(name);
   Py_RETURN_NONE;
 }
 
