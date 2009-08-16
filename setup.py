@@ -29,10 +29,14 @@ import shutil
 import sys
 import webbrowser
 import urllib
+import urllib2
+import StringIO
+import tarfile
+import distutils.dir_util
+import distutils.core
 
 from paver.easy import *
 from paver.setuputils import setup
-from distutils.core import Extension
 
 SOURCE_FILES = ['pymonkey.cpp',
                 'utils.cpp',
@@ -42,11 +46,18 @@ SOURCE_FILES = ['pymonkey.cpp',
                 'context.cpp',
                 'runtime.cpp']
 
-SPIDERMONKEY_DIR = os.path.abspath(os.path.join('spidermonkey', 'obj'))
+SPIDERMONKEY_TAG = "1.8.1pre"
 
-if not os.path.exists(SPIDERMONKEY_DIR):
-    print('WARNING: Spidermonkey objdir not found at %s.' % SPIDERMONKEY_DIR)
-    print('Some build tasks may not run properly.\n')
+SPIDERMONKEY_SRC_URL = ("http://hg.toolness.com/spidermonkey/archive/"
+                        "%s.tar.bz2" % SPIDERMONKEY_TAG)
+
+SPIDERMONKEY_DIR = os.path.abspath('spidermonkey-%s' % SPIDERMONKEY_TAG)
+
+BUILD_DIR = os.path.abspath('build')
+
+SPIDERMONKEY_OBJDIR = os.path.join(BUILD_DIR, 'spidermonkey')
+
+SPIDERMONKEY_MAKEFILE = os.path.join(SPIDERMONKEY_OBJDIR, 'Makefile')
 
 setup_options = dict(
     name='pymonkey',
@@ -58,8 +69,8 @@ setup_options = dict(
     )
 
 ext_options = dict(
-    include_dirs = [os.path.join(SPIDERMONKEY_DIR, 'dist', 'include')],
-    library_dirs = [SPIDERMONKEY_DIR]
+    include_dirs = [os.path.join(SPIDERMONKEY_OBJDIR, 'dist', 'include')],
+    library_dirs = [SPIDERMONKEY_OBJDIR]
     )
 
 if sys.platform == 'win32':
@@ -72,15 +83,17 @@ if sys.platform == 'win32':
     # TODO: This is almost certainly not the ideal way to distribute
     # a DLL used by a C extension module.
     setup_options['data_files'] = [
-        ('Lib\\site-packages', [os.path.join(SPIDERMONKEY_DIR,
+        ('Lib\\site-packages', [os.path.join(SPIDERMONKEY_OBJDIR,
                                              'js3250.dll')])
         ]
 else:
     ext_options['libraries'] = ['js_static']
 
-setup_options['ext_modules'] = [Extension('pymonkey',
-                                          SOURCE_FILES,
-                                          **ext_options)]
+setup_options['ext_modules'] = [
+    distutils.core.Extension('pymonkey',
+                             SOURCE_FILES,
+                             **ext_options)
+    ]
 
 setup(**setup_options)
 
@@ -91,6 +104,55 @@ def docs(options):
     url = os.path.abspath(os.path.join("docs", "rendered", "index.html"))
     url = urllib.pathname2url(url)
     webbrowser.open(url)
+
+@task
+def build_spidermonkey(options):
+    """Fetch and build SpiderMonkey."""
+
+    if not os.path.exists(SPIDERMONKEY_DIR):
+        print("SpiderMonkey source directory not found, "
+              "fetching from %s." % SPIDERMONKEY_SRC_URL)
+
+        urlfile = urllib2.urlopen(SPIDERMONKEY_SRC_URL)
+        output = StringIO.StringIO()
+        done = False
+        while not done:
+            stuff = urlfile.read(65536)
+            if stuff:
+                output.write(stuff)
+                sys.stdout.write(".")
+                sys.stdout.flush()
+            else:
+                done = True
+        sys.stdout.write("\n")
+        urlfile.close()
+        output.seek(0)
+
+        print "Extracting files."
+
+        tar = tarfile.open("", fileobj = output, mode = "r:bz2")
+        tar.extractall()
+        output.close()
+
+    distutils.dir_util.mkpath(SPIDERMONKEY_OBJDIR)
+    
+    if not os.path.exists(SPIDERMONKEY_MAKEFILE):
+        print "Running configure."
+
+        configure = os.path.join(SPIDERMONKEY_DIR, "js", "src",
+                                 "configure")
+        retval = subprocess.call([configure,
+                                  "--enable-static",
+                                  "--disable-tests"],
+                                 cwd = SPIDERMONKEY_OBJDIR)
+        if retval:
+            sys.exit(retval)
+
+    print "Running make."
+
+    retval = subprocess.call(["make"], cwd = SPIDERMONKEY_OBJDIR)
+    if retval:
+        sys.exit(retval)
 
 @task
 def build_docs(options):

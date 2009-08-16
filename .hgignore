@@ -4,6 +4,6 @@ syntax: glob
 docs/rendered/.buildinfo
 docs/rendered/.doctrees
 docs/rendered/objects.inv
-spidermonkey
+spidermonkey-1.8.1pre
 build
 _doctest_output
