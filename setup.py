@@ -143,9 +143,13 @@ def build_spidermonkey(options):
 
         configure = os.path.join(SPIDERMONKEY_DIR, "js", "src",
                                  "configure")
-        retval = subprocess.call([configure,
-                                  "--enable-static",
-                                  "--disable-tests"],
+        cmdline = [configure,
+                   "--enable-static",
+                   "--disable-tests"]
+        if options.get("build") and options.build.get("debug"):
+            cmdline.extend(["--enable-debug",
+                            "--enable-gczeal"])
+        retval = subprocess.call(cmdline,
                                  cwd = SPIDERMONKEY_OBJDIR)
         if retval:
             sys.exit(retval)
