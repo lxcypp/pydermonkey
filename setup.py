@@ -48,21 +48,41 @@ if not os.path.exists(SPIDERMONKEY_DIR):
     print('WARNING: Spidermonkey objdir not found at %s.' % SPIDERMONKEY_DIR)
     print('Some build tasks may not run properly.\n')
 
-INCLUDE_DIRS = [os.path.join(SPIDERMONKEY_DIR, 'dist', 'include')]
-LIB_DIRS = [os.path.join(SPIDERMONKEY_DIR)]
+setup_options = dict(
+    name='pymonkey',
+    version='0.0.1',
+    description='Access SpiderMonkey from Python',
+    author='Atul Varma',
+    author_email='atul@mozilla.com',
+    url='http://www.toolness.com'
+    )
 
-setup(name='pymonkey',
-      version='0.0.1',
-      description='Access SpiderMonkey from Python',
-      author='Atul Varma',
-      author_email='atul@mozilla.com',
-      url='http://www.toolness.com',
-      ext_modules=[Extension('pymonkey',
-                             SOURCE_FILES,
-                             include_dirs = INCLUDE_DIRS,
-                             library_dirs = LIB_DIRS,
-                             libraries = ['js_static'])]
-     )
+ext_options = dict(
+    include_dirs = [os.path.join(SPIDERMONKEY_DIR, 'dist', 'include')],
+    library_dirs = [SPIDERMONKEY_DIR]
+    )
+
+if sys.platform == 'win32':
+    # MSVC can't find the js_static.lib SpiderMonkey library, even though
+    # it exists and distutils is trying to tell it to link to it, so
+    # we'll just link to the DLL on Windows platforms and install
+    # it in a place where Windows can find it at runtime.
+    ext_options['libraries'] = ['js3250']
+    ext_options['define_macros'] = [('XP_WIN', 1)]
+    # TODO: This is almost certainly not the ideal way to distribute
+    # a DLL used by a C extension module.
+    setup_options['data_files'] = [
+        ('Lib\\site-packages', [os.path.join(SPIDERMONKEY_DIR,
+                                             'js3250.dll')])
+        ]
+else:
+    ext_options['libraries'] = ['js_static']
+
+setup_options['ext_modules'] = [Extension('pymonkey',
+                                          SOURCE_FILES,
+                                          **ext_options)]
+
+setup(**setup_options)
 
 @task
 def docs(options):
