@@ -66,31 +66,21 @@ Rationale and Goals:
 * Finally, Atul has never really made a straight Python CAPI module
   before, so he wanted to give it a try.
 
-Building and Testing
-====================
+Building, Testing, and Installing
+=================================
 
-You can either build SpiderMonkey off the mozilla-central HG
-repository, or off a mirror I made of its SpiderMonkey directory. The
-latter can be obtained here:
+From the root of your pymonkey repository, run::
 
-  http://hg.toolness.com/spidermonkey/
+  python setup.py build test
 
-Just HG clone that repository in the root of your pymonkey repository
-and read the instructions in the ``README`` file to build SpiderMonkey.
-
-Then come back to the root of your pymonkey repository and run::
-
-  python setup.py build
+This will build the C extension and run its test suite to ensure that
+everything works properly.
 
 Then run::
 
   sudo python setup.py install
 
 Note that if you're on Windows, you won't need the ``sudo`` bit.
-
-You can run the test suite by entering::
-
-  python setup.py test
 
 Challenges
 ==========

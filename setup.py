@@ -59,6 +59,8 @@ SPIDERMONKEY_OBJDIR = os.path.join(BUILD_DIR, 'spidermonkey')
 
 SPIDERMONKEY_MAKEFILE = os.path.join(SPIDERMONKEY_OBJDIR, 'Makefile')
 
+DOCTEST_OUTPUT_DIR = os.path.join(BUILD_DIR, 'doctest_output')
+
 setup_options = dict(
     name='pymonkey',
     version='0.0.1',
@@ -155,6 +157,13 @@ def build_spidermonkey(options):
         sys.exit(retval)
 
 @task
+@needs('build_spidermonkey', 'setuptools.command.build')
+def build(options):
+    """Builds the pymonkey extension."""
+
+    pass
+
+@task
 def build_docs(options):
     """Build the Pymonkey documentation (requires Sphinx)."""
 
@@ -165,7 +174,16 @@ def build_docs(options):
     if retval:
         sys.exit(retval)
 
+def get_lib_dir():
+    # This is really weird and hacky; it ought to be much easier
+    # to figure out the default directory that distutils builds
+    # its C extension modules in.
+    return [os.path.join(BUILD_DIR, name)
+            for name in os.listdir(BUILD_DIR)
+            if name.startswith("lib.")][0]
+
 @task
+@needs('build')
 def test(options):
     """Test the Pymonkey Python C extension."""
 
@@ -173,6 +191,20 @@ def test(options):
 
     new_env = {}
     new_env.update(os.environ)
+
+    def append_path(env_var, path):
+        paths = new_env.get(env_var, '').split(os.path.pathsep)
+        paths.append(path)
+        new_env[env_var] = os.path.pathsep.join(paths)
+
+    # We have to add our build directory to the python path so that
+    # our tests can find the pymonkey module.
+    append_path('PYTHONPATH', get_lib_dir())
+
+    if sys.platform == 'win32':
+        # If we're on Windows, ensure that the SpiderMonkey DLL
+        # can be loaded.
+        append_path('PATH', SPIDERMONKEY_OBJDIR)
 
     result = subprocess.call(
         [sys.executable,
@@ -185,13 +217,10 @@ def test(options):
 
     print "Running doctests."
 
-    # We have to add our current directory to the python path so that
-    # our doctests can find the pymonkey module.
-    new_env['PYTHONPATH'] = os.path.abspath('.')
     retval = subprocess.call(["sphinx-build",
                               "-b", "doctest",
                               os.path.join("docs", "src"),
-                              "_doctest_output"],
+                              DOCTEST_OUTPUT_DIR],
                              env = new_env)
     if retval:
         sys.exit(retval)
