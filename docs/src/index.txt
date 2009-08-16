@@ -73,8 +73,8 @@ From the root of your pymonkey repository, run::
 
   python setup.py build test
 
-This will build the C extension and run its test suite to ensure that
-everything works properly.
+This will fetch and compile SpiderMonkey, build the C extension, and
+run its test suite to ensure that everything works properly.
 
 Then run::
 
