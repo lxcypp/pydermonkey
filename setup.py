@@ -174,6 +174,23 @@ def build_docs(options):
     if retval:
         sys.exit(retval)
 
+def maybe_clean(dirname, only_if_empty = False):
+    if os.path.exists(dirname):
+        if not (only_if_empty and os.listdir(dirname)):
+            distutils.dir_util.remove_tree(dirname)
+
+@task
+@needs('setuptools.command.clean')
+def clean(options):
+    """Clean up intermediate files, and optionally other files too."""
+
+    maybe_clean(DOCTEST_OUTPUT_DIR)
+
+    if options.clean.get("all"):
+        maybe_clean(SPIDERMONKEY_OBJDIR)
+
+    maybe_clean(BUILD_DIR, only_if_empty = True)
+
 def get_lib_dir():
     # This is really weird and hacky; it ought to be much easier
     # to figure out the default directory that distutils builds

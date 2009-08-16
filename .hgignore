@@ -1,5 +1,4 @@
 syntax: glob
-*.so
 *.pyc
 docs/rendered/.buildinfo
 docs/rendered/.doctrees
