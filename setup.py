@@ -23,10 +23,9 @@ if __name__ == '__main__':
 
 # This code is run if we're executed as a pavement script by paver.
 
-import os
 import subprocess
 import shutil
-import sys
+import errno
 import webbrowser
 import urllib
 import urllib2
@@ -238,10 +237,18 @@ def test(options):
 
     print "Running doctests."
 
-    retval = subprocess.call(["sphinx-build",
-                              "-b", "doctest",
-                              os.path.join("docs", "src"),
-                              DOCTEST_OUTPUT_DIR],
-                             env = new_env)
+    try:
+        retval = subprocess.call(["sphinx-build",
+                                  "-b", "doctest",
+                                  os.path.join("docs", "src"),
+                                  DOCTEST_OUTPUT_DIR],
+                                 env = new_env)
+    except OSError, e:
+        if e.errno == errno.ENOENT:
+            print "Sphinx not found, skipping doctests."
+            retval = 0
+        else:
+            raise
+
     if retval:
         sys.exit(retval)
