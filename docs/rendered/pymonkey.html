@@ -142,6 +142,16 @@ JS context which is calling the function.</p>
 value of <tt class="docutils literal"><span class="pre">this</span></tt> for the duration of the call.</p>
 <p>The third argument is a tuple containing the arguments
 passed to the function.</p>
+<p>For instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">define_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">,</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_function</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;add(1, 1);&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">

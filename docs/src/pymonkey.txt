@@ -94,6 +94,16 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       The third argument is a tuple containing the arguments
       passed to the function.
 
+      For instance:
+
+        >>> def add(cx, this, args):
+        ...   return args[0] + args[1]
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> obj = cx.new_object()
+        >>> cx.define_property(obj, 'add', cx.new_function(add, 'add'))
+        >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
+        2
+
    .. method:: get_object_private(object)
 
       Returns the ``private_obj`` passed to :meth:`new_object()`
