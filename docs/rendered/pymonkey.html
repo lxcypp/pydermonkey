@@ -275,18 +275,27 @@ yet been set, this function does nothing.</p>
 to a JS runtime, and together with
 <a title="pymonkey.Context.set_operation_callback" class="reference" href="#pymonkey.Context.set_operation_callback"><tt class="xref docutils literal"><span class="pre">set_operation_callback()</span></tt></a> can be used to abort the
 execution of long-running code.</p>
-<p>For instance:</p>
+<p>For instance, we first create an operation callback to stop
+long-running code by throwing an exception:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">threading</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">stop_running_code</span><span class="p">(</span><span class="n">cx</span><span class="p">):</span>
 <span class="gp">... </span>  <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;JS took too long to execute.&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">set_operation_callback</span><span class="p">(</span><span class="n">stop_running_code</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">watchdog_thread</span><span class="p">():</span>
-<span class="gp">... </span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we create a watchdog thread to trigger the operation
+callback once a long amount of time has passed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">watchdog_thread</span><span class="p">():</span>
+<span class="gp">... </span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>                 <span class="c"># An eternity to a computer!</span>
 <span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">trigger_operation_callback</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watchdog_thread</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>Now, when we execute code that takes too long to run, it gets
+aborted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;while (1) {}&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
