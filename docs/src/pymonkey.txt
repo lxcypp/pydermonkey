@@ -76,13 +76,13 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       stored within the new JS object; it can be retrieved using
       :meth:`get_object_private()`.
 
-   .. method:: new_function(callable, name)
+   .. method:: new_function(func, name)
 
       Creates a new :class:`Function` instance that wraps the
       given Python callable.  In JS-land, the function will
       have the given name.
 
-      When the function is executed from JavaScript, `callable`
+      When the function is executed from JavaScript, `func`
       will be passed three positional arguments.
 
       The first argument is a :class:`Context` that represents the
@@ -195,6 +195,47 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       `JS_InitStandardClasses()
       <https://developer.mozilla.org/en/SpiderMonkey/JSAPI_Reference/JS_InitStandardClasses>`_,
       which this method wraps.
+
+   .. method:: gc()
+
+      Performs garbage collection on the context's JavaScript runtime.
+
+   .. method:: set_operation_callback(func)
+
+      Sets the operation callback for the context to the given Python
+      callable. The callback can be triggered via
+      :meth:`trigger_operation_callback()`.
+
+      `func` takes one argument: the context that triggered it.
+
+   .. method:: trigger_operation_callback()
+
+      Triggers the context's operation callback. If no callback has
+      yet been set, this function does nothing.
+
+      This function is one of the few thread-safe functions available
+      to a JS runtime, and together with
+      :meth:`set_operation_callback()` can be used to abort the
+      execution of long-running code.
+
+      For instance:
+
+        >>> import time, threading
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> def stop_running_code(cx):
+        ...   raise Exception('JS took too long to execute.')
+        >>> cx.set_operation_callback(stop_running_code)
+        >>> def watchdog_thread():
+        ...   time.sleep(0.1)
+        ...   cx.trigger_operation_callback()
+        >>> thread = threading.Thread(target=watchdog_thread)
+        >>> thread.start()
+        >>> try:
+        ...   cx.evaluate_script(cx.new_object(), 'while (1) {}',
+        ...                      '<string>', 1)
+        ... except pymonkey.error, e:
+        ...   print cx.get_object_private(e.args[0])
+        JS took too long to execute.
 
 .. class:: Runtime()
 

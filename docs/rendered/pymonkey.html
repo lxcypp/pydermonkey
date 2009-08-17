@@ -130,11 +130,11 @@ stored within the new JS object; it can be retrieved using
 
 <dl class="method">
 <dt id="pymonkey.Context.new_function">
-<tt class="descname">new_function</tt><big>(</big><em>callable</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.new_function" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">new_function</tt><big>(</big><em>func</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.new_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> instance that wraps the
 given Python callable.  In JS-land, the function will
 have the given name.</p>
-<p>When the function is executed from JavaScript, <cite>callable</cite>
+<p>When the function is executed from JavaScript, <cite>func</cite>
 will be passed three positional arguments.</p>
 <p>The first argument is a <a title="pymonkey.Context" class="reference" href="#pymonkey.Context"><tt class="xref docutils literal"><span class="pre">Context</span></tt></a> that represents the
 JS context which is calling the function.</p>
@@ -251,6 +251,50 @@ to pass to the function.</p>
 so forth. For more information, see the documentation to
 <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey/JSAPI_Reference/JS_InitStandardClasses">JS_InitStandardClasses()</a>,
 which this method wraps.</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.gc">
+<tt class="descname">gc</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.gc" title="Permalink to this definition">¶</a></dt>
+<dd>Performs garbage collection on the context&#8217;s JavaScript runtime.</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.set_operation_callback">
+<tt class="descname">set_operation_callback</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pymonkey.Context.set_operation_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the operation callback for the context to the given Python
+callable. The callback can be triggered via
+<a title="pymonkey.Context.trigger_operation_callback" class="reference" href="#pymonkey.Context.trigger_operation_callback"><tt class="xref docutils literal"><span class="pre">trigger_operation_callback()</span></tt></a>.</p>
+<p><cite>func</cite> takes one argument: the context that triggered it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.trigger_operation_callback">
+<tt class="descname">trigger_operation_callback</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.trigger_operation_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers the context&#8217;s operation callback. If no callback has
+yet been set, this function does nothing.</p>
+<p>This function is one of the few thread-safe functions available
+to a JS runtime, and together with
+<a title="pymonkey.Context.set_operation_callback" class="reference" href="#pymonkey.Context.set_operation_callback"><tt class="xref docutils literal"><span class="pre">set_operation_callback()</span></tt></a> can be used to abort the
+execution of long-running code.</p>
+<p>For instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">threading</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">stop_running_code</span><span class="p">(</span><span class="n">cx</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;JS took too long to execute.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">set_operation_callback</span><span class="p">(</span><span class="n">stop_running_code</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">watchdog_thread</span><span class="p">():</span>
+<span class="gp">... </span>  <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">trigger_operation_callback</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watchdog_thread</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;while (1) {}&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="k">print</span> <span class="n">cx</span><span class="o">.</span><span class="n">get_object_private</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+<span class="go">JS took too long to execute.</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </dd></dl>
 
