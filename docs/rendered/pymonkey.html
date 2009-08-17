@@ -197,6 +197,16 @@ exceptions, and so forth.</p>
 of <tt class="docutils literal"><span class="pre">this</span></tt> when the function executes, <cite>func</cite> is the
 <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> to execute, and <cite>args</cite> is a tuple of arguments
 to pass to the function.</p>
+<p>For instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Math</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;Math&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floor</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">Math</span><span class="p">,</span> <span class="s">&#39;floor&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">call_function</span><span class="p">(</span><span class="n">Math</span><span class="p">,</span> <span class="n">floor</span><span class="p">,</span> <span class="p">(</span><span class="mf">5.3</span><span class="p">,))</span>
+<span class="go">5</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">

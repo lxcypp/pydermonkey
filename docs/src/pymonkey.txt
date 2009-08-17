@@ -146,6 +146,16 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       :class:`Function` to execute, and `args` is a tuple of arguments
       to pass to the function.
 
+      For instance:
+
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> obj = cx.new_object()
+        >>> cx.init_standard_classes(obj)
+        >>> Math = cx.get_property(obj, 'Math')
+        >>> floor = cx.get_property(Math, 'floor')
+        >>> cx.call_function(Math, floor, (5.3,))
+        5
+
    .. method:: init_standard_classes(object)
 
       Defines the standard JavaScript classes on the given
