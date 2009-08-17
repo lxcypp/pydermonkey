@@ -187,6 +187,14 @@ object/scope.</p>
 the first line of <cite>code</cite> is assumed to be line number <cite>lineno</cite> of
 <cite>filename</cite>. This metadata is very useful for debugging stack traces,
 exceptions, and so forth.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;5 * Math&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="go">nan</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">

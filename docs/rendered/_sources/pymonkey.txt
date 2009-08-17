@@ -137,6 +137,14 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       `filename`. This metadata is very useful for debugging stack traces,
       exceptions, and so forth.
 
+      For example:
+
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> obj = cx.new_object()
+        >>> cx.init_standard_classes(obj)
+        >>> cx.evaluate_script(obj, '5 * Math', '<string>', 1)
+        nan
+
    .. method:: call_function(thisobj, func, args)
 
       Calls a JavaScript function.
