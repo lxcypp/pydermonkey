@@ -155,6 +155,32 @@ passed to the function.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pymonkey.Context.define_property">
+<tt class="descname">define_property</tt><big>(</big><em>object</em>, <em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#pymonkey.Context.define_property" title="Permalink to this definition">¶</a></dt>
+<dd>Creates a new property on <cite>object</cite>, bypassing any JavaScript setters.</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.get_property">
+<tt class="descname">get_property</tt><big>(</big><em>object</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the specified property on <cite>object</cite> and returns its value,
+possibly invoking a JavaScript getter.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">define_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;beets&#39;</span><span class="p">,</span> <span class="s">&#39;i like beets.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;beets&#39;</span><span class="p">)</span>
+<span class="go">u&#39;i like beets.&#39;</span>
+</pre></div>
+</div>
+<p>Note also that calling this function on undefined properties
+yields <a title="pymonkey.undefined" class="reference" href="#pymonkey.undefined"><tt class="xref docutils literal"><span class="pre">undefined</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;carrots&#39;</span><span class="p">)</span>
+<span class="go">pymonkey.undefined</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="pymonkey.Context.get_object_private">
 <tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pymonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pymonkey.Context.new_object" class="reference" href="#pymonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>

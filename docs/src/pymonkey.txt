@@ -104,6 +104,29 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
+   .. method:: define_property(object, name, value)
+
+      Creates a new property on `object`, bypassing any JavaScript setters.
+
+   .. method:: get_property(object, name)
+
+      Finds the specified property on `object` and returns its value,
+      possibly invoking a JavaScript getter.
+
+      Example:
+
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> obj = cx.new_object()
+        >>> cx.define_property(obj, 'beets', 'i like beets.')
+        >>> cx.get_property(obj, 'beets')
+        u'i like beets.'
+
+      Note also that calling this function on undefined properties
+      yields :data:`undefined`:
+
+        >>> cx.get_property(obj, 'carrots')
+        pymonkey.undefined
+
    .. method:: get_object_private(object)
 
       Returns the ``private_obj`` passed to :meth:`new_object()`
