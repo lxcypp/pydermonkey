@@ -204,7 +204,6 @@ def get_lib_dir():
             if name.startswith("lib.")][0]
 
 @task
-@needs('build')
 def test(options):
     """Test the Pymonkey Python C extension."""
 
