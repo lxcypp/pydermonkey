@@ -251,6 +251,11 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    Creates a new JavaScript runtime. JS objects created by the runtime
    may only interact with other JS objects of the same runtime.
 
+   With few exceptions, objects belonging to a runtime can currently
+   only be used in the same thread that the runtime was created
+   in. This may be changed in the future, since SpiderMonkey itself
+   has support for thread safety.
+
    .. method:: new_context()
 
       Creates a new Context object and returns it. Contexts are best

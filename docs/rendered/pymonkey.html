@@ -313,6 +313,10 @@ aborted:</p>
 class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Runtime</tt><a class="headerlink" href="#pymonkey.Runtime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new JavaScript runtime. JS objects created by the runtime
 may only interact with other JS objects of the same runtime.</p>
+<p>With few exceptions, objects belonging to a runtime can currently
+only be used in the same thread that the runtime was created
+in. This may be changed in the future, since SpiderMonkey itself
+has support for thread safety.</p>
 <dl class="method">
 <dt id="pymonkey.Runtime.new_context">
 <tt class="descname">new_context</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Runtime.new_context" title="Permalink to this definition">¶</a></dt>
