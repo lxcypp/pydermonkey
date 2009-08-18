@@ -43,6 +43,8 @@
 #include <jsdhash.h>
 #include <Python.h>
 
+// Simple class that holds the Python global interpreter lock (GIL)
+// for as long as it's in scope.
 class PYM_PyAutoEnsureGIL {
 public:
   PYM_PyAutoEnsureGIL() {
@@ -64,17 +66,29 @@ typedef struct {
 
 extern PyObject *PYM_error;
 
+// Convert a PyObject to a jsval. Returns 0 on success,
+// -1 on error. If an error occurs, a Python exception is
+// set.
+//
+// The jsval is placed in rval.
 extern int
 PYM_pyObjectToJsval(PYM_JSContextObject *context,
                     PyObject *object,
                     jsval *rval);
 
+// Convert a jsval to a PyObject, returning a new reference.
+// If this function fails, it sets a Python exception and
+// returns NULL.
 extern PyObject *
 PYM_jsvalToPyObject(PYM_JSContextObject *context, jsval value);
 
+// Converts the currently-pending Python exception to a
+// pending JS exception on the given JS context.
 extern void
 PYM_pythonExceptionToJs(PYM_JSContextObject *context);
 
+// Converts the currently-pending exception on the given
+// JS context into a pending Python exception.
 void
 PYM_jsExceptionToPython(PYM_JSContextObject *context);
 
