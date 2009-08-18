@@ -92,7 +92,8 @@ else:
 
 setup_options['ext_modules'] = [
     distutils.core.Extension('pymonkey',
-                             SOURCE_FILES,
+                             [os.path.join("src", filename)
+                              for filename in SOURCE_FILES],
                              **ext_options)
     ]
 
@@ -228,7 +229,7 @@ def test(options):
 
     result = subprocess.call(
         [sys.executable,
-         "test_pymonkey.py"],
+         os.path.join("tests", "test_pymonkey.py")],
         env = new_env
         )
 
