@@ -31,6 +31,11 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testErrorsRaisedIncludeStrings(self):
+        self.assertRaises(pymonkey.error, self._evaljs, 'boop()')
+        self.assertEqual(self.last_exception.args[1],
+                         u'ReferenceError: boop is not defined')
+
     def testThreadSafetyExceptionIsRaised(self):
         stuff = {}
         def make_runtime():

@@ -233,25 +233,35 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
 
   jsval val;
   if (JS_GetPendingException(context->cx, &val)) {
+    PyObject *pyStr = NULL;
+    PyObject *tuple = NULL;
     PyObject *obj = PYM_jsvalToPyObject(context, val);
-    if (obj) {
-      PyErr_SetObject(PYM_error, obj);
-      Py_DECREF(obj);
-    } else {
+    if (obj == NULL) {
       PyErr_Clear();
-
-      JSString *str = NULL;
-
-      Py_BEGIN_ALLOW_THREADS;
-      str = JS_ValueToString(context->cx, val);
-      Py_END_ALLOW_THREADS;
-
-      if (str != NULL) {
-        const char *chars = JS_GetStringBytes(str);
-        PyErr_SetString(PYM_error, chars);
-      } else
-        PyErr_SetString(PYM_error, "JS exception occurred");
+      obj = Py_None;
+      Py_INCREF(obj);
     }
+
+    JSString *str = NULL;
+
+    Py_BEGIN_ALLOW_THREADS;
+    str = JS_ValueToString(context->cx, val);
+    Py_END_ALLOW_THREADS;
+
+    if (str != NULL)
+      pyStr = PYM_jsvalToPyObject(context, STRING_TO_JSVAL(str));
+    else
+      // TODO: Is there an exception in JS-land we should clear?
+      pyStr = PyString_FromString("<string conversion failed>");
+
+    if (pyStr) {
+      tuple = Py_BuildValue("(OO)", obj, pyStr);
+      if (tuple)
+        PyErr_SetObject(PYM_error, tuple);
+    }
+    Py_DECREF(obj);
+    Py_XDECREF(pyStr);
+    Py_XDECREF(tuple);
   } else
     PyErr_SetString(PYM_error, "JS_GetPendingException() failed");
 }
