@@ -451,6 +451,10 @@ class PymonkeyTests(unittest.TestCase):
                                         self.last_exception.args[0]),
                          'ReferenceError: hai2u is not defined')
 
+    def testEvaluateTakesUnicodeCode(self):
+        self.assertEqual(self._evaljs(u"'foo\u2026'"),
+                         u"foo\u2026")
+
     def testEvaluateReturnsUndefined(self):
         retval = self._evaljs("")
         self.assertTrue(retval is pymonkey.undefined)

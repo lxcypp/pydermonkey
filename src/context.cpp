@@ -276,23 +276,30 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
-  const char *source;
+  char *source = NULL;
   int sourceLen;
   const char *filename;
   int lineNo;
 
-  if (!PyArg_ParseTuple(args, "O!s#si", &PYM_JSObjectType, &object,
-                        &source, &sourceLen, &filename, &lineNo))
+  if (!PyArg_ParseTuple(args, "O!es#si", &PYM_JSObjectType, &object,
+                        "utf-16", &source, &sourceLen, &filename, &lineNo))
     return NULL;
 
-  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+  if (self->runtime != object->runtime) {
+    PyMem_Free(source);
+    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+  }
 
   jsval rval;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  result = JS_EvaluateScript(self->cx, object->obj, source, sourceLen,
-                             filename, lineNo, &rval);
+  // Note that we're manipulating buffer and size here to get rid of
+  // the BOM.
+  result = JS_EvaluateUCScript(self->cx, object->obj, (jschar *) (source + 2),
+                               (sourceLen / 2) - 1, filename, lineNo, &rval);
   Py_END_ALLOW_THREADS;
+
+  PyMem_Free(source);
 
   if (!result) {
     PYM_jsExceptionToPython(self);
