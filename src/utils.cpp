@@ -233,6 +233,8 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
 
   jsval val;
   if (JS_GetPendingException(context->cx, &val)) {
+    JS_ClearPendingException(context->cx);
+
     PyObject *pyStr = NULL;
     PyObject *tuple = NULL;
     PyObject *obj = PYM_jsvalToPyObject(context, val);

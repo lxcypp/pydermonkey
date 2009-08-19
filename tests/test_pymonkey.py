@@ -451,6 +451,17 @@ class PymonkeyTests(unittest.TestCase):
                                         self.last_exception.args[0]),
                          'ReferenceError: hai2u is not defined')
 
+    def testThrowingObjWithBadToStringWorks(self):
+        self.assertRaises(
+            pymonkey.error,
+            self._evaljs,
+            "throw {toString: function() { throw 'dujg' }}"
+            )
+        self.assertEqual(
+            self.last_exception.args[1],
+            "<string conversion failed>"
+            )
+
     def testEvaluateTakesUnicodeCode(self):
         self.assertEqual(self._evaljs(u"'foo\u2026'"),
                          u"foo\u2026")
