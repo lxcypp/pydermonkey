@@ -252,9 +252,10 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
 
     if (str != NULL)
       pyStr = PYM_jsvalToPyObject(context, STRING_TO_JSVAL(str));
-    else
-      // TODO: Is there an exception in JS-land we should clear?
+    else {
+      JS_ClearPendingException(context->cx);
       pyStr = PyString_FromString("<string conversion failed>");
+    }
 
     if (pyStr) {
       tuple = Py_BuildValue("(OO)", obj, pyStr);
