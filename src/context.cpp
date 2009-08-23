@@ -84,22 +84,31 @@ PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
     PyErr_Warn(NULL, "A JS error was reported.");
 }
 
+static int
+PYM_traverse(PYM_JSContextObject *self, visitproc visit, void *arg)
+{
+  Py_VISIT(self->opCallback);
+  Py_VISIT(self->runtime);
+  return 0;
+}
+
+static int
+PYM_clear(PYM_JSContextObject *self)
+{
+  Py_CLEAR(self->opCallback);
+  Py_CLEAR(self->runtime);
+  return 0;
+}
+
 static void
 PYM_JSContextDealloc(PYM_JSContextObject *self)
 {
-  if (self->opCallback) {
-    Py_DECREF(self->opCallback);
-    self->opCallback = NULL;
-  }
-
   if (self->cx) {
     JS_DestroyContext(self->cx);
     self->cx = NULL;
   }
 
-  Py_DECREF(self->runtime);
-  self->runtime = NULL;
-
+  PYM_clear(self);
   self->ob_type->tp_free((PyObject *) self);
 }
 
@@ -512,11 +521,12 @@ PyTypeObject PYM_JSContextType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /*tp_flags*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
   /* tp_doc */
   "JavaScript Context.",
-  0,		               /* tp_traverse */
-  0,		               /* tp_clear */
+  (traverseproc) PYM_traverse, /* tp_traverse */
+  (inquiry) PYM_clear,         /* tp_clear */
   0,		               /* tp_richcompare */
   0,		               /* tp_weaklistoffset */
   0,		               /* tp_iter */
@@ -537,8 +547,8 @@ PyTypeObject PYM_JSContextType = {
 extern PYM_JSContextObject *
 PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
 {
-  PYM_JSContextObject *context = PyObject_New(PYM_JSContextObject,
-                                              &PYM_JSContextType);
+  PYM_JSContextObject *context = PyObject_GC_New(PYM_JSContextObject,
+                                                 &PYM_JSContextType);
   if (context == NULL)
     return NULL;
 
