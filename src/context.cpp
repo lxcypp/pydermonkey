@@ -103,6 +103,8 @@ PYM_clear(PYM_JSContextObject *self)
 static void
 PYM_JSContextDealloc(PYM_JSContextObject *self)
 {
+  if (self->weakrefs)
+    PyObject_ClearWeakRefs((PyObject *) self);
   if (self->cx) {
     JS_DestroyContext(self->cx);
     self->cx = NULL;
@@ -522,13 +524,14 @@ PyTypeObject PYM_JSContextType = {
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
   /*tp_flags*/
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_HAVE_WEAKREFS,
   /* tp_doc */
   "JavaScript Context.",
   (traverseproc) PYM_traverse, /* tp_traverse */
   (inquiry) PYM_clear,         /* tp_clear */
   0,		               /* tp_richcompare */
-  0,		               /* tp_weaklistoffset */
+  /* tp_weaklistoffset */
+  offsetof(PYM_JSContextObject, weakrefs),
   0,		               /* tp_iter */
   0,		               /* tp_iternext */
   PYM_JSContextMethods,        /* tp_methods */
@@ -552,6 +555,7 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   if (context == NULL)
     return NULL;
 
+  context->weakrefs = NULL;
   context->opCallback = NULL;
   context->runtime = runtime;
   Py_INCREF(runtime);

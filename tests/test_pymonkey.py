@@ -438,6 +438,14 @@ class PymonkeyTests(unittest.TestCase):
         cx = rt.new_context()
         self.assertEqual(cx.get_runtime(), rt)
 
+    def testContextsAreWeakReferencable(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        wcx = weakref.ref(cx)
+        self.assertEqual(cx, wcx())
+        del cx
+        self.assertEqual(wcx(), None)
+
     def testUndefinedCannotBeInstantiated(self):
         self.assertRaises(TypeError, pymonkey.undefined)
 
