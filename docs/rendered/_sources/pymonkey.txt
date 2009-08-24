@@ -65,6 +65,8 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      >>> isinstance(cx, pymonkey.Context)
      True
 
+   JS contexts are weak-referencable.
+
    .. method:: get_runtime()
 
       Returns the :class:`Runtime` that the context belongs to.
@@ -255,6 +257,8 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    only be used in the same thread that the runtime was created
    in. This may be changed in the future, since SpiderMonkey itself
    has support for thread safety.
+
+   JS runtimes are weak-referencable.
 
    .. method:: new_context()
 

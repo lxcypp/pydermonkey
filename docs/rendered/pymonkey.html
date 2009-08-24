@@ -115,6 +115,7 @@ to verify that an object is a context, like so:</p>
 <span class="go">True</span>
 </pre></div>
 </div>
+<p>JS contexts are weak-referencable.</p>
 <dl class="method">
 <dt id="pymonkey.Context.get_runtime">
 <tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_runtime" title="Permalink to this definition">¶</a></dt>
@@ -317,6 +318,7 @@ may only interact with other JS objects of the same runtime.</p>
 only be used in the same thread that the runtime was created
 in. This may be changed in the future, since SpiderMonkey itself
 has support for thread safety.</p>
+<p>JS runtimes are weak-referencable.</p>
 <dl class="method">
 <dt id="pymonkey.Runtime.new_context">
 <tt class="descname">new_context</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Runtime.new_context" title="Permalink to this definition">¶</a></dt>
