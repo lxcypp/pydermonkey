@@ -105,13 +105,15 @@ PYM_JSContextDealloc(PYM_JSContextObject *self)
 {
   if (self->weakrefs)
     PyObject_ClearWeakRefs((PyObject *) self);
+  PyObject_GC_UnTrack(self);
+
   if (self->cx) {
     JS_DestroyContext(self->cx);
     self->cx = NULL;
   }
 
   PYM_clear(self);
-  self->ob_type->tp_free((PyObject *) self);
+  PyObject_GC_Del(self);
 }
 
 static PyObject *
