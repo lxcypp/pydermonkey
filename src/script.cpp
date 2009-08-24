@@ -37,12 +37,42 @@
 #include "script.h"
 #include "utils.h"
 
+#include "jsscript.h"
+
 static void
 PYM_JSScriptDealloc(PYM_JSScript *self)
 {
   self->script = NULL;
   PYM_JSObjectType.tp_dealloc((PyObject *) self);
 }
+
+Py_ssize_t PYM_readbuffer(PYM_JSScript *self, Py_ssize_t segment,
+                          void **ptrptr)
+{
+  *ptrptr = self->script->code;
+  return self->script->length;
+}
+
+Py_ssize_t PYM_segcount(PYM_JSScript *self, Py_ssize_t *lenp)
+{
+  if (lenp)
+    *lenp = self->script->length;
+  return 1;
+}
+
+Py_ssize_t PYM_charbuffer(PYM_JSScript *self, Py_ssize_t segment,
+                          const char **ptrptr)
+{
+  *ptrptr = (char *) self->script->code;
+  return self->script->length;
+}
+
+static PyBufferProcs PYM_bufferProcs = {
+  (readbufferproc) PYM_readbuffer,
+  NULL,
+  (segcountproc) PYM_segcount,
+  (charbufferproc) PYM_charbuffer
+};
 
 PyTypeObject PYM_JSScriptType = {
   PyObject_HEAD_INIT(NULL)
@@ -65,9 +95,9 @@ PyTypeObject PYM_JSScriptType = {
   0,                           /*tp_str*/
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
-  0,                           /*tp_as_buffer*/
+  &PYM_bufferProcs,            /*tp_as_buffer*/
                                /*tp_flags*/
-  Py_TPFLAGS_DEFAULT,
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GETCHARBUFFER,
                                /* tp_doc */
   "JavaScript Script.",
   0,                           /* tp_traverse */

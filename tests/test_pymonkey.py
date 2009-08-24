@@ -48,6 +48,13 @@ class PymonkeyTests(unittest.TestCase):
                 u'SyntaxError: missing ; before statement'
                 )
 
+    def testScriptIsExposedAsBuffer(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        script = cx.compile_script(obj, 'foo', '<string>', 1)
+        self.assertTrue(len(buffer(script)) > 0)
+
     def testCompileScriptWorks(self):
         self.assertEqual(self._execjs('5 + 1'), 6)
 
