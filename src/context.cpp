@@ -233,21 +233,16 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
                         "utf-16", &buffer, &size))
     return NULL;
 
-  if (self->runtime != object->runtime) {
-    PyMem_Free(buffer);
-    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-  }
+  PYM_UTF16String str(buffer, size);
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
   jsval val;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  // Note that we're manipulating buffer and size here to get rid of
-  // the BOM.
-  result = JS_GetUCProperty(self->cx, object->obj, (jschar *) (buffer + 2),
-                            (size / 2) - 1, &val);
+  result = JS_GetUCProperty(self->cx, object->obj, str.jsbuffer,
+                            str.jslen, &val);
   Py_END_ALLOW_THREADS;
-
-  PyMem_Free(buffer);
 
   if (!result) {
     PYM_jsExceptionToPython(self);
@@ -298,21 +293,16 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
                         "utf-16", &source, &sourceLen, &filename, &lineNo))
     return NULL;
 
-  if (self->runtime != object->runtime) {
-    PyMem_Free(source);
-    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-  }
+  PYM_UTF16String str(source, sourceLen);
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
   jsval rval;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  // Note that we're manipulating buffer and size here to get rid of
-  // the BOM.
-  result = JS_EvaluateUCScript(self->cx, object->obj, (jschar *) (source + 2),
-                               (sourceLen / 2) - 1, filename, lineNo, &rval);
+  result = JS_EvaluateUCScript(self->cx, object->obj, str.jsbuffer,
+                               str.jslen, filename, lineNo, &rval);
   Py_END_ALLOW_THREADS;
-
-  PyMem_Free(source);
 
   if (!result) {
     PYM_jsExceptionToPython(self);
@@ -336,31 +326,23 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
                         "utf-16", &name, &namelen, &value))
     return NULL;
 
-  if (self->runtime != object->runtime) {
-    PyMem_Free(name);
-    PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-  }
-
+  PYM_UTF16String str(name, namelen);
   jsval jsValue;
 
-  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1) {
-    PyMem_Free(name);
-    return NULL;
-  }
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
-  // Note that we're manipulating buffer and size here to get rid of
-  // the BOM.
-  if (!JS_DefineUCProperty(self->cx, object->obj, (jschar *) (name + 2),
-                           (namelen / 2) - 1, jsValue, NULL, NULL,
+  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
+    return NULL;
+
+  if (!JS_DefineUCProperty(self->cx, object->obj, str.jsbuffer,
+                           str.jslen, jsValue, NULL, NULL,
                            JSPROP_ENUMERATE)) {
     // TODO: There's probably an exception pending on self->cx,
     // what should we do about it?
-    PyMem_Free(name);
     PyErr_SetString(PYM_error, "JS_DefineProperty() failed");
     return NULL;
   }
 
-  PyMem_Free(name);
   Py_RETURN_NONE;
 }
 

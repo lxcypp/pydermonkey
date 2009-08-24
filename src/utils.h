@@ -43,6 +43,27 @@
 #include <jsdhash.h>
 #include <Python.h>
 
+// Simple class that holds on to a UTF-16 string created by
+// PyArg_ParseTuple() for as long as it's in scope.  It also
+// provides easy BOM-stripping accessors for JS-land.
+class PYM_UTF16String {
+public:
+  PYM_UTF16String(char *buffer, int size) : jsbuffer((jschar *) (buffer + 2)),
+    jslen(size / 2 - 1), pybuffer(buffer), pysize(size) {
+  }
+
+  ~PYM_UTF16String() {
+    PyMem_Free(pybuffer);
+  }
+
+  jschar *jsbuffer;
+  size_t jslen;
+
+protected:
+  char *pybuffer;
+  int pysize;
+};
+
 // Simple class that holds the Python global interpreter lock (GIL)
 // for as long as it's in scope.
 class PYM_PyAutoEnsureGIL {
