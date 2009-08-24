@@ -110,6 +110,10 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Creates a new property on `object`, bypassing any JavaScript setters.
 
+   .. method:: has_property(object, name)
+
+      Returns whether or not `object` has the specified property.
+
    .. method:: get_property(object, name)
 
       Finds the specified property on `object` and returns its value,
