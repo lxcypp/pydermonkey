@@ -54,6 +54,16 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    This is the type of JavaScript functions, which is a subtype of
    :class:`Object`.
 
+.. class:: Script
+
+   This is the type of compiled JavaScript scripts; it's actually a
+   subtype of :class:`Object`, though when exposed to JS code it
+   doesn't provide access to any special data or functionality.
+
+   Script instances have a read-only buffer interface that exposes
+   their bytecode. This can be accessed by passing an instance to
+   Python's built-in ``buffer()`` function.
+
 .. class:: Context
 
    This is the type of JavaScript context objects. Contexts can only
@@ -172,6 +182,33 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> obj = cx.new_object()
         >>> cx.init_standard_classes(obj)
         >>> cx.evaluate_script(obj, '5 * Math', '<string>', 1)
+        nan
+
+   .. method:: compile_script(obj, code, filename, lineno)
+
+      Compiles the given string of code and returns a :class:`Script`
+      instance that can be executed via :meth:`execute_script()`.
+
+      `filename` and `lineno` are used just as in
+      :meth:`evaluate_script()`.
+
+      `obj` is defined in the SpiderMonkey documentation to be
+      the "object with which the script is associated", though it's
+      unclear what its actual role is.
+
+   .. method:: execute_script(globalobj, script)
+
+      Executes the code in the given :class:`Script` object, using
+      `globalobj` as the global object/scope, and returns the result.
+
+      For example:
+
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> obj = cx.new_object()
+        >>> cx.init_standard_classes(obj)
+        >>> script = cx.compile_script(cx.new_object(), '5 * Math',
+        ...                            '<string>', 1)
+        >>> cx.execute_script(obj, script)
         nan
 
    .. method:: call_function(thisobj, func, args)
