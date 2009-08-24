@@ -46,6 +46,7 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 
   self = (PYM_JSRuntimeObject *) type->tp_alloc(type, 0);
   if (self != NULL) {
+    self->weakrefs = NULL;
     self->thread = PyThread_get_thread_ident();
     self->rt = NULL;
     self->cx = NULL;
@@ -84,6 +85,9 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
 static void
 PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
 {
+  if (self->weakrefs)
+    PyObject_ClearWeakRefs((PyObject *) self);
+
   if (self->objects.ops) {
     JS_DHashTableFinish(&self->objects);
     self->objects.ops = NULL;
@@ -154,13 +158,15 @@ PyTypeObject PYM_JSRuntimeType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT,          /*tp_flags*/
+  /*tp_flags*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_WEAKREFS,
   /* tp_doc */
   "JavaScript Runtime.",
   0,		               /* tp_traverse */
   0,		               /* tp_clear */
   0,		               /* tp_richcompare */
-  0,		               /* tp_weaklistoffset */
+  /* tp_weaklistoffset */
+  offsetof(PYM_JSRuntimeObject, weakrefs),
   0,		               /* tp_iter */
   0,		               /* tp_iternext */
   PYM_JSRuntimeMethods,        /* tp_methods */

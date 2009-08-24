@@ -60,6 +60,7 @@ typedef struct {
   JSContext *cx;
   JSDHashTable objects;
   long thread;
+  JSObject *weakrefs;
 } PYM_JSRuntimeObject;
 
 extern PyTypeObject PYM_JSRuntimeType;

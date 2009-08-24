@@ -459,6 +459,13 @@ class PymonkeyTests(unittest.TestCase):
         cx = rt.new_context()
         self.assertEqual(cx.get_runtime(), rt)
 
+    def testRuntimesAreWeakReferencable(self):
+        rt = pymonkey.Runtime()
+        wrt = weakref.ref(rt)
+        self.assertEqual(rt, wrt())
+        del rt
+        self.assertEqual(wrt(), None)
+
     def testContextsAreWeakReferencable(self):
         rt = pymonkey.Runtime()
         cx = rt.new_context()
