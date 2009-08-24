@@ -130,7 +130,7 @@ PyTypeObject PYM_JSFunctionType = {
   "pymonkey.Function",         /*tp_name*/
   sizeof(PYM_JSFunction),      /*tp_basicsize*/
   0,                           /*tp_itemsize*/
-  /*tp_dealloc*/
+                               /*tp_dealloc*/
   (destructor) PYM_JSFunctionDealloc,
   0,                           /*tp_print*/
   0,                           /*tp_getattr*/
@@ -146,16 +146,16 @@ PyTypeObject PYM_JSFunctionType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  /*tp_flags*/
+                               /*tp_flags*/
   Py_TPFLAGS_DEFAULT,
-  /* tp_doc */
+                               /* tp_doc */
   "JavaScript Function.",
-  0,		               /* tp_traverse */
-  0,		               /* tp_clear */
-  0,		               /* tp_richcompare */
+  0,                           /* tp_traverse */
+  0,                           /* tp_clear */
+  0,                           /* tp_richcompare */
   0,                           /* tp_weaklistoffset */
-  0,		               /* tp_iter */
-  0,		               /* tp_iternext */
+  0,                           /* tp_iter */
+  0,                           /* tp_iternext */
   0,                           /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */

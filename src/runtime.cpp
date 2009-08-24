@@ -142,7 +142,7 @@ PyTypeObject PYM_JSRuntimeType = {
   "pymonkey.Runtime",          /*tp_name*/
   sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
-  /*tp_dealloc*/
+                               /*tp_dealloc*/
   (destructor) PYM_JSRuntimeDealloc,
   0,                           /*tp_print*/
   0,                           /*tp_getattr*/
@@ -158,17 +158,17 @@ PyTypeObject PYM_JSRuntimeType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  /*tp_flags*/
+                               /*tp_flags*/
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_WEAKREFS,
-  /* tp_doc */
+                               /* tp_doc */
   "JavaScript Runtime.",
-  0,		               /* tp_traverse */
-  0,		               /* tp_clear */
-  0,		               /* tp_richcompare */
-  /* tp_weaklistoffset */
+  0,                           /* tp_traverse */
+  0,                           /* tp_clear */
+  0,                           /* tp_richcompare */
+                               /* tp_weaklistoffset */
   offsetof(PYM_JSRuntimeObject, weakrefs),
-  0,		               /* tp_iter */
-  0,		               /* tp_iternext */
+  0,                           /* tp_iter */
+  0,                           /* tp_iternext */
   PYM_JSRuntimeMethods,        /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */

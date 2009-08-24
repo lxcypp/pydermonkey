@@ -509,7 +509,7 @@ PyTypeObject PYM_JSContextType = {
   "pymonkey.Context",          /*tp_name*/
   sizeof(PYM_JSContextObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
-  /*tp_dealloc*/
+                               /*tp_dealloc*/
   (destructor) PYM_JSContextDealloc,
   0,                           /*tp_print*/
   0,                           /*tp_getattr*/
@@ -525,17 +525,17 @@ PyTypeObject PYM_JSContextType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  /*tp_flags*/
+                               /*tp_flags*/
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_HAVE_WEAKREFS,
-  /* tp_doc */
+                               /* tp_doc */
   "JavaScript Context.",
   (traverseproc) PYM_traverse, /* tp_traverse */
   (inquiry) PYM_clear,         /* tp_clear */
-  0,		               /* tp_richcompare */
-  /* tp_weaklistoffset */
+  0,                           /* tp_richcompare */
+                               /* tp_weaklistoffset */
   offsetof(PYM_JSContextObject, weakrefs),
-  0,		               /* tp_iter */
-  0,		               /* tp_iternext */
+  0,                           /* tp_iter */
+  0,                           /* tp_iternext */
   PYM_JSContextMethods,        /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */

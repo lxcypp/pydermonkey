@@ -140,7 +140,7 @@ PyTypeObject PYM_JSObjectType = {
   "pymonkey.Object",           /*tp_name*/
   sizeof(PYM_JSObject),        /*tp_basicsize*/
   0,                           /*tp_itemsize*/
-  /*tp_dealloc*/
+                               /*tp_dealloc*/
   (destructor) PYM_JSObjectDealloc,
   0,                           /*tp_print*/
   0,                           /*tp_getattr*/
@@ -156,16 +156,16 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /*tp_getattro*/
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
-  /*tp_flags*/
+                               /*tp_flags*/
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-  /* tp_doc */
+                               /* tp_doc */
   "JavaScript Object.",
-  0,		               /* tp_traverse */
-  0,		               /* tp_clear */
-  0,		               /* tp_richcompare */
+  0,                           /* tp_traverse */
+  0,                           /* tp_clear */
+  0,                           /* tp_richcompare */
   0,                           /* tp_weaklistoffset */
-  0,		               /* tp_iter */
-  0,		               /* tp_iternext */
+  0,                           /* tp_iter */
+  0,                           /* tp_iternext */
   PYM_JSObjectMethods,         /* tp_methods */
   0,                           /* tp_members */
   0,                           /* tp_getset */

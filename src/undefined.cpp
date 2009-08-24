@@ -50,9 +50,6 @@ static PyObject *PYM_undefinedRepr(PyObject *o) {
   return PyString_FromString("pymonkey.undefined");
 }
 
-// TODO: We should make this behave as much like JavaScript's
-// "undefined" value as possible; e.g., its string value should
-// be "undefined", the singleton should be falsy, etc.
 PyTypeObject PYM_undefinedType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
@@ -75,7 +72,7 @@ PyTypeObject PYM_undefinedType = {
   0,                           /*tp_setattro*/
   0,                           /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT,          /*tp_flags*/
-  /* tp_doc */
+                               /* tp_doc */
   "Pythonic equivalent of JavaScript's 'undefined' value",
 };
 
