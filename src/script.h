@@ -34,69 +34,23 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "undefined.h"
-#include "runtime.h"
-#include "context.h"
+#ifndef PYM_SCRIPT_H
+#define PYM_SCRIPT_H
+
 #include "object.h"
-#include "function.h"
-#include "script.h"
-#include "utils.h"
+#include "context.h"
 
-static PyMethodDef PYM_methods[] = {
-  {NULL, NULL, 0, NULL}
-};
+#include <jsapi.h>
+#include <Python.h>
 
-PyMODINIT_FUNC
-initpymonkey(void)
-{
-  PyObject *module;
+typedef struct {
+  PYM_JSObject base;
+  JSScript *script;
+} PYM_JSScript;
 
-  module = Py_InitModule("pymonkey", PYM_methods);
-  if (module == NULL)
-    return;
+extern PyTypeObject PYM_JSScriptType;
 
-  if (PyType_Ready(&PYM_undefinedType) < 0)
-    return;
+extern PYM_JSScript *
+PYM_newJSScript(PYM_JSContextObject *context, JSScript *script);
 
-  PYM_undefined = PyObject_New(PYM_undefinedObject, &PYM_undefinedType);
-  if (PYM_undefined == NULL)
-    return;
-  Py_INCREF(PYM_undefined);
-  PyModule_AddObject(module, "undefined", (PyObject *) PYM_undefined);
-
-  PYM_error = PyErr_NewException("pymonkey.error", NULL, NULL);
-  Py_INCREF(PYM_error);
-  PyModule_AddObject(module, "error", PYM_error);
-
-  if (!PyType_Ready(&PYM_JSRuntimeType) < 0)
-    return;
-
-  Py_INCREF(&PYM_JSRuntimeType);
-  PyModule_AddObject(module, "Runtime", (PyObject *) &PYM_JSRuntimeType);
-
-  if (!PyType_Ready(&PYM_JSContextType) < 0)
-    return;
-
-  Py_INCREF(&PYM_JSContextType);
-  PyModule_AddObject(module, "Context", (PyObject *) &PYM_JSContextType);
-
-  if (!PyType_Ready(&PYM_JSObjectType) < 0)
-    return;
-
-  Py_INCREF(&PYM_JSObjectType);
-  PyModule_AddObject(module, "Object", (PyObject *) &PYM_JSObjectType);
-
-  PYM_JSFunctionType.tp_base = &PYM_JSObjectType;
-  if (!PyType_Ready(&PYM_JSFunctionType) < 0)
-    return;
-
-  Py_INCREF(&PYM_JSFunctionType);
-  PyModule_AddObject(module, "Function", (PyObject *) &PYM_JSFunctionType);
-
-  PYM_JSScriptType.tp_base = &PYM_JSObjectType;
-  if (!PyType_Ready(&PYM_JSScriptType) < 0)
-    return;
-
-  Py_INCREF(&PYM_JSScriptType);
-  PyModule_AddObject(module, "Script", (PyObject *) &PYM_JSScriptType);
-}
+#endif

@@ -41,6 +41,7 @@ SOURCE_FILES = ['pymonkey.cpp',
                 'utils.cpp',
                 'object.cpp',
                 'function.cpp',
+                'script.cpp',
                 'undefined.cpp',
                 'context.cpp',
                 'runtime.cpp']

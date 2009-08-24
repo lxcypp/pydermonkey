@@ -245,6 +245,5 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
 
   JS_AddNamedRootRT(object->runtime->rt, &object->obj,
                     "Pymonkey-Generated Object");
-
   return object;
 }

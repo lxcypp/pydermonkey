@@ -32,6 +32,15 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testCompileScriptWorks(self):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        code = '5 + 1'
+        script = cx.compile_script(obj, code, '<string>', 1)
+        self.assertEqual(cx.execute_script(obj, script), 6)
+
     def testErrorsRaisedIncludeStrings(self):
         self.assertRaises(pymonkey.error, self._evaljs, 'boop()')
         self.assertEqual(self.last_exception.args[1],

@@ -37,6 +37,7 @@
 #include "context.h"
 #include "object.h"
 #include "function.h"
+#include "script.h"
 #include "utils.h"
 
 // This is the default JSOperationCallback for pymonkey-owned JS contexts,
@@ -311,6 +312,65 @@ PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_compileScript(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  char *source = NULL;
+  int sourceLen;
+  const char *filename;
+  int lineNo;
+
+  if (!PyArg_ParseTuple(args, "O!es#si", &PYM_JSObjectType, &object,
+                        "utf-16", &source, &sourceLen, &filename, &lineNo))
+    return NULL;
+
+  PYM_UTF16String str(source, sourceLen);
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  JSScript *script;
+  script = JS_CompileUCScript(self->cx, object->obj, str.jsbuffer,
+                              str.jslen, filename, lineNo);
+
+  if (script == NULL) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return (PyObject *) PYM_newJSScript(self, script);
+}
+
+static PyObject *
+PYM_executeScript(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  PYM_JSScript *script;
+
+  if (!PyArg_ParseTuple(args, "O!O!", &PYM_JSObjectType, &object,
+                        &PYM_JSScriptType, &script))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, script->base.runtime);
+
+  jsval rval;
+  JSBool result;
+  Py_BEGIN_ALLOW_THREADS;
+  result = JS_ExecuteScript(self->cx, object->obj, script->script, &rval);
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  PyObject *pyRval = PYM_jsvalToPyObject(self, rval);
+  return pyRval;
+}
+
+static PyObject *
 PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -485,6 +545,14 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"init_standard_classes",
    (PyCFunction) PYM_initStandardClasses, METH_VARARGS,
    "Add standard classes and functions to the given object."},
+  {"compile_script",
+   (PyCFunction) PYM_compileScript, METH_VARARGS,
+   "Compile the given JavaScript code using the given filename"
+   "and line number information."},
+  {"execute_script",
+   (PyCFunction) PYM_executeScript, METH_VARARGS,
+   "Execute the given JavaScript script object in the context of "
+   "the given global object."},
   {"evaluate_script",
    (PyCFunction) PYM_evaluateScript, METH_VARARGS,
    "Evaluate the given JavaScript code in the context of the given "
