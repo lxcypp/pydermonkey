@@ -570,5 +570,6 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   JS_SetGCZeal(cx, 2);
 #endif
 
+  PyObject_GC_Track((PyObject *) context);
   return context;
 }

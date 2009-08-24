@@ -1,3 +1,4 @@
+import gc
 import sys
 import unittest
 import weakref
@@ -71,6 +72,26 @@ class PymonkeyTests(unittest.TestCase):
         del obj
         del cx
         self.assertEqual(pyobj(), None)
+
+    def testContextSupportsCyclicGc(self):
+        def makecx():
+            cx = pymonkey.Runtime().new_context()
+
+            def opcb(othercx):
+                return cx
+
+            cx.set_operation_callback(opcb)
+            return cx
+
+        gc.disable()
+        cx = makecx()
+        wcx = weakref.ref(cx)
+        self.assertEqual(wcx(), cx)
+        del cx
+        self.assertTrue(wcx())
+        gc.enable()
+        gc.collect()
+        self.assertEqual(wcx(), None)
 
     def testOperationCallbackIsCalled(self):
         def opcb(cx):
