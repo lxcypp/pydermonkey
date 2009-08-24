@@ -15,6 +15,14 @@ class PymonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
+    def _execjs(self, code):
+        rt = pymonkey.Runtime()
+        cx = rt.new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        script = cx.compile_script(obj, code, '<string>', 1)
+        return cx.execute_script(obj, script)
+
     def _evalJsWrappedPyFunc(self, func, code):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
@@ -32,14 +40,16 @@ class PymonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testSyntaxErrorsAreRaised(self):
+        for run in [self._evaljs, self._execjs]:
+            self.assertRaises(pymonkey.error, run, '5f')
+            self.assertEqual(
+                self.last_exception.args[1],
+                u'SyntaxError: missing ; before statement'
+                )
+
     def testCompileScriptWorks(self):
-        rt = pymonkey.Runtime()
-        cx = rt.new_context()
-        obj = cx.new_object()
-        cx.init_standard_classes(obj)
-        code = '5 + 1'
-        script = cx.compile_script(obj, code, '<string>', 1)
-        self.assertEqual(cx.execute_script(obj, script), 6)
+        self.assertEqual(self._execjs('5 + 1'), 6)
 
     def testErrorsRaisedIncludeStrings(self):
         self.assertRaises(pymonkey.error, self._evaljs, 'boop()')
