@@ -344,6 +344,15 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)
 
+    def testHasPropertyWorks(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        foo = cx.new_object()
+        cx.define_property(obj, u"foo\u2026", foo)
+        self.assertTrue(cx.has_property(obj, u"foo\u2026"))
+        self.assertFalse(cx.has_property(obj, "bar"))
+
     def testDefinePropertyWorksWithUnicodePropertyNames(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
