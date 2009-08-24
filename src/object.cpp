@@ -179,12 +179,10 @@ PyTypeObject PYM_JSObjectType = {
   0,                           /* tp_new */
 };
 
-PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
-                              JSObject *obj,
-                              PYM_JSObject *subclass) {
-  PYM_JSRuntimeObject *runtime = context->runtime;
+PYM_JSObject *PYM_findJSObject(PYM_JSContextObject *context, JSObject *obj)
+{
   PYM_HashEntry *cached = (PYM_HashEntry *) JS_DHashTableOperate(
-    &runtime->objects,
+    &context->runtime->objects,
     (void *) obj,
     JS_DHASH_LOOKUP
     );
@@ -193,6 +191,17 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     Py_INCREF((PyObject *) cached->value);
     return (PYM_JSObject *) cached->value;
   }
+
+  return NULL;
+}
+
+PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
+                              JSObject *obj,
+                              PYM_JSObject *subclass)
+{
+  PYM_JSObject *cachedObject = PYM_findJSObject(context, obj);
+  if (cachedObject)
+    return cachedObject;
 
   PYM_JSObject *object;
 
@@ -214,9 +223,12 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
   object->runtime = NULL;
   object->obj = NULL;
 
-  cached = (PYM_HashEntry *) JS_DHashTableOperate(&runtime->objects,
-                                                  (void *) obj,
-                                                  JS_DHASH_ADD);
+  PYM_HashEntry *cached = (PYM_HashEntry *) JS_DHashTableOperate(
+    &context->runtime->objects,
+    (void *) obj,
+    JS_DHASH_ADD
+    );
+
   if (cached == NULL) {
     Py_DECREF(object);
     PyErr_SetString(PYM_error, "JS_DHashTableOperate() failed");
