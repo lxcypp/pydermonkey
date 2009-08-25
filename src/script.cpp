@@ -79,11 +79,11 @@ static PyBufferProcs PYM_bufferProcs = {
 
 static PyMemberDef PYM_members[] = {
   {"filename", T_STRING, offsetof(PYM_JSScript, filename), READONLY,
-   "Filename of script."},
+   "Filename of script's source code."},
   {"base_lineno", T_UINT, offsetof(PYM_JSScript, baseLineno), READONLY,
-   "Base line number of script."},
+   "Base line number of script's source code."},
   {"line_extent", T_UINT, offsetof(PYM_JSScript, lineExtent), READONLY,
-   "Line extent of script."},
+   "Line extent of script's source code."},
   {NULL, NULL, NULL, NULL, NULL}
 };
 

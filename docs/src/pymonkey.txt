@@ -64,6 +64,19 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    their bytecode. This can be accessed by passing an instance to
    Python's built-in ``buffer()`` function.
 
+   .. data:: filename
+
+      The filename of the script's original source code.
+
+   .. data:: base_lineno
+
+      The line number at which the script's original source code
+      begins.
+
+   .. data:: line_extent
+
+      The number of lines comprising the original source code.
+
 .. class:: Context
 
    This is the type of JavaScript context objects. Contexts can only

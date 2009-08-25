@@ -112,6 +112,22 @@ doesn&#8217;t provide access to any special data or functionality.</p>
 <p>Script instances have a read-only buffer interface that exposes
 their bytecode. This can be accessed by passing an instance to
 Python&#8217;s built-in <tt class="docutils literal"><span class="pre">buffer()</span></tt> function.</p>
+<dl class="data">
+<dt id="pymonkey.Script.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#pymonkey.Script.filename" title="Permalink to this definition">¶</a></dt>
+<dd>The filename of the script&#8217;s original source code.</dd></dl>
+
+<dl class="data">
+<dt id="pymonkey.Script.base_lineno">
+<tt class="descname">base_lineno</tt><a class="headerlink" href="#pymonkey.Script.base_lineno" title="Permalink to this definition">¶</a></dt>
+<dd>The line number at which the script&#8217;s original source code
+begins.</dd></dl>
+
+<dl class="data">
+<dt id="pymonkey.Script.line_extent">
+<tt class="descname">line_extent</tt><a class="headerlink" href="#pymonkey.Script.line_extent" title="Permalink to this definition">¶</a></dt>
+<dd>The number of lines comprising the original source code.</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
