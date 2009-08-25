@@ -37,12 +37,15 @@
 #include "script.h"
 #include "utils.h"
 
+#include "structmember.h"
+#include "jsdbgapi.h"
 #include "jsscript.h"
 
 static void
 PYM_JSScriptDealloc(PYM_JSScript *self)
 {
   self->script = NULL;
+  self->filename = NULL;
   PYM_JSObjectType.tp_dealloc((PyObject *) self);
 }
 
@@ -72,6 +75,12 @@ static PyBufferProcs PYM_bufferProcs = {
   NULL,
   (segcountproc) PYM_segcount,
   (charbufferproc) PYM_charbuffer
+};
+
+static PyMemberDef PYM_members[] = {
+  {"filename", T_STRING, offsetof(PYM_JSScript, filename), READONLY,
+   "Filename of script."},
+  {NULL, NULL, NULL, NULL, NULL}
 };
 
 PyTypeObject PYM_JSScriptType = {
@@ -107,7 +116,7 @@ PyTypeObject PYM_JSScriptType = {
   0,                           /* tp_iter */
   0,                           /* tp_iternext */
   0,                           /* tp_methods */
-  0,                           /* tp_members */
+  PYM_members,                 /* tp_members */
   0,                           /* tp_getset */
   0,                           /* tp_base */
   0,                           /* tp_dict */
@@ -142,6 +151,7 @@ PYM_newJSScript(PYM_JSContextObject *context, JSScript *script)
       return NULL;
 
     object->script = script;
+    object->filename = JS_GetScriptFilename(context->cx, script);
     return (PYM_JSScript *) PYM_newJSObject(context, scriptObj,
                                             (PYM_JSObject *) object);
   }
