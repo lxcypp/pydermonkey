@@ -80,6 +80,10 @@ static PyBufferProcs PYM_bufferProcs = {
 static PyMemberDef PYM_members[] = {
   {"filename", T_STRING, offsetof(PYM_JSScript, filename), READONLY,
    "Filename of script."},
+  {"base_lineno", T_UINT, offsetof(PYM_JSScript, baseLineno), READONLY,
+   "Base line number of script."},
+  {"line_extent", T_UINT, offsetof(PYM_JSScript, lineExtent), READONLY,
+   "Line extent of script."},
   {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -152,6 +156,9 @@ PYM_newJSScript(PYM_JSContextObject *context, JSScript *script)
 
     object->script = script;
     object->filename = JS_GetScriptFilename(context->cx, script);
+    object->baseLineno = JS_GetScriptBaseLineNumber(context->cx, script);
+    object->lineExtent = JS_GetScriptLineExtent(context->cx, script);
+
     return (PYM_JSScript *) PYM_newJSObject(context, scriptObj,
                                             (PYM_JSObject *) object);
   }

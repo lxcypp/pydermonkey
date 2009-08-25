@@ -53,6 +53,12 @@ class PymonkeyTests(unittest.TestCase):
         script = cx.compile_script('foo', '<string>', 1)
         self.assertEqual(script.filename, '<string>')
 
+    def testScriptHasLineInfo(self):
+        cx = pymonkey.Runtime().new_context()
+        script = cx.compile_script('foo\nbar', '<string>', 1)
+        self.assertEqual(script.base_lineno, 1)
+        self.assertEqual(script.line_extent, 2)
+
     def testScriptIsExposedAsBuffer(self):
         rt = pymonkey.Runtime()
         cx = rt.new_context()

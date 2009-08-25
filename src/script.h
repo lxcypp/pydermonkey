@@ -47,6 +47,8 @@ typedef struct {
   PYM_JSObject base;
   JSScript *script;
   const char *filename;
+  unsigned int baseLineno;
+  unsigned int lineExtent;
 } PYM_JSScript;
 
 extern PyTypeObject PYM_JSScriptType;
