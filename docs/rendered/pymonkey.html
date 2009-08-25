@@ -243,14 +243,11 @@ exceptions, and so forth.</p>
 
 <dl class="method">
 <dt id="pymonkey.Context.compile_script">
-<tt class="descname">compile_script</tt><big>(</big><em>obj</em>, <em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pymonkey.Context.compile_script" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">compile_script</tt><big>(</big><em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pymonkey.Context.compile_script" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compiles the given string of code and returns a <a title="pymonkey.Script" class="reference" href="#pymonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a>
 instance that can be executed via <a title="pymonkey.Context.execute_script" class="reference" href="#pymonkey.Context.execute_script"><tt class="xref docutils literal"><span class="pre">execute_script()</span></tt></a>.</p>
 <p><cite>filename</cite> and <cite>lineno</cite> are used just as in
 <a title="pymonkey.Context.evaluate_script" class="reference" href="#pymonkey.Context.evaluate_script"><tt class="xref docutils literal"><span class="pre">evaluate_script()</span></tt></a>.</p>
-<p><cite>obj</cite> is defined in the SpiderMonkey documentation to be
-the &#8220;object with which the script is associated&#8221;, though it&#8217;s
-unclear what its actual role is.</p>
 </dd></dl>
 
 <dl class="method">
@@ -262,8 +259,7 @@ unclear what its actual role is.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">script</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">compile_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;5 * Math&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                           <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">script</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">compile_script</span><span class="p">(</span><span class="s">&#39;5 * Math&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
 <span class="go">nan</span>
 </pre></div>
