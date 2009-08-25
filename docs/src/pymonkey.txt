@@ -184,17 +184,13 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, '5 * Math', '<string>', 1)
         nan
 
-   .. method:: compile_script(obj, code, filename, lineno)
+   .. method:: compile_script(code, filename, lineno)
 
       Compiles the given string of code and returns a :class:`Script`
       instance that can be executed via :meth:`execute_script()`.
 
       `filename` and `lineno` are used just as in
       :meth:`evaluate_script()`.
-
-      `obj` is defined in the SpiderMonkey documentation to be
-      the "object with which the script is associated", though it's
-      unclear what its actual role is.
 
    .. method:: execute_script(globalobj, script)
 
@@ -206,8 +202,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx = pymonkey.Runtime().new_context()
         >>> obj = cx.new_object()
         >>> cx.init_standard_classes(obj)
-        >>> script = cx.compile_script(cx.new_object(), '5 * Math',
-        ...                            '<string>', 1)
+        >>> script = cx.compile_script('5 * Math', '<string>', 1)
         >>> cx.execute_script(obj, script)
         nan
 

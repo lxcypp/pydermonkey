@@ -315,22 +315,19 @@ static PyObject *
 PYM_compileScript(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
-  PYM_JSObject *object;
   char *source = NULL;
   int sourceLen;
   const char *filename;
   int lineNo;
 
-  if (!PyArg_ParseTuple(args, "O!es#si", &PYM_JSObjectType, &object,
-                        "utf-16", &source, &sourceLen, &filename, &lineNo))
+  if (!PyArg_ParseTuple(args, "es#si", "utf-16", &source, &sourceLen,
+                        &filename, &lineNo))
     return NULL;
 
   PYM_UTF16String str(source, sourceLen);
 
-  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-
   JSScript *script;
-  script = JS_CompileUCScript(self->cx, object->obj, str.jsbuffer,
+  script = JS_CompileUCScript(self->cx, NULL, str.jsbuffer,
                               str.jslen, filename, lineNo);
 
   if (script == NULL) {

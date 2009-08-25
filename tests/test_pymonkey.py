@@ -20,7 +20,7 @@ class PymonkeyTests(unittest.TestCase):
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
-        script = cx.compile_script(obj, code, '<string>', 1)
+        script = cx.compile_script(code, '<string>', 1)
         return cx.execute_script(obj, script)
 
     def _evalJsWrappedPyFunc(self, func, code):
@@ -52,7 +52,7 @@ class PymonkeyTests(unittest.TestCase):
         rt = pymonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
-        script = cx.compile_script(obj, 'foo', '<string>', 1)
+        script = cx.compile_script('foo', '<string>', 1)
         self.assertTrue(len(buffer(script)) > 0)
 
     def testCompileScriptWorks(self):
