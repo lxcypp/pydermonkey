@@ -94,6 +94,35 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Returns the :class:`Runtime` that the context belongs to.
 
+   .. method:: get_stack()
+
+      Returns a dictionary containing information about the context's
+      current stack.
+
+      The dictionary contains the following string keys:
+
+      +------------------------------+-------------------------------------+
+      | key                          | value                               |
+      +==============================+=====================================+
+      | :const:`script`              | :class:`Script` of the frame.       |
+      |                              | This may be ``None`` if the frame   |
+      |                              | isn't a scripted frame.             |
+      +------------------------------+-------------------------------------+
+      | :const:`lineno`              | Line number of the frame, if the    |
+      |                              | frame is scripted.                  |
+      +------------------------------+-------------------------------------+
+      | :const:`pc`                  | Program counter of the frame; this  |
+      |                              | is an index into the bytecode of    |
+      |                              | the frame's script, if the frame    |
+      |                              | is scripted.                        |
+      +------------------------------+-------------------------------------+
+      | :const:`caller`              | Dictionary containing information   |
+      |                              | about the stack frame of the        |
+      |                              | caller of this frame. If this frame |
+      |                              | has no caller, this value is        |
+      |                              | ``None``.                           |
+      +------------------------------+-------------------------------------+
+
    .. method:: new_object([private_obj])
 
       Creates a new :class:`Object` instance and returns

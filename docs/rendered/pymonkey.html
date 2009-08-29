@@ -150,6 +150,49 @@ to verify that an object is a context, like so:</p>
 <dd>Returns the <a title="pymonkey.Runtime" class="reference" href="#pymonkey.Runtime"><tt class="xref docutils literal"><span class="pre">Runtime</span></tt></a> that the context belongs to.</dd></dl>
 
 <dl class="method">
+<dt id="pymonkey.Context.get_stack">
+<tt class="descname">get_stack</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary containing information about the context&#8217;s
+current stack.</p>
+<p>The dictionary contains the following string keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">key</th>
+<th class="head">value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="xref docutils literal"><span class="pre">script</span></tt></td>
+<td><a title="pymonkey.Script" class="reference" href="#pymonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a> of the frame.
+This may be <tt class="xref docutils literal"><span class="pre">None</span></tt> if the frame
+isn&#8217;t a scripted frame.</td>
+</tr>
+<tr><td><tt class="xref docutils literal"><span class="pre">lineno</span></tt></td>
+<td>Line number of the frame, if the
+frame is scripted.</td>
+</tr>
+<tr><td><tt class="xref docutils literal"><span class="pre">pc</span></tt></td>
+<td>Program counter of the frame; this
+is an index into the bytecode of
+the frame&#8217;s script, if the frame
+is scripted.</td>
+</tr>
+<tr><td><tt class="xref docutils literal"><span class="pre">caller</span></tt></td>
+<td>Dictionary containing information
+about the stack frame of the
+caller of this frame. If this frame
+has no caller, this value is
+<tt class="xref docutils literal"><span class="pre">None</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="pymonkey.Context.new_object">
 <tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pymonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
 <dd>Creates a new <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
