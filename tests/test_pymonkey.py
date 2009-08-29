@@ -69,6 +69,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(script.filename, '<string>')
         self.assertEqual(stack_holder[0]['caller']['lineno'], 1)
         self.assertTrue(pc >= 0 and pc < len(buffer(script)))
+        self.assertEqual(stack_holder[0]['caller']['caller'], None)
 
     def testScriptHasFilenameMember(self):
         cx = pymonkey.Runtime().new_context()

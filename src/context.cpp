@@ -157,10 +157,11 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     }
 
     PyObject *frameDict = Py_BuildValue(
-      "{sOsIsI}",
+      "{sOsIsIsO}",
       "script", pyScript,
       "pc", pc,
-      "lineno", lineno
+      "lineno", lineno,
+      "caller", Py_None
       );
 
     Py_DECREF(pyScript);
