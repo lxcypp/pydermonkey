@@ -60,8 +60,11 @@ class PymonkeyTests(unittest.TestCase):
         jsfunc = cx.new_function(func, func.__name__)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.evaluate_script(obj, 'func()', '<string>', 1)
-        self.assertEqual(stack_holder[0]['caller']['script'].filename,
-                         '<string>')
+        script = stack_holder[0]['caller']['script']
+        pc = stack_holder[0]['caller']['pc']
+        self.assertEqual(script.filename, '<string>')
+        self.assertEqual(stack_holder[0]['caller']['lineno'], 1)
+        self.assertTrue(pc >= 0 and pc < len(buffer(script)))
 
     def testScriptHasFilenameMember(self):
         cx = pymonkey.Runtime().new_context()

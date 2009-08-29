@@ -41,6 +41,7 @@
 #include "utils.h"
 
 #include "jsdbgapi.h"
+#include "jsscript.h"
 
 // This is the default JSOperationCallback for pymonkey-owned JS contexts,
 // when they've defined one in Python.
@@ -140,20 +141,29 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
   while ((frame = JS_FrameIterator(self->cx, &iteratorp)) != NULL) {
     bool success = true;
     JSScript *script = JS_GetFrameScript(self->cx, frame);
+    unsigned int pc = 0;
+    unsigned int lineno = 0;
     PyObject *pyScript;
-    if (script)
+    if (script) {
       pyScript = (PyObject *) PYM_newJSScript(self, script);
-    else {
+      if (pyScript == NULL)
+        return NULL;
+      jsbytecode *pcByte = JS_GetFramePC(self->cx, frame);
+      pc = pcByte - script->code;
+      lineno = JS_PCToLineNumber(self->cx, script, pcByte);
+    } else {
       pyScript = Py_None;
       Py_INCREF(pyScript);
     }
 
     PyObject *frameDict = Py_BuildValue(
-      "{sO}",
-      "script", pyScript
+      "{sOsIsI}",
+      "script", pyScript,
+      "pc", pc,
+      "lineno", lineno
       );
 
-    Py_XDECREF(pyScript);
+    Py_DECREF(pyScript);
 
     if (frameDict) {
       if (last) {
