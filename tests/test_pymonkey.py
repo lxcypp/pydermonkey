@@ -8,6 +8,22 @@ import threading
 import pymonkey
 
 class PymonkeyTests(unittest.TestCase):
+    def setUp(self):
+        self._teardowns = []
+
+    def tearDown(self):
+        self.last_exception = None
+        while self._teardowns:
+            obj = self._teardowns.pop()
+            runtime = obj.get_runtime()
+            runtime.new_context().clear_object_private(obj)
+            del runtime
+            del obj
+        self.assertEqual(pymonkey.get_debug_info()['runtime_count'], 0)
+
+    def _clearOnTeardown(self, obj):
+        self._teardowns.append(obj)
+
     def _evaljs(self, code):
         rt = pymonkey.Runtime()
         cx = rt.new_context()
@@ -28,6 +44,7 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
+        self._clearOnTeardown(jsfunc)
         cx.define_property(obj, func.__name__, jsfunc)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
@@ -62,6 +79,7 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
+        self._clearOnTeardown(jsfunc)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.evaluate_script(obj, 'func()', '<string>', 1)
         script = stack_holder[0]['caller']['script']
@@ -281,6 +299,7 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
+        self._clearOnTeardown(jsfunc)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.evaluate_script(obj, code, '<string>', 1)
         self.assertEqual(contexts[0], cx)
@@ -297,6 +316,7 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
+        self._clearOnTeardown(jsfunc)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.evaluate_script(obj, code, '<string>', 1)
         self.assertEqual(thisObjs[0], obj)
@@ -312,6 +332,8 @@ class PymonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
+        self._clearOnTeardown(jsfunc)
+
         cx.define_property(obj, func.__name__, jsfunc)
 
         cx.evaluate_script(obj, "func()", '<string>', 1)

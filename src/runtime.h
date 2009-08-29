@@ -65,4 +65,6 @@ typedef struct {
 
 extern PyTypeObject PYM_JSRuntimeType;
 
+extern unsigned int PYM_getJSRuntimeCount();
+
 #endif

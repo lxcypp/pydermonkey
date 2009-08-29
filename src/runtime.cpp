@@ -38,6 +38,13 @@
 #include "context.h"
 #include "utils.h"
 
+static unsigned int runtimeCount = 0;
+
+unsigned int PYM_getJSRuntimeCount()
+{
+  return runtimeCount;
+}
+
 static PyObject *
 PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
                  PyObject *kwds)
@@ -79,6 +86,9 @@ PYM_JSRuntimeNew(PyTypeObject *type, PyObject *args,
     }
   }
 
+  if (self)
+    runtimeCount++;
+
   return (PyObject *) self;
 }
 
@@ -106,6 +116,8 @@ PYM_JSRuntimeDealloc(PYM_JSRuntimeObject *self)
   }
 
   self->ob_type->tp_free((PyObject *) self);
+
+  runtimeCount--;
 }
 
 static PyObject *

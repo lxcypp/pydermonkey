@@ -42,7 +42,17 @@
 #include "script.h"
 #include "utils.h"
 
+static PyObject *
+PYM_getDebugInfo(PyObject *self, PyObject *args)
+{
+  PyObject *info = Py_BuildValue("{sI}",
+                                 "runtime_count", PYM_getJSRuntimeCount());
+  return info;
+}
+
 static PyMethodDef PYM_methods[] = {
+  {"get_debug_info", PYM_getDebugInfo, METH_VARARGS,
+   "Get debugging information about the module."},
   {NULL, NULL, 0, NULL}
 };
 
