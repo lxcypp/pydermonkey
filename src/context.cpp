@@ -187,7 +187,9 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     }
   }
 
-  return top;
+  if (top)
+    return top;
+  Py_RETURN_NONE;
 }
 
 static PyObject *

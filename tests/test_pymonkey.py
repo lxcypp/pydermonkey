@@ -48,6 +48,10 @@ class PymonkeyTests(unittest.TestCase):
                 u'SyntaxError: missing ; before statement'
                 )
 
+    def testGetStackOnEmptyStackReturnsNone(self):
+        cx = pymonkey.Runtime().new_context()
+        self.assertEqual(cx.get_stack(), None)
+
     def testGetStackWorks(self):
         stack_holder = []
 
