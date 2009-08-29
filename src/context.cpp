@@ -40,6 +40,8 @@
 #include "script.h"
 #include "utils.h"
 
+#include "jsdbgapi.h"
+
 // This is the default JSOperationCallback for pymonkey-owned JS contexts,
 // when they've defined one in Python.
 static JSBool
@@ -122,6 +124,60 @@ PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
 {
   Py_INCREF(self->runtime);
   return (PyObject *) self->runtime;
+}
+
+static PyObject *
+PYM_getStack(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+
+  JSStackFrame *iteratorp = NULL;
+  JSStackFrame *frame;
+  PyObject *top = NULL;
+  // This is always a borrowed reference, i.e. we never incref/decref it.
+  PyObject *last = NULL;
+
+  while ((frame = JS_FrameIterator(self->cx, &iteratorp)) != NULL) {
+    bool success = true;
+    JSScript *script = JS_GetFrameScript(self->cx, frame);
+    PyObject *pyScript;
+    if (script)
+      pyScript = (PyObject *) PYM_newJSScript(self, script);
+    else {
+      pyScript = Py_None;
+      Py_INCREF(pyScript);
+    }
+
+    PyObject *frameDict = Py_BuildValue(
+      "{sO}",
+      "script", pyScript
+      );
+
+    Py_XDECREF(pyScript);
+
+    if (frameDict) {
+      if (last) {
+        if (PyDict_SetItemString(last, "caller", frameDict) == 0) {
+          last = frameDict;
+          Py_DECREF(frameDict);
+          frameDict = NULL;
+        } else
+          success = false;
+      } else {
+        top = frameDict;
+        last = frameDict;
+      }
+    } else
+      success = false;
+
+    if (!success) {
+      Py_XDECREF(top);
+      Py_XDECREF(frameDict);
+      return NULL;
+    }
+  }
+
+  return top;
 }
 
 static PyObject *
@@ -335,6 +391,8 @@ PYM_compileScript(PYM_JSContextObject *self, PyObject *args)
     return NULL;
   }
 
+  // TODO: If this somehow fails, we may have a memory leak if a
+  // script object wasn't created for the JSScript.
   return (PyObject *) PYM_newJSScript(self, script);
 }
 
@@ -385,13 +443,37 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
+  // Instead of calling JS_EvaluateUCScript(), we're going to first
+  // compile the script and then execute it. This is because the
+  // former function calls JS_DestroyScript() on the script it's
+  // created, which prevents e.g. the script object from being
+  // extracted during execution and outliving the script's execution.
+
+  JSScript *script;
+  script = JS_CompileUCScript(self->cx, NULL, str.jsbuffer,
+                              str.jslen, filename, lineNo);
+
+  if (script == NULL) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  // TODO: If this somehow fails, we may have a memory leak if a
+  // script object wasn't created for the JSScript.
+  PYM_JSScript *pyScript = PYM_newJSScript(self, script);
+
+  if (pyScript == NULL) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
   jsval rval;
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  result = JS_EvaluateUCScript(self->cx, object->obj, str.jsbuffer,
-                               str.jslen, filename, lineNo, &rval);
+  result = JS_ExecuteScript(self->cx, object->obj, pyScript->script, &rval);
   Py_END_ALLOW_THREADS;
 
+  Py_DECREF((PyObject *) pyScript);
   if (!result) {
     PYM_jsExceptionToPython(self);
     return NULL;
@@ -537,6 +619,8 @@ PYM_triggerOperationCallback(PYM_JSContextObject *self, PyObject *args)
 static PyMethodDef PYM_JSContextMethods[] = {
   {"get_runtime", (PyCFunction) PYM_getRuntime, METH_VARARGS,
    "Get the JavaScript runtime associated with this context."},
+  {"get_stack", (PyCFunction) PYM_getStack, METH_VARARGS,
+   "Get the current stack for the context."},
   {"new_object", (PyCFunction) PYM_newObject, METH_VARARGS,
    "Create a new JavaScript object."},
   {"init_standard_classes",

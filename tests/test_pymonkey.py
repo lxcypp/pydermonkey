@@ -48,6 +48,21 @@ class PymonkeyTests(unittest.TestCase):
                 u'SyntaxError: missing ; before statement'
                 )
 
+    def testGetStackWorks(self):
+        stack_holder = []
+
+        def func(cx, this, args):
+            stack_holder.append(cx.get_stack())
+
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.new_function(func, func.__name__)
+        cx.define_property(obj, func.__name__, jsfunc)
+        cx.evaluate_script(obj, 'func()', '<string>', 1)
+        self.assertEqual(stack_holder[0]['caller']['script'].filename,
+                         '<string>')
+
     def testScriptHasFilenameMember(self):
         cx = pymonkey.Runtime().new_context()
         script = cx.compile_script('foo', '<string>', 1)
