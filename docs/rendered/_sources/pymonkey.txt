@@ -123,6 +123,9 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       |                              | ``None``.                           |
       +------------------------------+-------------------------------------+
 
+      If the context isn't currently executing any code (i.e., the stack
+      is empty), this method returns ``None``.
+
    .. method:: new_object([private_obj])
 
       Creates a new :class:`Object` instance and returns
