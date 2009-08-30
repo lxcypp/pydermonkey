@@ -47,6 +47,9 @@ typedef struct {
   PYM_JSObject base;
   JSFunction *fun;
   PyObject *name;
+  const char *filename;
+  unsigned int baseLineno;
+  unsigned int lineExtent;
 } PYM_JSFunction;
 
 extern PyTypeObject PYM_JSFunctionType;

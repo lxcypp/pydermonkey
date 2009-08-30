@@ -660,6 +660,17 @@ class PymonkeyTests(unittest.TestCase):
         self.assertTrue(isinstance(obj, pymonkey.Object))
         self.assertEqual(cx.get_property(obj, u"boop"), 1)
 
+    def testScriptedFunctionsHaveFilenameInfo(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.evaluate_script(obj,
+                                    '(function boop() { \nreturn 1; })',
+                                    'somefile', 5)
+        self.assertEqual(jsfunc.filename, 'somefile')
+        self.assertEqual(jsfunc.base_lineno, 5)
+        self.assertEqual(jsfunc.line_extent, 2)
+
     def testEvaluateReturnsFunction(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()

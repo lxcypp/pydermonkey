@@ -37,12 +37,14 @@
 #include "function.h"
 #include "utils.h"
 
+#include "jsdbgapi.h"
 #include "structmember.h"
 
 static void
 PYM_JSFunctionDealloc(PYM_JSFunction *self)
 {
   self->fun = NULL;
+  self->filename = NULL;
 
   if (self->name) {
     Py_DECREF(self->name);
@@ -136,6 +138,12 @@ PYM_dispatchJSFunctionToPython(JSContext *cx,
 static PyMemberDef PYM_members[] = {
   {"name", T_OBJECT, offsetof(PYM_JSFunction, name), READONLY,
    "Name of the function."},
+  {"filename", T_STRING, offsetof(PYM_JSFunction, filename), READONLY,
+   "Filename of function's source code."},
+  {"base_lineno", T_UINT, offsetof(PYM_JSFunction, baseLineno), READONLY,
+   "Base line number of function's source code."},
+  {"line_extent", T_UINT, offsetof(PYM_JSFunction, lineExtent), READONLY,
+   "Line extent of function's source code."},
   {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -194,18 +202,33 @@ PYM_newJSFunction(PYM_JSContextObject *context,
     return NULL;
 
   jsFunction->fun = function;
+  jsFunction->name = NULL;
+  jsFunction->filename = NULL;
+  jsFunction->baseLineno = 0;
+  jsFunction->lineExtent = 0;
 
   JSString *name = JS_GetFunctionId(jsFunction->fun);
-  if (name == NULL) {
-    // It's an anonymous function.
-    jsFunction->name = NULL;
-  } else {
+  if (name != NULL) {
+    // It's not an anonymous function.
     jsFunction->name = PYM_jsvalToPyObject(context,
                                            STRING_TO_JSVAL(name));
     if (jsFunction->name == NULL) {
       Py_DECREF((PyObject *) jsFunction);
       return NULL;
     }
+  }
+
+  JSScript *script = JS_GetFunctionScript(context->cx, jsFunction->fun);
+
+  // TODO: Ideally, we'd convert the script to an object and set it as
+  // an attribute of the function, but this results in strange segfaults,
+  // perhaps because JS functions destroy their scripts on finalization
+  // while creating an object from a script makes it subject to GC.
+  if (script) {
+    // It's an interpreted function.
+    jsFunction->filename = JS_GetScriptFilename(context->cx, script);
+    jsFunction->baseLineno = JS_GetScriptBaseLineNumber(context->cx, script);
+    jsFunction->lineExtent = JS_GetScriptLineExtent(context->cx, script);
   }
 
   return jsFunction;
