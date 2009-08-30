@@ -125,6 +125,7 @@ class PymonkeyTests(unittest.TestCase):
                           stuff['rt'].new_context)
         self.assertEqual(self.last_exception.args[0],
                          'Function called from wrong thread')
+        del stuff['rt']
 
     def testClearObjectPrivateWorks(self):
         class Foo(object):
@@ -250,6 +251,30 @@ class PymonkeyTests(unittest.TestCase):
         del cx
         del obj
         self.assertEqual(ref(), None)
+
+    def testAnonymousJsFunctionHasNullNameAttribute(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.evaluate_script(obj, "(function() {})",
+                                    "<string>", 1)
+        self.assertEqual(jsfunc.name, None)
+
+    def testJsFunctionHasNameAttribute(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        jsfunc = cx.evaluate_script(obj, "(function blarg() {})",
+                                    "<string>", 1)
+        self.assertEqual(jsfunc.name, "blarg")
+
+    def testJsWrappedPythonFuncHasNameAttribute(self):
+        def func(cx, this, args):
+            return True
+
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.new_function(func, "foo")
+        self.assertEqual(jsfunc.name, "foo")
 
     def testJsWrappedPythonFuncIsGCdAtRuntimeDestruction(self):
         def define(cx, obj):

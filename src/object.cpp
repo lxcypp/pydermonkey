@@ -209,8 +209,10 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
     object = subclass;
   else {
     if (JS_ObjectIsFunction(context->cx, obj)) {
-      PYM_JSFunction *func = PyObject_New(PYM_JSFunction,
-                                          &PYM_JSFunctionType);
+      PYM_JSFunction *func = PYM_newJSFunction(
+        context,
+        JS_ValueToFunction(context->cx, OBJECT_TO_JSVAL(obj))
+        );
       object = (PYM_JSObject *) func;
     } else
       object = PyObject_New(PYM_JSObject,

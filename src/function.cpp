@@ -37,9 +37,18 @@
 #include "function.h"
 #include "utils.h"
 
+#include "structmember.h"
+
 static void
 PYM_JSFunctionDealloc(PYM_JSFunction *self)
 {
+  self->fun = NULL;
+
+  if (self->name) {
+    Py_DECREF(self->name);
+    self->name = NULL;
+  }
+
   PYM_JSObjectType.tp_dealloc((PyObject *) self);
 }
 
@@ -124,6 +133,12 @@ PYM_dispatchJSFunctionToPython(JSContext *cx,
   return JS_TRUE;
 }
 
+static PyMemberDef PYM_members[] = {
+  {"name", T_OBJECT, offsetof(PYM_JSFunction, name), READONLY,
+   "Name of the function."},
+  {NULL, NULL, NULL, NULL, NULL}
+};
+
 PyTypeObject PYM_JSFunctionType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
@@ -157,7 +172,7 @@ PyTypeObject PYM_JSFunctionType = {
   0,                           /* tp_iter */
   0,                           /* tp_iternext */
   0,                           /* tp_methods */
-  0,                           /* tp_members */
+  PYM_members,                 /* tp_members */
   0,                           /* tp_getset */
   0,                           /* tp_base */
   0,                           /* tp_dict */
@@ -168,6 +183,33 @@ PyTypeObject PYM_JSFunctionType = {
   0,                           /* tp_alloc */
   0,                           /* tp_new */
 };
+
+PYM_JSFunction *
+PYM_newJSFunction(PYM_JSContextObject *context,
+                  JSFunction *function)
+{
+  PYM_JSFunction *jsFunction = PyObject_New(PYM_JSFunction,
+                                            &PYM_JSFunctionType);
+  if (jsFunction == NULL)
+    return NULL;
+
+  jsFunction->fun = function;
+
+  JSString *name = JS_GetFunctionId(jsFunction->fun);
+  if (name == NULL) {
+    // It's an anonymous function.
+    jsFunction->name = NULL;
+  } else {
+    jsFunction->name = PYM_jsvalToPyObject(context,
+                                           STRING_TO_JSVAL(name));
+    if (jsFunction->name == NULL) {
+      Py_DECREF((PyObject *) jsFunction);
+      return NULL;
+    }
+  }
+
+  return jsFunction;
+}
 
 PYM_JSFunction *
 PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
@@ -195,8 +237,7 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     return NULL;
   }
 
-  PYM_JSFunction *object = PyObject_New(PYM_JSFunction,
-                                        &PYM_JSFunctionType);
+  PYM_JSFunction *object = PYM_newJSFunction(context, func);
   if (object == NULL)
     return NULL;
 

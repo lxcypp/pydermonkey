@@ -45,9 +45,15 @@
 
 typedef struct {
   PYM_JSObject base;
+  JSFunction *fun;
+  PyObject *name;
 } PYM_JSFunction;
 
 extern PyTypeObject PYM_JSFunctionType;
+
+extern PYM_JSFunction *
+PYM_newJSFunction(PYM_JSContextObject *context,
+                  JSFunction *function);
 
 extern PYM_JSFunction *
 PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,

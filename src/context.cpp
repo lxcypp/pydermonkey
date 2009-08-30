@@ -564,15 +564,11 @@ PYM_callFunction(PYM_JSContextObject *self, PyObject *args)
   }
 
   jsval rval;
-
-  // TODO: This assumes that a JSFunction * is actually a subclass of
-  // a JSObject *, which may or may not be regarded as an implementation
-  // detail.
   JSBool result;
   Py_BEGIN_ALLOW_THREADS;
-  result = JS_CallFunction(self->cx, obj->obj,
-                           (JSFunction *) fun->base.obj,
-                           argc, argv, &rval);
+  result = JS_CallFunctionValue(self->cx, obj->obj,
+                                OBJECT_TO_JSVAL(fun->base.obj),
+                                argc, argv, &rval);
   Py_END_ALLOW_THREADS;
 
   PyMem_Free(argv);
