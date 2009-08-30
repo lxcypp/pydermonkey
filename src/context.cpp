@@ -143,15 +143,24 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     JSScript *script = JS_GetFrameScript(self->cx, frame);
     unsigned int pc = 0;
     unsigned int lineno = 0;
-    PyObject *pyScript;
-    if (script) {
+    PyObject *pyScript = NULL;
+
+    // TODO: Ideally, we'd always convert the script to an object and
+    // set it as an attribute of the function, but this can result in
+    // strange segfaults, perhaps because JS functions destroy their
+    // scripts on finalization while creating an object from a script
+    // makes it subject to GC.  So to be safe, we'll only provide the
+    // script object if one already exists.
+    if (script && JS_GetScriptObject(script)) {
       pyScript = (PyObject *) PYM_newJSScript(self, script);
       if (pyScript == NULL)
         return NULL;
       jsbytecode *pcByte = JS_GetFramePC(self->cx, frame);
       pc = pcByte - script->code;
       lineno = JS_PCToLineNumber(self->cx, script, pcByte);
-    } else {
+    }
+
+    if (pyScript == NULL) {
       pyScript = Py_None;
       Py_INCREF(pyScript);
     }
