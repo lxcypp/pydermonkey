@@ -226,6 +226,12 @@ class PymonkeyTests(unittest.TestCase):
         jsfunc = cx.new_function(foo, foo.__name__)
         self.assertEqual(jsfunc.filename, None)
 
+    def testJsScriptedFuncHasNoPrivate(self):
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.evaluate_script(cx.new_object(),
+                                    '(function(){})', '<string>', 1)
+        self.assertEqual(cx.get_object_private(jsfunc), None)
+
     def testJsWrappedPythonFuncHasPrivate(self):
         def foo(cx, this, args):
             pass
