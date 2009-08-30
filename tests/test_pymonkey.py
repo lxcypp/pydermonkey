@@ -204,6 +204,14 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(str(pymonkey.undefined),
                          "pymonkey.undefined")
 
+    def testJsWrappedPythonFuncHasNoFilename(self):
+        def foo(cx, this, args):
+            pass
+
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.new_function(foo, foo.__name__)
+        self.assertEqual(jsfunc.filename, None)
+
     def testJsWrappedPythonFuncHasPrivate(self):
         def foo(cx, this, args):
             pass

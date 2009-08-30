@@ -54,6 +54,20 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    This is the type of JavaScript functions, which is a subtype of
    :class:`Object`.
 
+   .. data:: filename
+
+      Name of the file that contains the function's original JS source
+      code. If the function isn't a JS function, this value is
+      ``None``.
+
+   .. data:: base_lineno
+
+      The line number at which the function's JS source code begins.
+
+   .. data:: line_extent
+
+      The number of lines comprising the function's JS source code.
+
 .. class:: Script
 
    This is the type of compiled JavaScript scripts; it's actually a
@@ -106,7 +120,9 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       +==============================+=====================================+
       | :const:`script`              | :class:`Script` of the frame.       |
       |                              | This may be ``None`` if the frame   |
-      |                              | isn't a scripted frame.             |
+      |                              | isn't a scripted frame, or if it's  |
+      |                              | not possible to expose the script   |
+      |                              | to Python for some reason.          |
       +------------------------------+-------------------------------------+
       | :const:`lineno`              | Line number of the frame, if the    |
       |                              | frame is scripted.                  |
@@ -115,6 +131,9 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       |                              | is an index into the bytecode of    |
       |                              | the frame's script, if the frame    |
       |                              | is scripted.                        |
+      +------------------------------+-------------------------------------+
+      | :const:`function`            | The :class:`Function` in which the  |
+      |                              | frame is executing, if any.         |
       +------------------------------+-------------------------------------+
       | :const:`caller`              | Dictionary containing information   |
       |                              | about the stack frame of the        |
