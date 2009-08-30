@@ -144,6 +144,7 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     unsigned int pc = 0;
     unsigned int lineno = 0;
     PyObject *pyScript = NULL;
+    PyObject *pyFunc = NULL;
 
     // TODO: Ideally, we'd always convert the script to an object and
     // set it as an attribute of the function, but this can result in
@@ -151,15 +152,18 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     // scripts on finalization while creating an object from a script
     // makes it subject to GC.  So to be safe, we'll only provide the
     // script object if one already exists.
-    if (script && JS_GetScriptObject(script)) {
-      pyScript = (PyObject *) PYM_newJSScript(self, script);
-      if (pyScript == NULL) {
-        // TODO: We should clean up here.
-        return NULL;
-      }
+    if (script) {
       jsbytecode *pcByte = JS_GetFramePC(self->cx, frame);
       pc = pcByte - script->code;
       lineno = JS_PCToLineNumber(self->cx, script, pcByte);
+
+      if (JS_GetScriptObject(script)) {
+        pyScript = (PyObject *) PYM_newJSScript(self, script);
+        if (pyScript == NULL) {
+          // TODO: We should clean up here.
+          return NULL;
+        }
+      }
     }
 
     if (pyScript == NULL) {
@@ -167,15 +171,29 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
       Py_INCREF(pyScript);
     }
 
+    JSObject *funObj = JS_GetFrameFunctionObject(self->cx, frame);
+    if (funObj) {
+      pyFunc = (PyObject *) PYM_newJSObject(self, funObj, NULL);
+      if (pyFunc == NULL) {
+        // TODO: We should clean up here.
+        return NULL;
+      }
+    } else {
+      pyFunc = Py_None;
+      Py_INCREF(pyFunc);
+    }
+
     PyObject *frameDict = Py_BuildValue(
-      "{sOsIsIsO}",
+      "{sOsIsIsOsO}",
       "script", pyScript,
       "pc", pc,
       "lineno", lineno,
-      "caller", Py_None
+      "caller", Py_None,
+      "function", pyFunc
       );
 
     Py_DECREF(pyScript);
+    Py_DECREF(pyFunc);
 
     if (frameDict) {
       if (last) {

@@ -81,13 +81,20 @@ class PymonkeyTests(unittest.TestCase):
         jsfunc = cx.new_function(func, func.__name__)
         self._clearOnTeardown(jsfunc)
         cx.define_property(obj, func.__name__, jsfunc)
-        cx.evaluate_script(obj, '(function() { func() })()', '<string>', 1)
-        script = stack_holder[0]['caller']['caller']['script']
-        pc = stack_holder[0]['caller']['caller']['pc']
+        cx.evaluate_script(obj, '(function closure() { \nfunc() })()',
+                           '<string>', 1)
+        stack = stack_holder[0]
+        script = stack['caller']['caller']['script']
+        pc = stack['caller']['caller']['pc']
+        closure = stack['caller']['function']
+        self.assertEqual(closure.name, 'closure')
+        self.assertEqual(closure.filename, '<string>')
+        self.assertEqual(stack['caller']['script'], None)
+        self.assertEqual(stack['caller']['lineno'], 2)
         self.assertEqual(script.filename, '<string>')
-        self.assertEqual(stack_holder[0]['caller']['caller']['lineno'], 1)
+        self.assertEqual(stack['caller']['caller']['lineno'], 1)
         self.assertTrue(pc >= 0 and pc < len(buffer(script)))
-        self.assertEqual(stack_holder[0]['caller']['caller']['caller'], None)
+        self.assertEqual(stack['caller']['caller']['caller'], None)
 
     def testScriptHasFilenameMember(self):
         cx = pymonkey.Runtime().new_context()
