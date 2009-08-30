@@ -252,6 +252,20 @@ class PymonkeyTests(unittest.TestCase):
         del obj
         self.assertEqual(ref(), None)
 
+    def testFunctionsWithClosuresAreNotIdentical(self):
+        cx = pymonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        cx.evaluate_script(
+            obj, "function build(x) { return function foo() { return x; } }",
+            "<string>", 1
+            )
+        func1 = cx.evaluate_script(obj, "build(1)", "<string>", 1)
+        func2 = cx.evaluate_script(obj, "build(2)", "<string>", 1)
+        self.assertNotEqual(func1, func2)
+        self.assertEqual(func1.name, 'foo')
+        self.assertEqual(func1.name, func2.name)
+
     def testAnonymousJsFunctionHasNullNameAttribute(self):
         cx = pymonkey.Runtime().new_context()
         obj = cx.new_object()
