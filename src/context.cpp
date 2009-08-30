@@ -153,8 +153,10 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     // script object if one already exists.
     if (script && JS_GetScriptObject(script)) {
       pyScript = (PyObject *) PYM_newJSScript(self, script);
-      if (pyScript == NULL)
+      if (pyScript == NULL) {
+        // TODO: We should clean up here.
         return NULL;
+      }
       jsbytecode *pcByte = JS_GetFramePC(self->cx, frame);
       pc = pcByte - script->code;
       lineno = JS_PCToLineNumber(self->cx, script, pcByte);
