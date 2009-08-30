@@ -118,6 +118,13 @@ code. If the function isn&#8217;t a JS function, this value is
 <tt class="descname">line_extent</tt><a class="headerlink" href="#pymonkey.Function.line_extent" title="Permalink to this definition">¶</a></dt>
 <dd>The number of lines comprising the function&#8217;s JS source code.</dd></dl>
 
+<dl class="data">
+<dt id="pymonkey.Function.is_python">
+<tt class="descname">is_python</tt><a class="headerlink" href="#pymonkey.Function.is_python" title="Permalink to this definition">¶</a></dt>
+<dd>Whether or not the function is actually implemented in Python.
+If it is, you can use <a title="pymonkey.Context.get_object_private" class="reference" href="#pymonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">Context.get_object_private()</span></tt></a> to
+retrieve this Python function.</dd></dl>
+
 </dd></dl>
 
 <dl class="class">

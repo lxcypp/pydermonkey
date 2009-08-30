@@ -68,6 +68,12 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       The number of lines comprising the function's JS source code.
 
+   .. data:: is_python
+
+      Whether or not the function is actually implemented in Python.
+      If it is, you can use :meth:`Context.get_object_private()` to
+      retrieve this Python function.
+
 .. class:: Script
 
    This is the type of compiled JavaScript scripts; it's actually a
