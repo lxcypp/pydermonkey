@@ -204,6 +204,20 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(str(pymonkey.undefined),
                          "pymonkey.undefined")
 
+    def testScriptedJsFuncHasIsPythonFalse(self):
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.evaluate_script(cx.new_object(), 
+                                    '(function(){})', '<string>', 1)
+        self.assertFalse(jsfunc.is_python)
+
+    def testJsWrappedPythonFuncHasIsPythonTrue(self):
+        def foo(cx, this, args):
+            pass
+
+        cx = pymonkey.Runtime().new_context()
+        jsfunc = cx.new_function(foo, foo.__name__)
+        self.assertTrue(jsfunc.is_python)
+
     def testJsWrappedPythonFuncHasNoFilename(self):
         def foo(cx, this, args):
             pass

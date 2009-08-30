@@ -144,6 +144,8 @@ static PyMemberDef PYM_members[] = {
    "Base line number of function's source code."},
   {"line_extent", T_UINT, offsetof(PYM_JSFunction, lineExtent), READONLY,
    "Line extent of function's source code."},
+  {"is_python", T_BYTE, offsetof(PYM_JSFunction, isPython), READONLY,
+   "Whether or not the function is implemented in Python."},
   {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -206,6 +208,7 @@ PYM_newJSFunction(PYM_JSContextObject *context,
   jsFunction->filename = NULL;
   jsFunction->baseLineno = 0;
   jsFunction->lineExtent = 0;
+  jsFunction->isPython = 0;
 
   JSString *name = JS_GetFunctionId(jsFunction->fun);
   if (name != NULL) {
@@ -283,6 +286,8 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
     return NULL;
   }
+
+  object->isPython = 1;
 
   return object;
 }

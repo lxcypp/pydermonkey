@@ -50,6 +50,7 @@ typedef struct {
   const char *filename;
   unsigned int baseLineno;
   unsigned int lineExtent;
+  char isPython;
 } PYM_JSFunction;
 
 extern PyTypeObject PYM_JSFunctionType;
