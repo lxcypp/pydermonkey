@@ -160,7 +160,7 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
       if (JS_GetScriptObject(script)) {
         pyScript = (PyObject *) PYM_newJSScript(self, script);
         if (pyScript == NULL) {
-          // TODO: We should clean up here.
+          Py_XDECREF(top);
           return NULL;
         }
       }
@@ -175,7 +175,8 @@ PYM_getStack(PYM_JSContextObject *self, PyObject *args)
     if (funObj) {
       pyFunc = (PyObject *) PYM_newJSObject(self, funObj, NULL);
       if (pyFunc == NULL) {
-        // TODO: We should clean up here.
+        Py_XDECREF(top);
+        Py_DECREF(pyScript);
         return NULL;
       }
     } else {
