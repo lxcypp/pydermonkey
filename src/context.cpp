@@ -274,6 +274,34 @@ PYM_maybeGetFunctionHolder(PYM_JSContextObject *context,
 }
 
 static PyObject *
+PYM_isExceptionPending(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+
+  if (JS_IsExceptionPending(self->cx))
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+static PyObject *
+PYM_getPendingException(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+
+  if (!JS_IsExceptionPending(self->cx))
+    Py_RETURN_NONE;
+
+  jsval exception;
+
+  if (!JS_GetPendingException(self->cx, &exception)) {
+    PyErr_SetString(PYM_error, "JS_GetPendingException() failed");
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, exception);
+}
+
+static PyObject *
 PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -764,6 +792,12 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Returns the private Python object stored in the JavaScript object."},
   {"clear_object_private", (PyCFunction) PYM_clearObjectPrivate, METH_VARARGS,
    "Clears any private Python object stored in the JavaScript object."},
+  {"is_exception_pending", (PyCFunction) PYM_isExceptionPending,
+   METH_VARARGS,
+   "Returns whether an exception is currently being propagated."},
+  {"get_pending_exception", (PyCFunction) PYM_getPendingException,
+   METH_VARARGS,
+   "Returns the current exception being propagated."},
   {NULL, NULL, 0, NULL}
 };
 

@@ -232,10 +232,16 @@ class PymonkeyTests(unittest.TestCase):
                                     '(function(){})', '<string>', 1)
         self.assertEqual(cx.get_object_private(jsfunc), None)
 
+    def testGetPendingExceptionReturnsNone(self):
+        cx = pymonkey.Runtime().new_context()
+        self.assertFalse(cx.is_exception_pending())
+        self.assertEqual(cx.get_pending_exception(), None)
+
     def testThrowHookWorks(self):
-        timesCalled = [0]
+        exceptions = []
         def throwhook(cx):
-            timesCalled[0] += 1
+            self.assertTrue(cx.is_exception_pending())
+            exceptions.append(cx.get_pending_exception())
 
         cx = pymonkey.Runtime().new_context()
         cx.set_throw_hook(throwhook)
@@ -246,7 +252,9 @@ class PymonkeyTests(unittest.TestCase):
             '(function() { throw "hi"; })()',
             '<string>', 1
             )
-        self.assertEqual(timesCalled[0], 2)
+        self.assertEqual(exceptions, ['hi', 'hi'])
+        self.assertFalse(cx.is_exception_pending())
+        self.assertEqual(cx.get_pending_exception(), None)
 
     def testJsWrappedPythonFuncHasPrivate(self):
         def foo(cx, this, args):
