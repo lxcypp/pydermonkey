@@ -46,8 +46,8 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      True
 
    Note that :class:`Object` and all its subclasses are
-   identity-preserving when passed between Python-land and
-   JS-land. For instance:
+   identity-preserving when passed between Python and
+   JavaScript code. For instance:
 
      >>> cx = pymonkey.Runtime().new_context()
      >>> obj1 = cx.new_object()
