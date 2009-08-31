@@ -16,6 +16,19 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
    This is the type of any SpiderMonkey-related errors thrown by this
    module.
 
+   If the error is a wrapped JavaScript exception, the first argument
+   will be the thrown JS exception, and the second argument will be 
+   the JS exception converted to a string. Otherwise, the error
+   will only contain a descriptive string argument.
+
+   For example:
+
+     >>> cx = pymonkey.Runtime().new_context()
+     >>> cx.evaluate_script(cx.new_object(), 'throw 1', '<string>', 1)
+     Traceback (most recent call last):
+     ...
+     error: (1, u'1')
+
 .. data:: undefined
 
    This is the singleton that represents the JavaScript value

@@ -51,8 +51,20 @@
 <dt id="pymonkey.error">
 <em class="property">
 exception </em><tt class="descclassname">pymonkey.</tt><tt class="descname">error</tt><a class="headerlink" href="#pymonkey.error" title="Permalink to this definition">¶</a></dt>
-<dd>This is the type of any SpiderMonkey-related errors thrown by this
-module.</dd></dl>
+<dd><p>This is the type of any SpiderMonkey-related errors thrown by this
+module.</p>
+<p>If the error is a wrapped JavaScript exception, the first argument
+will be the thrown JS exception, and the second argument will be
+the JS exception converted to a string. Otherwise, the error
+will only contain a descriptive string argument.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;throw 1&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">error: (1, u&#39;1&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="data">
 <dt id="pymonkey.undefined">
