@@ -45,6 +45,16 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      >>> isinstance(obj, pymonkey.Object)
      True
 
+   Note that :class:`Object` and all its subclasses are
+   identity-preserving when passed between Python-land and
+   JS-land. For instance:
+
+     >>> cx = pymonkey.Runtime().new_context()
+     >>> obj1 = cx.new_object()
+     >>> obj2 = cx.evaluate_script(obj1, 'this', '<string>', 1)
+     >>> obj1 is obj2
+     True
+
    .. method:: get_runtime()
 
       Returns the :class:`Runtime` that the object belongs to.
