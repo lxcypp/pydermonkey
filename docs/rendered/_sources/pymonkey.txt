@@ -332,6 +332,40 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       pending exception or there is no pending exception, use
       :meth:`is_exception_pending()`.
 
+   .. method:: set_throw_hook(func)
+
+      Sets the throw hook for the context to the given Python callable.
+      The hook is triggered whenever an exception is thrown in the
+      context.
+
+      `func` takes one argument: the context that triggered it.
+
+      For example, here's a throw hook that prints information about
+      an exception as it's being propagated through the stack:
+
+        >>> def throwhook(cx): 
+        ...   stack = cx.get_stack()
+        ...   if stack['function']:
+        ...     where = stack['function'].name
+        ...   else:
+        ...     where = stack['script'].filename
+        ...   exc = cx.get_pending_exception()
+        ...   print "%s being thrown in %s" % (exc, where)
+
+      Here's the hook in action:
+
+        >>> cx = pymonkey.Runtime().new_context()
+        >>> cx.set_throw_hook(throwhook)
+        >>> obj = cx.new_object()
+        >>> code = "(function foo() { throw 'oops' })()"
+        >>> try:
+        ...   cx.evaluate_script(obj, code, '<string>', 1)
+        ... except pymonkey.error, e:
+        ...   print "caught %s" % e.args[0]
+        oops being thrown in foo
+        oops being thrown in <string>
+        caught oops
+
    .. method:: set_operation_callback(func)
 
       Sets the operation callback for the context to the given Python
