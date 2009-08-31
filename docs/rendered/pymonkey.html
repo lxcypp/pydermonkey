@@ -403,6 +403,22 @@ which this method wraps.</dd></dl>
 <dd>Performs garbage collection on the context&#8217;s JavaScript runtime.</dd></dl>
 
 <dl class="method">
+<dt id="pymonkey.Context.is_exception_pending">
+<tt class="descname">is_exception_pending</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.is_exception_pending" title="Permalink to this definition">¶</a></dt>
+<dd>Returns whether an exception is currently being propagated in
+the context.</dd></dl>
+
+<dl class="method">
+<dt id="pymonkey.Context.get_pending_exception">
+<tt class="descname">get_pending_exception</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_pending_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current exception being propagated in the context. If
+no exception is being propagated, this method returns <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
+<p>If you need to disambiguate between whether <tt class="xref docutils literal"><span class="pre">None</span></tt> is the
+pending exception or there is no pending exception, use
+<a title="pymonkey.Context.is_exception_pending" class="reference" href="#pymonkey.Context.is_exception_pending"><tt class="xref docutils literal"><span class="pre">is_exception_pending()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pymonkey.Context.set_operation_callback">
 <tt class="descname">set_operation_callback</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pymonkey.Context.set_operation_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the operation callback for the context to the given Python

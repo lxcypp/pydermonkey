@@ -318,6 +318,20 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Performs garbage collection on the context's JavaScript runtime.
 
+   .. method:: is_exception_pending()
+
+      Returns whether an exception is currently being propagated in
+      the context.
+
+   .. method:: get_pending_exception()
+
+      Returns the current exception being propagated in the context. If
+      no exception is being propagated, this method returns ``None``.
+
+      If you need to disambiguate between whether ``None`` is the
+      pending exception or there is no pending exception, use
+      :meth:`is_exception_pending()`.
+
    .. method:: set_operation_callback(func)
 
       Sets the operation callback for the context to the given Python
