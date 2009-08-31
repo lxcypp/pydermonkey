@@ -43,6 +43,33 @@
 #include "jsdbgapi.h"
 #include "jsscript.h"
 
+// This is the default throw hook for pymonkey-owned JS contexts,
+// when they've defined one in Python.
+static JSTrapStatus
+PYM_throwHook(JSContext *cx, JSScript *script, jsbytecode *pc, jsval *rval,
+              void *closure)
+{
+  PYM_PyAutoEnsureGIL gil;
+  PYM_JSContextObject *context = (PYM_JSContextObject *)
+    JS_GetContextPrivate(cx);
+
+  PyObject *callable = context->throwHook;
+  PyObject *args = PyTuple_Pack(1, (PyObject *) context);
+  if (args == NULL) {
+    JS_ReportOutOfMemory(cx);
+    return JSTRAP_CONTINUE;
+  }
+  PyObject *result = PyObject_Call(callable, args, NULL);
+  Py_DECREF(args);
+  if (result == NULL) {
+    PYM_pythonExceptionToJs(context);
+    return JSTRAP_CONTINUE;
+  }
+
+  Py_DECREF(result);
+  return JSTRAP_CONTINUE;
+}
+
 // This is the default JSOperationCallback for pymonkey-owned JS contexts,
 // when they've defined one in Python.
 static JSBool
@@ -92,6 +119,7 @@ static int
 PYM_traverse(PYM_JSContextObject *self, visitproc visit, void *arg)
 {
   Py_VISIT(self->opCallback);
+  Py_VISIT(self->throwHook);
   Py_VISIT(self->runtime);
   return 0;
 }
@@ -100,6 +128,7 @@ static int
 PYM_clear(PYM_JSContextObject *self)
 {
   Py_CLEAR(self->opCallback);
+  Py_CLEAR(self->throwHook);
   Py_CLEAR(self->runtime);
   return 0;
 }
@@ -630,6 +659,31 @@ PYM_newFunction(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_setThrowHook(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PyObject *callable;
+
+  if (!PyArg_ParseTuple(args, "O", &callable))
+    return NULL;
+
+  if (!PyCallable_Check(callable)) {
+    PyErr_SetString(PyExc_TypeError, "Callable must be callable");
+    return NULL;
+  }
+
+  self->hooks.throwHook = PYM_throwHook;
+  JS_SetContextDebugHooks(self->cx, &self->hooks);
+
+  Py_INCREF(callable);
+  if (self->throwHook)
+    Py_DECREF(self->throwHook);
+  self->throwHook = callable;
+
+  Py_RETURN_NONE;
+}
+
+static PyObject *
 PYM_setOperationCallback(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -701,6 +755,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"set_operation_callback", (PyCFunction) PYM_setOperationCallback,
    METH_VARARGS,
    "Sets the operation callback for the context."},
+  {"set_throw_hook", (PyCFunction) PYM_setThrowHook, METH_VARARGS,
+   "Sets the throw hook for the context."},
   {"trigger_operation_callback", (PyCFunction) PYM_triggerOperationCallback,
    METH_VARARGS,
    "Triggers the operation callback for the context."},
@@ -765,8 +821,11 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   if (context == NULL)
     return NULL;
 
+  memset(&context->hooks, 0, sizeof(context->hooks));
+
   context->weakrefs = NULL;
   context->opCallback = NULL;
+  context->throwHook = NULL;
   context->runtime = runtime;
   Py_INCREF(runtime);
 

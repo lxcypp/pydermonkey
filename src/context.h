@@ -40,6 +40,7 @@
 #include "runtime.h"
 
 #include <jsapi.h>
+#include <jsdbgapi.h>
 #include <Python.h>
 
 typedef struct {
@@ -47,7 +48,9 @@ typedef struct {
   PYM_JSRuntimeObject *runtime;
   JSContext *cx;
   PyObject *opCallback;
+  PyObject *throwHook;
   PyObject *weakrefs;
+  JSDebugHooks hooks;
 } PYM_JSContextObject;
 
 extern PyTypeObject PYM_JSContextType;

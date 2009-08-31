@@ -232,6 +232,22 @@ class PymonkeyTests(unittest.TestCase):
                                     '(function(){})', '<string>', 1)
         self.assertEqual(cx.get_object_private(jsfunc), None)
 
+    def testThrowHookWorks(self):
+        timesCalled = [0]
+        def throwhook(cx):
+            timesCalled[0] += 1
+
+        cx = pymonkey.Runtime().new_context()
+        cx.set_throw_hook(throwhook)
+        self.assertRaises(
+            pymonkey.error,
+            cx.evaluate_script,
+            cx.new_object(),
+            '(function() { throw "hi"; })()',
+            '<string>', 1
+            )
+        self.assertEqual(timesCalled[0], 2)
+
     def testJsWrappedPythonFuncHasPrivate(self):
         def foo(cx, this, args):
             pass
