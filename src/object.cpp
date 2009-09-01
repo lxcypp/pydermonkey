@@ -137,7 +137,7 @@ static PyMethodDef PYM_JSObjectMethods[] = {
 PyTypeObject PYM_JSObjectType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pydermonkey.Object",           /*tp_name*/
+  "pydermonkey.Object",        /*tp_name*/
   sizeof(PYM_JSObject),        /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

@@ -151,7 +151,7 @@ static PyMethodDef PYM_JSRuntimeMethods[] = {
 PyTypeObject PYM_JSRuntimeType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pydermonkey.Runtime",          /*tp_name*/
+  "pydermonkey.Runtime",       /*tp_name*/
   sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

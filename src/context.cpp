@@ -70,8 +70,8 @@ PYM_throwHook(JSContext *cx, JSScript *script, jsbytecode *pc, jsval *rval,
   return JSTRAP_CONTINUE;
 }
 
-// This is the default JSOperationCallback for pydermonkey-owned JS contexts,
-// when they've defined one in Python.
+// This is the default JSOperationCallback for pydermonkey-owned JS
+// contexts, when they've defined one in Python.
 static JSBool
 PYM_operationCallback(JSContext *cx)
 {
@@ -804,7 +804,7 @@ static PyMethodDef PYM_JSContextMethods[] = {
 PyTypeObject PYM_JSContextType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pydermonkey.Context",          /*tp_name*/
+  "pydermonkey.Context",       /*tp_name*/
   sizeof(PYM_JSContextObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

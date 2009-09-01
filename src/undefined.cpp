@@ -53,7 +53,7 @@ static PyObject *PYM_undefinedRepr(PyObject *o) {
 PyTypeObject PYM_undefinedType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pydermonkey.undefined",        /*tp_name*/
+  "pydermonkey.undefined",     /*tp_name*/
   sizeof(PYM_undefinedObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
   0,                           /*tp_dealloc*/

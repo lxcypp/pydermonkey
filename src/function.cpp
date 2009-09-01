@@ -152,7 +152,7 @@ static PyMemberDef PYM_members[] = {
 PyTypeObject PYM_JSFunctionType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pydermonkey.Function",         /*tp_name*/
+  "pydermonkey.Function",      /*tp_name*/
   sizeof(PYM_JSFunction),      /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

@@ -100,7 +100,8 @@ creating something akin to `XPCOM's cycle collector
 <https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector>`_.
 
 For the time being, however, such cycles can be manually broken via
-:meth:`pydermonkey.Context.clear_object_private()` on valid objects and functions.
+:meth:`pydermonkey.Context.clear_object_private()` on valid objects
+and functions.
 
 Indices and Tables
 ==================
