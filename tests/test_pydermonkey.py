@@ -5,9 +5,9 @@ import weakref
 import time
 import threading
 
-import pymonkey
+import pydermonkey
 
-class PymonkeyTests(unittest.TestCase):
+class PydermonkeyTests(unittest.TestCase):
     def setUp(self):
         self._teardowns = []
 
@@ -19,20 +19,20 @@ class PymonkeyTests(unittest.TestCase):
             runtime.new_context().clear_object_private(obj)
             del runtime
             del obj
-        self.assertEqual(pymonkey.get_debug_info()['runtime_count'], 0)
+        self.assertEqual(pydermonkey.get_debug_info()['runtime_count'], 0)
 
     def _clearOnTeardown(self, obj):
         self._teardowns.append(obj)
 
     def _evaljs(self, code):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
     def _execjs(self, code):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
@@ -40,7 +40,7 @@ class PymonkeyTests(unittest.TestCase):
         return cx.execute_script(obj, script)
 
     def _evalJsWrappedPyFunc(self, func, code):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
@@ -59,14 +59,14 @@ class PymonkeyTests(unittest.TestCase):
 
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:
-            self.assertRaises(pymonkey.error, run, '5f')
+            self.assertRaises(pydermonkey.error, run, '5f')
             self.assertEqual(
                 self.last_exception.args[1],
                 u'SyntaxError: missing ; before statement'
                 )
 
     def testGetStackOnEmptyStackReturnsNone(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         self.assertEqual(cx.get_stack(), None)
 
     def testGetStackWorks(self):
@@ -75,7 +75,7 @@ class PymonkeyTests(unittest.TestCase):
         def func(cx, this, args):
             stack_holder.append(cx.get_stack())
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
@@ -97,18 +97,18 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(stack['caller']['caller']['caller'], None)
 
     def testScriptHasFilenameMember(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         script = cx.compile_script('foo', '<string>', 1)
         self.assertEqual(script.filename, '<string>')
 
     def testScriptHasLineInfo(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         script = cx.compile_script('foo\nbar', '<string>', 1)
         self.assertEqual(script.base_lineno, 1)
         self.assertEqual(script.line_extent, 2)
 
     def testScriptIsExposedAsBuffer(self):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         script = cx.compile_script('foo', '<string>', 1)
         self.assertTrue(len(buffer(script)) > 0)
@@ -117,18 +117,18 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(self._execjs('5 + 1'), 6)
 
     def testErrorsRaisedIncludeStrings(self):
-        self.assertRaises(pymonkey.error, self._evaljs, 'boop()')
+        self.assertRaises(pydermonkey.error, self._evaljs, 'boop()')
         self.assertEqual(self.last_exception.args[1],
                          u'ReferenceError: boop is not defined')
 
     def testThreadSafetyExceptionIsRaised(self):
         stuff = {}
         def make_runtime():
-            stuff['rt'] = pymonkey.Runtime()
+            stuff['rt'] = pydermonkey.Runtime()
         thread = threading.Thread(target = make_runtime)
         thread.start()
         thread.join()
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           stuff['rt'].new_context)
         self.assertEqual(self.last_exception.args[0],
                          'Function called from wrong thread')
@@ -138,7 +138,7 @@ class PymonkeyTests(unittest.TestCase):
         class Foo(object):
             pass
         pyobj = Foo()
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object(pyobj)
         pyobj = weakref.ref(pyobj)
         self.assertEqual(pyobj(), cx.get_object_private(obj))
@@ -150,7 +150,7 @@ class PymonkeyTests(unittest.TestCase):
         class Foo(object):
             pass
         pyobj = Foo()
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object(pyobj)
         pyobj = weakref.ref(pyobj)
         self.assertEqual(pyobj(), cx.get_object_private(obj))
@@ -160,7 +160,7 @@ class PymonkeyTests(unittest.TestCase):
 
     def testContextSupportsCyclicGc(self):
         def makecx():
-            cx = pymonkey.Runtime().new_context()
+            cx = pydermonkey.Runtime().new_context()
 
             def opcb(othercx):
                 return cx
@@ -182,7 +182,7 @@ class PymonkeyTests(unittest.TestCase):
         def opcb(cx):
             raise Exception("stop eet!")
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         cx.set_operation_callback(opcb)
         obj = cx.new_object()
         cx.init_standard_classes(obj)
@@ -195,17 +195,17 @@ class PymonkeyTests(unittest.TestCase):
         thread.start()
 
         self.assertRaises(
-            pymonkey.error,
+            pydermonkey.error,
             cx.evaluate_script,
             obj, 'while (1) {}', '<string>', 1
             )
 
     def testUndefinedStrIsUndefined(self):
-        self.assertEqual(str(pymonkey.undefined),
-                         "pymonkey.undefined")
+        self.assertEqual(str(pydermonkey.undefined),
+                         "pydermonkey.undefined")
 
     def testScriptedJsFuncHasIsPythonFalse(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.evaluate_script(cx.new_object(), 
                                     '(function(){})', '<string>', 1)
         self.assertFalse(jsfunc.is_python)
@@ -214,7 +214,7 @@ class PymonkeyTests(unittest.TestCase):
         def foo(cx, this, args):
             pass
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.new_function(foo, foo.__name__)
         self.assertTrue(jsfunc.is_python)
 
@@ -222,18 +222,18 @@ class PymonkeyTests(unittest.TestCase):
         def foo(cx, this, args):
             pass
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.new_function(foo, foo.__name__)
         self.assertEqual(jsfunc.filename, None)
 
     def testJsScriptedFuncHasNoPrivate(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.evaluate_script(cx.new_object(),
                                     '(function(){})', '<string>', 1)
         self.assertEqual(cx.get_object_private(jsfunc), None)
 
     def testGetPendingExceptionReturnsNone(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         self.assertFalse(cx.is_exception_pending())
         self.assertEqual(cx.get_pending_exception(), None)
 
@@ -243,10 +243,10 @@ class PymonkeyTests(unittest.TestCase):
             self.assertTrue(cx.is_exception_pending())
             exceptions.append(cx.get_pending_exception())
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         cx.set_throw_hook(throwhook)
         self.assertRaises(
-            pymonkey.error,
+            pydermonkey.error,
             cx.evaluate_script,
             cx.new_object(),
             '(function() { throw "hi"; })()',
@@ -260,7 +260,7 @@ class PymonkeyTests(unittest.TestCase):
         def foo(cx, this, args):
             pass
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.new_function(foo, foo.__name__)
         self.assertEqual(cx.get_object_private(jsfunc), foo)
 
@@ -271,7 +271,7 @@ class PymonkeyTests(unittest.TestCase):
             jsfunc = cx.new_function(func, func.__name__)
             cx.define_property(obj, func.__name__, jsfunc)
             return weakref.ref(func)
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
@@ -296,7 +296,7 @@ class PymonkeyTests(unittest.TestCase):
             jsfunc = cx.new_function(func, func.__name__)
             cx.define_property(obj, func.__name__, jsfunc)
             return (jsfunc, weakref.ref(func))
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
@@ -312,7 +312,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(ref(), None)
 
     def testFunctionsWithClosuresAreNotIdentical(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         cx.evaluate_script(
@@ -326,7 +326,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(func1.name, func2.name)
 
     def testAnonymousJsFunctionHasNullNameAttribute(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.evaluate_script(obj, "(function() {})",
@@ -334,7 +334,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(jsfunc.name, None)
 
     def testJsFunctionHasNameAttribute(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.evaluate_script(obj, "(function blarg() {})",
@@ -345,7 +345,7 @@ class PymonkeyTests(unittest.TestCase):
         def func(cx, this, args):
             return True
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         jsfunc = cx.new_function(func, "foo")
         self.assertEqual(jsfunc.name, "foo")
 
@@ -356,7 +356,7 @@ class PymonkeyTests(unittest.TestCase):
             jsfunc = cx.new_function(func, func.__name__)
             cx.define_property(obj, func.__name__, jsfunc)
             return weakref.ref(func)
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
@@ -371,13 +371,13 @@ class PymonkeyTests(unittest.TestCase):
             return True
 
         code = "func()"
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.clear_object_private(jsfunc)
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           cx.evaluate_script,
                           obj, code, '<string>', 1)
         self.assertEqual(
@@ -393,7 +393,7 @@ class PymonkeyTests(unittest.TestCase):
             return True
 
         code = "func()"
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
@@ -410,7 +410,7 @@ class PymonkeyTests(unittest.TestCase):
             return True
 
         code = "func()"
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
@@ -426,7 +426,7 @@ class PymonkeyTests(unittest.TestCase):
             funcArgs.append(args)
             return True
 
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.new_function(func, func.__name__)
@@ -464,8 +464,8 @@ class PymonkeyTests(unittest.TestCase):
 
     def testJsWrappedPythonFunctionThrowsJsException(self):
         def hai2u(cx, this, args):
-            raise pymonkey.error(u"blarg")
-        self.assertRaises(pymonkey.error,
+            raise pydermonkey.error(u"blarg")
+        self.assertRaises(pydermonkey.error,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
         self.assertEqual(self.last_exception.args[0], u"blarg")
@@ -475,7 +475,7 @@ class PymonkeyTests(unittest.TestCase):
         def hai2u(cx, this, args):
             thecx.append(cx)
             raise Exception("hello")
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
         exc = thecx[0].get_object_private(self.last_exception.args[0])
@@ -524,7 +524,7 @@ class PymonkeyTests(unittest.TestCase):
                          2147483647)
 
     def testHasPropertyWorks(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         foo = cx.new_object()
@@ -533,7 +533,7 @@ class PymonkeyTests(unittest.TestCase):
         self.assertFalse(cx.has_property(obj, "bar"))
 
     def testDefinePropertyWorksWithUnicodePropertyNames(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         foo = cx.new_object()
@@ -544,7 +544,7 @@ class PymonkeyTests(unittest.TestCase):
             )
 
     def testDefinePropertyWorksWithObject(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         foo = cx.new_object()
@@ -555,7 +555,7 @@ class PymonkeyTests(unittest.TestCase):
             )
 
     def testDefinePropertyWorksWithString(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         foo = cx.new_object()
@@ -566,33 +566,33 @@ class PymonkeyTests(unittest.TestCase):
             )
 
     def testObjectIsIdentityPreserving(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         cx.evaluate_script(obj, 'var foo = {bar: 1}', '<string>', 1)
         self.assertTrue(isinstance(cx.get_property(obj, u"foo"),
-                                   pymonkey.Object))
+                                   pydermonkey.Object))
         self.assertTrue(cx.get_property(obj, u"foo") is
                         cx.get_property(obj, "foo"))
 
     def testObjectGetattrThrowsException(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         result = cx.evaluate_script(obj, '({get foo() { throw "blah"; }})',
                                     '<string>', 1)
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           cx.get_property,
                           result,
                           u"foo")
         self.assertEqual(self.last_exception.args[0], u"blah")
 
     def testInfiniteRecursionRaisesError(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         self.assertRaises(
-            pymonkey.error,
+            pydermonkey.error,
             cx.evaluate_script,
             obj, '(function foo() { foo(); })();', '<string>', 1
             )
@@ -602,60 +602,60 @@ class PymonkeyTests(unittest.TestCase):
             )
 
     def testObjectGetattrWorks(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         cx.evaluate_script(obj, 'var boop = 5', '<string>', 1)
         cx.evaluate_script(obj, 'this["blarg\u2026"] = 5', '<string>', 1)
         self.assertEqual(cx.get_property(obj, u"beans"),
-                         pymonkey.undefined)
+                         pydermonkey.undefined)
         self.assertEqual(cx.get_property(obj, u"blarg\u2026"), 5)
         self.assertEqual(cx.get_property(obj, u"boop"), 5)
 
     def testContextIsInstance(self):
-        cx = pymonkey.Runtime().new_context()
-        self.assertTrue(isinstance(cx, pymonkey.Context))
+        cx = pydermonkey.Runtime().new_context()
+        self.assertTrue(isinstance(cx, pydermonkey.Context))
 
     def testContextTypeCannotBeInstantiated(self):
-        self.assertRaises(TypeError, pymonkey.Context)
+        self.assertRaises(TypeError, pydermonkey.Context)
 
     def testObjectIsInstance(self):
-        obj = pymonkey.Runtime().new_context().new_object()
-        self.assertTrue(isinstance(obj, pymonkey.Object))
-        self.assertFalse(isinstance(obj, pymonkey.Function))
+        obj = pydermonkey.Runtime().new_context().new_object()
+        self.assertTrue(isinstance(obj, pydermonkey.Object))
+        self.assertFalse(isinstance(obj, pydermonkey.Function))
 
     def testObjectTypeCannotBeInstantiated(self):
-        self.assertRaises(TypeError, pymonkey.Object)
+        self.assertRaises(TypeError, pydermonkey.Object)
 
     def testFunctionIsInstance(self):
         def boop():
             pass
-        obj = pymonkey.Runtime().new_context().new_function(boop, "boop")
-        self.assertTrue(isinstance(obj, pymonkey.Object))
-        self.assertTrue(isinstance(obj, pymonkey.Function))
+        obj = pydermonkey.Runtime().new_context().new_function(boop, "boop")
+        self.assertTrue(isinstance(obj, pydermonkey.Object))
+        self.assertTrue(isinstance(obj, pydermonkey.Function))
 
     def testFunctionTypeCannotBeInstantiated(self):
-        self.assertRaises(TypeError, pymonkey.Function)
+        self.assertRaises(TypeError, pydermonkey.Function)
 
     def testObjectGetRuntimeWorks(self):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         obj = rt.new_context().new_object()
         self.assertEqual(obj.get_runtime(), rt)
 
     def testContextGetRuntimeWorks(self):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         self.assertEqual(cx.get_runtime(), rt)
 
     def testRuntimesAreWeakReferencable(self):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         wrt = weakref.ref(rt)
         self.assertEqual(rt, wrt())
         del rt
         self.assertEqual(wrt(), None)
 
     def testContextsAreWeakReferencable(self):
-        rt = pymonkey.Runtime()
+        rt = pydermonkey.Runtime()
         cx = rt.new_context()
         wcx = weakref.ref(cx)
         self.assertEqual(cx, wcx())
@@ -663,12 +663,12 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(wcx(), None)
 
     def testUndefinedCannotBeInstantiated(self):
-        self.assertRaises(TypeError, pymonkey.undefined)
+        self.assertRaises(TypeError, pydermonkey.undefined)
 
     def testEvaluateThrowsException(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           cx.evaluate_script,
                           obj, 'hai2u()', '<string>', 1)
         self.assertEqual(self._tostring(cx,
@@ -677,7 +677,7 @@ class PymonkeyTests(unittest.TestCase):
 
     def testThrowingObjWithBadToStringWorks(self):
         self.assertRaises(
-            pymonkey.error,
+            pydermonkey.error,
             self._evaljs,
             "throw {toString: function() { throw 'dujg' }}"
             )
@@ -692,7 +692,7 @@ class PymonkeyTests(unittest.TestCase):
 
     def testEvaluateReturnsUndefined(self):
         retval = self._evaljs("")
-        self.assertTrue(retval is pymonkey.undefined)
+        self.assertTrue(retval is pydermonkey.undefined)
 
     def testEvaludateReturnsUnicodeWithEmbeddedNULs(self):
         retval = self._evaljs("'\x00hi'")
@@ -712,15 +712,15 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(retval, u'o hai\u2026')
 
     def testEvaluateReturnsObject(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         obj = cx.evaluate_script(obj, '({boop: 1})', '<string>', 1)
-        self.assertTrue(isinstance(obj, pymonkey.Object))
+        self.assertTrue(isinstance(obj, pydermonkey.Object))
         self.assertEqual(cx.get_property(obj, u"boop"), 1)
 
     def testScriptedFunctionsHaveFilenameInfo(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         jsfunc = cx.evaluate_script(obj,
@@ -731,24 +731,24 @@ class PymonkeyTests(unittest.TestCase):
         self.assertEqual(jsfunc.line_extent, 2)
 
     def testEvaluateReturnsFunction(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         obj = cx.evaluate_script(obj, '(function boop() { return 1; })',
                                  '<string>', 1)
-        self.assertTrue(isinstance(obj, pymonkey.Function))
+        self.assertTrue(isinstance(obj, pydermonkey.Function))
 
     def testJsExceptionStateIsClearedAfterExceptionIsCaught(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           cx.evaluate_script,
                           obj, 'blah()', '<string>', 1)
         self.assertEqual(cx.evaluate_script(obj, '5+3', '<string>', 1),
                          8)
 
     def testCallFunctionRaisesErrorOnBadFuncArgs(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         obj = cx.evaluate_script(
             obj,
@@ -767,14 +767,14 @@ class PymonkeyTests(unittest.TestCase):
                                 ())
 
     def testCallFunctionRaisesErrorFromJS(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         obj = cx.evaluate_script(
             obj,
             '(function boop(a, b) { blarg(); })',
             '<string>', 1
             )
-        self.assertRaises(pymonkey.error,
+        self.assertRaises(pydermonkey.error,
                           cx.call_function,
                           obj, obj, (1,))
         self.assertEqual(self._tostring(cx,
@@ -782,8 +782,8 @@ class PymonkeyTests(unittest.TestCase):
                          'ReferenceError: blarg is not defined')
 
     def testInitStandardClassesRaisesExcOnRuntimeMismatch(self):
-        cx2 = pymonkey.Runtime().new_context()
-        cx = pymonkey.Runtime().new_context()
+        cx2 = pydermonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         self.assertRaises(ValueError,
                           cx2.init_standard_classes,
@@ -792,7 +792,7 @@ class PymonkeyTests(unittest.TestCase):
                          'JS runtime mismatch')
 
     def testCallFunctionWorks(self):
-        cx = pymonkey.Runtime().new_context()
+        cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         thisArg = cx.new_object()
         cx.define_property(thisArg, "c", 3)

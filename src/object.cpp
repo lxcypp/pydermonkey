@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -69,7 +69,7 @@ PYM_JS_getPrivatePyObject(JSContext *cx, JSObject *obj, PyObject **pyObject)
 {
   JSClass *klass = JS_GET_CLASS(cx, obj);
   if (klass != &PYM_JS_ObjectClass) {
-    JS_ReportError(cx, "Object is not an instance of PymonkeyObject");
+    JS_ReportError(cx, "Object is not an instance of PydermonkeyObject");
     return JS_FALSE;
   }
 
@@ -93,7 +93,7 @@ PYM_JS_finalizeObject(JSContext *cx, JSObject *obj)
 // garbage collected by the JS interpreter, it releases its reference on
 // the Python object.
 JSClass PYM_JS_ObjectClass = {
-  "PymonkeyObject", JSCLASS_GLOBAL_FLAGS | JSCLASS_HAS_PRIVATE,
+  "PydermonkeyObject", JSCLASS_GLOBAL_FLAGS | JSCLASS_HAS_PRIVATE,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
   JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, PYM_JS_finalizeObject,
   JSCLASS_NO_OPTIONAL_MEMBERS
@@ -137,7 +137,7 @@ static PyMethodDef PYM_JSObjectMethods[] = {
 PyTypeObject PYM_JSObjectType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.Object",           /*tp_name*/
+  "pydermonkey.Object",           /*tp_name*/
   sizeof(PYM_JSObject),        /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/
@@ -246,6 +246,6 @@ PYM_JSObject *PYM_newJSObject(PYM_JSContextObject *context,
   object->obj = obj;
 
   JS_AddNamedRootRT(object->runtime->rt, &object->obj,
-                    "Pymonkey-Generated Object");
+                    "Pydermonkey-Generated Object");
   return object;
 }

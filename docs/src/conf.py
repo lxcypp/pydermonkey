@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Pymonkey documentation build configuration file, created by
+# Pydermonkey documentation build configuration file, created by
 # sphinx-quickstart on Mon Jul  6 17:20:31 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -37,7 +37,7 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Pymonkey'
+project = u'Pydermonkey'
 copyright = u'2009, Atul Varma'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -158,7 +158,7 @@ html_use_smartypants = True
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Pymonkeydoc'
+htmlhelp_basename = 'Pydermonkeydoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -172,7 +172,7 @@ htmlhelp_basename = 'Pymonkeydoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Pymonkey.tex', u'Pymonkey Documentation',
+  ('index', 'Pydermonkey.tex', u'Pydermonkey Documentation',
    u'Atul Varma', 'manual'),
 ]
 

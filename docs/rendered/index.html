@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Pymonkey Documentation &mdash; Pymonkey v0.0.1 documentation</title>
+    <title>Pydermonkey Documentation &mdash; Pydermonkey v0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -19,8 +19,8 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Pymonkey v0.0.1 documentation" href="" />
-    <link rel="next" title="pymonkey — Access SpiderMonkey from Python" href="pymonkey.html" /> 
+    <link rel="top" title="Pydermonkey v0.0.1 documentation" href="" />
+    <link rel="next" title="pydermonkey — Access SpiderMonkey from Python" href="pydermonkey.html" /> 
   </head>
   <body>
     <div class="related">
@@ -33,9 +33,9 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="pymonkey.html" title="pymonkey — Access SpiderMonkey from Python"
+          <a href="pydermonkey.html" title="pydermonkey — Access SpiderMonkey from Python"
              accesskey="N">next</a> |</li>
-        <li><a href="">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="">Pydermonkey v0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -44,13 +44,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="pymonkey-documentation">
-<h1>Pymonkey Documentation<a class="headerlink" href="#pymonkey-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Pymonkey is a Python C extension module to expose the <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey">Mozilla
+  <div class="section" id="pydermonkey-documentation">
+<h1>Pydermonkey Documentation<a class="headerlink" href="#pydermonkey-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Pydermonkey is a Python C extension module to expose the <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey">Mozilla
 SpiderMonkey</a> engine
 to Python.</p>
 <ul>
-<li class="toctree-l1"><a class="reference" href="pymonkey.html"><tt class="docutils literal"><span class="pre">pymonkey</span></tt> &#8212; Access SpiderMonkey from Python</a></li>
+<li class="toctree-l1"><a class="reference" href="pydermonkey.html"><tt class="docutils literal"><span class="pre">pydermonkey</span></tt> &#8212; Access SpiderMonkey from Python</a></li>
 </ul>
 <p>Rationale and Goals:</p>
 <ul>
@@ -69,17 +69,17 @@ duplicate business logic on the server and client (i.e., browser)
 would be very useful. Standards-based solutions like <a class="reference" href="https://wiki.mozilla.org/ServerJS">ServerJS</a> are currently paving the way
 in this field. There&#8217;s Java-based solutions like Rhino out there,
 but nothing really mature is available for the Python
-world. Ideally, Pymonkey should enable a Python programmer to create
+world. Ideally, Pydermonkey should enable a Python programmer to create
 a custom sandboxed environment for executing JS code without needing
 to write any C.</p>
 </li>
-<li><p class="first">Pymonkey should have awesome Sphinx documentation with doctests and
+<li><p class="first">Pydermonkey should have awesome Sphinx documentation with doctests and
 all the trappings of a model Python package. Not only should it be
 easy for Python programmers to learn how to use the module, but it
 should also be easy for them to learn more about how SpiderMonkey
 works by reading the documentation and playing around with the code.</p>
 </li>
-<li><p class="first">Pymonkey needs to have outstanding developer ergonomics. Full
+<li><p class="first">Pydermonkey needs to have outstanding developer ergonomics. Full
 cross-language stack tracebacks should be available, for instance,
 and developers should be able to easily debug. Access to memory
 profiling facilities in JS-land is a must.</p>
@@ -103,7 +103,7 @@ before, so he wanted to give it a try.</p>
 </ul>
 <div class="section" id="building-testing-and-installing">
 <h2>Building, Testing, and Installing<a class="headerlink" href="#building-testing-and-installing" title="Permalink to this headline">¶</a></h2>
-<p>From the root of your pymonkey repository, run:</p>
+<p>From the root of your pydermonkey repository, run:</p>
 <div class="highlight-python"><pre>python setup.py build test</pre>
 </div>
 <p>This will fetch and compile SpiderMonkey, build the C extension, and
@@ -116,7 +116,7 @@ run its test suite to ensure that everything works properly.</p>
 <div class="section" id="challenges">
 <h2>Challenges<a class="headerlink" href="#challenges" title="Permalink to this headline">¶</a></h2>
 <p>There&#8217;s a number of challenges that need to be resolved before
-pymonkey can be really usable. Here&#8217;s some of them.</p>
+pydermonkey can be really usable. Here&#8217;s some of them.</p>
 <p><strong>Garbage Collection</strong></p>
 <p>Python&#8217;s garbage collection uses reference counting, whereas
 SpiderMonkey&#8217;s is mark-and-sweep. It&#8217;s possible for there to be
@@ -126,7 +126,7 @@ between XPCOM and JavaScript in the Mozilla platform&#8211;XPCOM uses
 reference counting too&#8211;so detecting such cycles will probably involve
 creating something akin to <a class="reference" href="https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector">XPCOM&#8217;s cycle collector</a>.</p>
 <p>For the time being, however, such cycles can be manually broken via
-<a title="pymonkey.Context.clear_object_private" class="reference" href="pymonkey.html#pymonkey.Context.clear_object_private"><tt class="xref docutils literal"><span class="pre">pymonkey.Context.clear_object_private()</span></tt></a> on valid objects and functions.</p>
+<a title="pydermonkey.Context.clear_object_private" class="reference" href="pydermonkey.html#pydermonkey.Context.clear_object_private"><tt class="xref docutils literal"><span class="pre">pydermonkey.Context.clear_object_private()</span></tt></a> on valid objects and functions.</p>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
@@ -146,7 +146,7 @@ creating something akin to <a class="reference" href="https://developer.mozilla.
         <div class="sphinxsidebarwrapper">
             <h3><a href="">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference" href="">Pymonkey Documentation</a><ul>
+<li><a class="reference" href="">Pydermonkey Documentation</a><ul>
 <li><a class="reference" href="#building-testing-and-installing">Building, Testing, and Installing</a></li>
 <li><a class="reference" href="#challenges">Challenges</a></li>
 <li><a class="reference" href="#indices-and-tables">Indices and Tables</a></li>
@@ -155,8 +155,8 @@ creating something akin to <a class="reference" href="https://developer.mozilla.
 </ul>
 
             <h4>Next topic</h4>
-            <p class="topless"><a href="pymonkey.html"
-                                  title="next chapter"><tt class="docutils literal"><span class="pre">pymonkey</span></tt> &#8212; Access SpiderMonkey from Python</a></p>
+            <p class="topless"><a href="pydermonkey.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">pydermonkey</span></tt> &#8212; Access SpiderMonkey from Python</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/index.txt"
@@ -189,9 +189,9 @@ creating something akin to <a class="reference" href="https://developer.mozilla.
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pymonkey.html" title="pymonkey — Access SpiderMonkey from Python"
+          <a href="pydermonkey.html" title="pydermonkey — Access SpiderMonkey from Python"
              >next</a> |</li>
-        <li><a href="">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="">Pydermonkey v0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

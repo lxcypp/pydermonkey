@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -90,7 +90,7 @@ static PyMemberDef PYM_members[] = {
 PyTypeObject PYM_JSScriptType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.Script",           /*tp_name*/
+  "pydermonkey.Script",           /*tp_name*/
   sizeof(PYM_JSScript),        /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

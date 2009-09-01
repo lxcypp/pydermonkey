@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -47,13 +47,13 @@ static PyMappingMethods PYM_undefinedAsMapping = {
 };
 
 static PyObject *PYM_undefinedRepr(PyObject *o) {
-  return PyString_FromString("pymonkey.undefined");
+  return PyString_FromString("pydermonkey.undefined");
 }
 
 PyTypeObject PYM_undefinedType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.undefined",        /*tp_name*/
+  "pydermonkey.undefined",        /*tp_name*/
   sizeof(PYM_undefinedObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
   0,                           /*tp_dealloc*/

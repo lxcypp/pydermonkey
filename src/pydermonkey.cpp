@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -57,11 +57,11 @@ static PyMethodDef PYM_methods[] = {
 };
 
 PyMODINIT_FUNC
-initpymonkey(void)
+initpydermonkey(void)
 {
   PyObject *module;
 
-  module = Py_InitModule("pymonkey", PYM_methods);
+  module = Py_InitModule("pydermonkey", PYM_methods);
   if (module == NULL)
     return;
 
@@ -74,7 +74,7 @@ initpymonkey(void)
   Py_INCREF(PYM_undefined);
   PyModule_AddObject(module, "undefined", (PyObject *) PYM_undefined);
 
-  PYM_error = PyErr_NewException("pymonkey.error", NULL, NULL);
+  PYM_error = PyErr_NewException("pydermonkey.error", NULL, NULL);
   Py_INCREF(PYM_error);
   PyModule_AddObject(module, "error", PYM_error);
 

@@ -37,7 +37,7 @@ import distutils.core
 from paver.easy import *
 from paver.setuputils import setup
 
-SOURCE_FILES = ['pymonkey.cpp',
+SOURCE_FILES = ['pydermonkey.cpp',
                 'utils.cpp',
                 'object.cpp',
                 'function.cpp',
@@ -62,7 +62,7 @@ SPIDERMONKEY_MAKEFILE = os.path.join(SPIDERMONKEY_OBJDIR, 'Makefile')
 DOCTEST_OUTPUT_DIR = os.path.join(BUILD_DIR, 'doctest_output')
 
 setup_options = dict(
-    name='pymonkey',
+    name='pydermonkey',
     version='0.0.1',
     description='Access SpiderMonkey from Python',
     author='Atul Varma',
@@ -92,7 +92,7 @@ else:
     ext_options['libraries'] = ['js_static']
 
 setup_options['ext_modules'] = [
-    distutils.core.Extension('pymonkey',
+    distutils.core.Extension('pydermonkey',
                              [os.path.join("src", filename)
                               for filename in SOURCE_FILES],
                              **ext_options)
@@ -102,7 +102,7 @@ setup(**setup_options)
 
 @task
 def docs(options):
-    """Open the Pymonkey documentation in your web browser."""
+    """Open the Pydermonkey documentation in your web browser."""
 
     url = os.path.abspath(os.path.join("docs", "rendered", "index.html"))
     url = urllib.pathname2url(url)
@@ -164,13 +164,13 @@ def build_spidermonkey(options):
 @task
 @needs('build_spidermonkey', 'setuptools.command.build')
 def build(options):
-    """Builds the pymonkey extension."""
+    """Builds the pydermonkey extension."""
 
     pass
 
 @task
 def build_docs(options):
-    """Build the Pymonkey documentation (requires Sphinx)."""
+    """Build the Pydermonkey documentation (requires Sphinx)."""
 
     retval = subprocess.call(["sphinx-build",
                               "-b", "html",
@@ -206,7 +206,7 @@ def get_lib_dir():
 
 @task
 def test(options):
-    """Test the Pymonkey Python C extension."""
+    """Test the Pydermonkey Python C extension."""
 
     print "Running test suite."
 
@@ -219,7 +219,7 @@ def test(options):
         new_env[env_var] = os.path.pathsep.join(paths)
 
     # We have to add our build directory to the python path so that
-    # our tests can find the pymonkey module.
+    # our tests can find the pydermonkey module.
     append_path('PYTHONPATH', get_lib_dir())
 
     if sys.platform == 'win32':
@@ -229,7 +229,7 @@ def test(options):
 
     result = subprocess.call(
         [sys.executable,
-         os.path.join("tests", "test_pymonkey.py")],
+         os.path.join("tests", "test_pydermonkey.py")],
         env = new_env
         )
 

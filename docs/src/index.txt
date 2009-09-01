@@ -1,20 +1,20 @@
-.. Pymonkey documentation master file, created by
+.. Pydermonkey documentation master file, created by
    sphinx-quickstart on Mon Jul  6 17:20:31 2009.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 ======================
-Pymonkey Documentation
+Pydermonkey Documentation
 ======================
 
-Pymonkey is a Python C extension module to expose the `Mozilla
+Pydermonkey is a Python C extension module to expose the `Mozilla
 SpiderMonkey <https://developer.mozilla.org/en/SpiderMonkey>`_ engine
 to Python.
 
 .. toctree::
    :maxdepth: 2
 
-   pymonkey
+   pydermonkey
 
 Rationale and Goals:
 
@@ -34,17 +34,17 @@ Rationale and Goals:
   <https://wiki.mozilla.org/ServerJS>`_ are currently paving the way
   in this field. There's Java-based solutions like Rhino out there,
   but nothing really mature is available for the Python
-  world. Ideally, Pymonkey should enable a Python programmer to create
+  world. Ideally, Pydermonkey should enable a Python programmer to create
   a custom sandboxed environment for executing JS code without needing
   to write any C.
 
-* Pymonkey should have awesome Sphinx documentation with doctests and
+* Pydermonkey should have awesome Sphinx documentation with doctests and
   all the trappings of a model Python package. Not only should it be
   easy for Python programmers to learn how to use the module, but it
   should also be easy for them to learn more about how SpiderMonkey
   works by reading the documentation and playing around with the code.
 
-* Pymonkey needs to have outstanding developer ergonomics. Full
+* Pydermonkey needs to have outstanding developer ergonomics. Full
   cross-language stack tracebacks should be available, for instance,
   and developers should be able to easily debug. Access to memory
   profiling facilities in JS-land is a must.
@@ -69,7 +69,7 @@ Rationale and Goals:
 Building, Testing, and Installing
 =================================
 
-From the root of your pymonkey repository, run::
+From the root of your pydermonkey repository, run::
 
   python setup.py build test
 
@@ -86,7 +86,7 @@ Challenges
 ==========
 
 There's a number of challenges that need to be resolved before
-pymonkey can be really usable. Here's some of them.
+pydermonkey can be really usable. Here's some of them.
 
 **Garbage Collection**
 
@@ -100,7 +100,7 @@ creating something akin to `XPCOM's cycle collector
 <https://developer.mozilla.org/en/Interfacing_with_the_XPCOM_cycle_collector>`_.
 
 For the time being, however, such cycles can be manually broken via
-:meth:`pymonkey.Context.clear_object_private()` on valid objects and functions.
+:meth:`pydermonkey.Context.clear_object_private()` on valid objects and functions.
 
 Indices and Tables
 ==================

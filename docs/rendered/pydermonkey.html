@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pymonkey — Access SpiderMonkey from Python &mdash; Pymonkey v0.0.1 documentation</title>
+    <title>pydermonkey — Access SpiderMonkey from Python &mdash; Pydermonkey v0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -19,8 +19,8 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Pymonkey v0.0.1 documentation" href="index.html" />
-    <link rel="prev" title="Pymonkey Documentation" href="index.html" /> 
+    <link rel="top" title="Pydermonkey v0.0.1 documentation" href="index.html" />
+    <link rel="prev" title="Pydermonkey Documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -33,9 +33,9 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Pymonkey Documentation"
+          <a href="index.html" title="Pydermonkey Documentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Pydermonkey v0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -44,13 +44,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-pymonkey">
-<h1><tt class="xref docutils literal"><span class="pre">pymonkey</span></tt> &#8212; Access SpiderMonkey from Python<a class="headerlink" href="#module-pymonkey" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pydermonkey">
+<h1><tt class="xref docutils literal"><span class="pre">pydermonkey</span></tt> &#8212; Access SpiderMonkey from Python<a class="headerlink" href="#module-pydermonkey" title="Permalink to this headline">¶</a></h1>
 <p>This module offers a low-level interface to the <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey">Mozilla SpiderMonkey</a> JavaScript engine.</p>
 <dl class="exception">
-<dt id="pymonkey.error">
+<dt id="pydermonkey.error">
 <em class="property">
-exception </em><tt class="descclassname">pymonkey.</tt><tt class="descname">error</tt><a class="headerlink" href="#pymonkey.error" title="Permalink to this definition">¶</a></dt>
+exception </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">error</tt><a class="headerlink" href="#pydermonkey.error" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type of any SpiderMonkey-related errors thrown by this
 module.</p>
 <p>If the error is a wrapped JavaScript exception, the first argument
@@ -58,7 +58,7 @@ will be the thrown JS exception, and the second argument will be
 the JS exception converted to a string. Otherwise, the error
 will only contain a descriptive string argument.</p>
 <p>For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;throw 1&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">error: (1, u&#39;1&#39;)</span>
@@ -67,19 +67,19 @@ will only contain a descriptive string argument.</p>
 </dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.undefined">
-<tt class="descclassname">pymonkey.</tt><tt class="descname">undefined</tt><a class="headerlink" href="#pymonkey.undefined" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.undefined">
+<tt class="descclassname">pydermonkey.</tt><tt class="descname">undefined</tt><a class="headerlink" href="#pydermonkey.undefined" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the singleton that represents the JavaScript value
 <tt class="docutils literal"><span class="pre">undefined</span></tt>, as Python has no equivalent representation
 (JavaScript&#8217;s <tt class="docutils literal"><span class="pre">null</span></tt> is mapped to Python&#8217;s <tt class="xref docutils literal"><span class="pre">None</span></tt> object).
 For instance:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
-<span class="go">pymonkey.undefined</span>
+<span class="go">pydermonkey.undefined</span>
 </pre></div>
 </div>
 <p>This object also has a &#8220;falsy&#8221; value:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">undefined</span><span class="p">:</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">undefined</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="k">print</span> <span class="s">&quot;See, it&#39;s falsy!&quot;</span>
 <span class="go">See, it&#39;s falsy!</span>
 </pre></div>
@@ -87,23 +87,23 @@ For instance:</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pymonkey.Object">
+<dt id="pydermonkey.Object">
 <em class="property">
-class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Object</tt><a class="headerlink" href="#pymonkey.Object" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">Object</tt><a class="headerlink" href="#pydermonkey.Object" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type of JavaScript objects. Such objects can only be
-created via Pymonkey calls like <a title="pymonkey.Context.new_object" class="reference" href="#pymonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">Context.new_object()</span></tt></a> or
+created via Pydermonkey calls like <a title="pydermonkey.Context.new_object" class="reference" href="#pydermonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">Context.new_object()</span></tt></a> or
 through the execution of JS code, but this type object can be used
 with Python&#8217;s built-in <tt class="xref docutils literal"><span class="pre">isinstance()</span></tt> to verify that an
 object is a JS object, like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Object</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>
 </div>
-<p>Note that <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> and all its subclasses are
+<p>Note that <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> and all its subclasses are
 identity-preserving when passed between Python and
 JavaScript code. For instance:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj1</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj2</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span> <span class="s">&#39;this&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj1</span> <span class="ow">is</span> <span class="n">obj2</span>
@@ -111,94 +111,94 @@ JavaScript code. For instance:</p>
 </pre></div>
 </div>
 <dl class="method">
-<dt id="pymonkey.Object.get_runtime">
-<tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Object.get_runtime" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the <a title="pymonkey.Runtime" class="reference" href="#pymonkey.Runtime"><tt class="xref docutils literal"><span class="pre">Runtime</span></tt></a> that the object belongs to.</dd></dl>
+<dt id="pydermonkey.Object.get_runtime">
+<tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Object.get_runtime" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the <a title="pydermonkey.Runtime" class="reference" href="#pydermonkey.Runtime"><tt class="xref docutils literal"><span class="pre">Runtime</span></tt></a> that the object belongs to.</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="pymonkey.Function">
+<dt id="pydermonkey.Function">
 <em class="property">
-class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Function</tt><a class="headerlink" href="#pymonkey.Function" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">Function</tt><a class="headerlink" href="#pydermonkey.Function" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type of JavaScript functions, which is a subtype of
-<a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>.</p>
+<a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>.</p>
 <dl class="data">
-<dt id="pymonkey.Function.filename">
-<tt class="descname">filename</tt><a class="headerlink" href="#pymonkey.Function.filename" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Function.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#pydermonkey.Function.filename" title="Permalink to this definition">¶</a></dt>
 <dd>Name of the file that contains the function&#8217;s original JS source
 code. If the function isn&#8217;t a JS function, this value is
 <tt class="xref docutils literal"><span class="pre">None</span></tt>.</dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.Function.base_lineno">
-<tt class="descname">base_lineno</tt><a class="headerlink" href="#pymonkey.Function.base_lineno" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Function.base_lineno">
+<tt class="descname">base_lineno</tt><a class="headerlink" href="#pydermonkey.Function.base_lineno" title="Permalink to this definition">¶</a></dt>
 <dd>The line number at which the function&#8217;s JS source code begins.</dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.Function.line_extent">
-<tt class="descname">line_extent</tt><a class="headerlink" href="#pymonkey.Function.line_extent" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Function.line_extent">
+<tt class="descname">line_extent</tt><a class="headerlink" href="#pydermonkey.Function.line_extent" title="Permalink to this definition">¶</a></dt>
 <dd>The number of lines comprising the function&#8217;s JS source code.</dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.Function.is_python">
-<tt class="descname">is_python</tt><a class="headerlink" href="#pymonkey.Function.is_python" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Function.is_python">
+<tt class="descname">is_python</tt><a class="headerlink" href="#pydermonkey.Function.is_python" title="Permalink to this definition">¶</a></dt>
 <dd>Whether or not the function is actually implemented in Python.
-If it is, you can use <a title="pymonkey.Context.get_object_private" class="reference" href="#pymonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">Context.get_object_private()</span></tt></a> to
+If it is, you can use <a title="pydermonkey.Context.get_object_private" class="reference" href="#pydermonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">Context.get_object_private()</span></tt></a> to
 retrieve this Python function.</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="pymonkey.Script">
+<dt id="pydermonkey.Script">
 <em class="property">
-class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Script</tt><a class="headerlink" href="#pymonkey.Script" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">Script</tt><a class="headerlink" href="#pydermonkey.Script" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type of compiled JavaScript scripts; it&#8217;s actually a
-subtype of <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>, though when exposed to JS code it
+subtype of <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>, though when exposed to JS code it
 doesn&#8217;t provide access to any special data or functionality.</p>
 <p>Script instances have a read-only buffer interface that exposes
 their bytecode. This can be accessed by passing an instance to
 Python&#8217;s built-in <tt class="docutils literal"><span class="pre">buffer()</span></tt> function.</p>
 <dl class="data">
-<dt id="pymonkey.Script.filename">
-<tt class="descname">filename</tt><a class="headerlink" href="#pymonkey.Script.filename" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Script.filename">
+<tt class="descname">filename</tt><a class="headerlink" href="#pydermonkey.Script.filename" title="Permalink to this definition">¶</a></dt>
 <dd>The filename of the script&#8217;s original source code.</dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.Script.base_lineno">
-<tt class="descname">base_lineno</tt><a class="headerlink" href="#pymonkey.Script.base_lineno" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Script.base_lineno">
+<tt class="descname">base_lineno</tt><a class="headerlink" href="#pydermonkey.Script.base_lineno" title="Permalink to this definition">¶</a></dt>
 <dd>The line number at which the script&#8217;s original source code
 begins.</dd></dl>
 
 <dl class="data">
-<dt id="pymonkey.Script.line_extent">
-<tt class="descname">line_extent</tt><a class="headerlink" href="#pymonkey.Script.line_extent" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Script.line_extent">
+<tt class="descname">line_extent</tt><a class="headerlink" href="#pydermonkey.Script.line_extent" title="Permalink to this definition">¶</a></dt>
 <dd>The number of lines comprising the original source code.</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="pymonkey.Context">
+<dt id="pydermonkey.Context">
 <em class="property">
-class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Context</tt><a class="headerlink" href="#pymonkey.Context" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">Context</tt><a class="headerlink" href="#pydermonkey.Context" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type of JavaScript context objects. Contexts can only
-be created via a call to <a title="pymonkey.Runtime.new_context" class="reference" href="#pymonkey.Runtime.new_context"><tt class="xref docutils literal"><span class="pre">Runtime.new_context()</span></tt></a>, but this
+be created via a call to <a title="pydermonkey.Runtime.new_context" class="reference" href="#pydermonkey.Runtime.new_context"><tt class="xref docutils literal"><span class="pre">Runtime.new_context()</span></tt></a>, but this
 type object can be used with Python&#8217;s built-in <tt class="xref docutils literal"><span class="pre">isinstance()</span></tt>
 to verify that an object is a context, like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>JS contexts are weak-referencable.</p>
 <dl class="method">
-<dt id="pymonkey.Context.get_runtime">
-<tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_runtime" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the <a title="pymonkey.Runtime" class="reference" href="#pymonkey.Runtime"><tt class="xref docutils literal"><span class="pre">Runtime</span></tt></a> that the context belongs to.</dd></dl>
+<dt id="pydermonkey.Context.get_runtime">
+<tt class="descname">get_runtime</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_runtime" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the <a title="pydermonkey.Runtime" class="reference" href="#pydermonkey.Runtime"><tt class="xref docutils literal"><span class="pre">Runtime</span></tt></a> that the context belongs to.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.get_stack">
-<tt class="descname">get_stack</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_stack" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.get_stack">
+<tt class="descname">get_stack</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_stack" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dictionary containing information about the context&#8217;s
 current stack.</p>
 <p>The dictionary contains the following string keys:</p>
@@ -214,7 +214,7 @@ current stack.</p>
 </thead>
 <tbody valign="top">
 <tr><td><tt class="xref docutils literal"><span class="pre">script</span></tt></td>
-<td><a title="pymonkey.Script" class="reference" href="#pymonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a> of the frame.
+<td><a title="pydermonkey.Script" class="reference" href="#pydermonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a> of the frame.
 This may be <tt class="xref docutils literal"><span class="pre">None</span></tt> if the frame
 isn&#8217;t a scripted frame, or if it&#8217;s
 not possible to expose the script
@@ -231,7 +231,7 @@ the frame&#8217;s script, if the frame
 is scripted.</td>
 </tr>
 <tr><td><tt class="xref docutils literal"><span class="pre">function</span></tt></td>
-<td>The <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> in which the
+<td>The <a title="pydermonkey.Function" class="reference" href="#pydermonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> in which the
 frame is executing, if any.</td>
 </tr>
 <tr><td><tt class="xref docutils literal"><span class="pre">caller</span></tt></td>
@@ -248,31 +248,31 @@ is empty), this method returns <tt class="xref docutils literal"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.new_object">
-<tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pymonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
-<dd>Creates a new <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
+<dt id="pydermonkey.Context.new_object">
+<tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pydermonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
+<dd>Creates a new <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
 it. <tt class="docutils literal"><span class="pre">private_obj</span></tt> is any Python object that is privately
 stored within the new JS object; it can be retrieved using
-<a title="pymonkey.Context.get_object_private" class="reference" href="#pymonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">get_object_private()</span></tt></a>.</dd></dl>
+<a title="pydermonkey.Context.get_object_private" class="reference" href="#pydermonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">get_object_private()</span></tt></a>.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.new_function">
-<tt class="descname">new_function</tt><big>(</big><em>func</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.new_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> instance that wraps the
+<dt id="pydermonkey.Context.new_function">
+<tt class="descname">new_function</tt><big>(</big><em>func</em>, <em>name</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.new_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a title="pydermonkey.Function" class="reference" href="#pydermonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> instance that wraps the
 given Python callable.  In JS-land, the function will
 have the given name.</p>
 <p>When the function is executed from JavaScript, <cite>func</cite>
 will be passed three positional arguments.</p>
-<p>The first argument is a <a title="pymonkey.Context" class="reference" href="#pymonkey.Context"><tt class="xref docutils literal"><span class="pre">Context</span></tt></a> that represents the
+<p>The first argument is a <a title="pydermonkey.Context" class="reference" href="#pydermonkey.Context"><tt class="xref docutils literal"><span class="pre">Context</span></tt></a> that represents the
 JS context which is calling the function.</p>
-<p>The second argument is an <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that represents the
+<p>The second argument is an <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that represents the
 value of <tt class="docutils literal"><span class="pre">this</span></tt> for the duration of the call.</p>
 <p>The third argument is a tuple containing the arguments
 passed to the function.</p>
 <p>For instance:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="gp">... </span>  <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">define_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">,</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_function</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;add(1, 1);&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
@@ -282,22 +282,22 @@ passed to the function.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.define_property">
-<tt class="descname">define_property</tt><big>(</big><em>object</em>, <em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#pymonkey.Context.define_property" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.define_property">
+<tt class="descname">define_property</tt><big>(</big><em>object</em>, <em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.define_property" title="Permalink to this definition">¶</a></dt>
 <dd>Creates a new property on <cite>object</cite>, bypassing any JavaScript setters.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.has_property">
-<tt class="descname">has_property</tt><big>(</big><em>object</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.has_property" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.has_property">
+<tt class="descname">has_property</tt><big>(</big><em>object</em>, <em>name</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.has_property" title="Permalink to this definition">¶</a></dt>
 <dd>Returns whether or not <cite>object</cite> has the specified property.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.get_property">
-<tt class="descname">get_property</tt><big>(</big><em>object</em>, <em>name</em><big>)</big><a class="headerlink" href="#pymonkey.Context.get_property" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.get_property">
+<tt class="descname">get_property</tt><big>(</big><em>object</em>, <em>name</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the specified property on <cite>object</cite> and returns its value,
 possibly invoking a JavaScript getter.</p>
 <p>Example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">define_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;beets&#39;</span><span class="p">,</span> <span class="s">&#39;i like beets.&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;beets&#39;</span><span class="p">)</span>
@@ -305,40 +305,40 @@ possibly invoking a JavaScript getter.</p>
 </pre></div>
 </div>
 <p>Note also that calling this function on undefined properties
-yields <a title="pymonkey.undefined" class="reference" href="#pymonkey.undefined"><tt class="xref docutils literal"><span class="pre">undefined</span></tt></a>:</p>
+yields <a title="pydermonkey.undefined" class="reference" href="#pydermonkey.undefined"><tt class="xref docutils literal"><span class="pre">undefined</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;carrots&#39;</span><span class="p">)</span>
-<span class="go">pymonkey.undefined</span>
+<span class="go">pydermonkey.undefined</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.get_object_private">
-<tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pymonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pymonkey.Context.new_object" class="reference" href="#pymonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
+<dt id="pydermonkey.Context.get_object_private">
+<tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pydermonkey.Context.new_object" class="reference" href="#pydermonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
 when <cite>object</cite> was first created. If it doesn&#8217;t exist, <tt class="xref docutils literal"><span class="pre">None</span></tt>
 is returned.</p>
-<p>If <cite>object</cite> was created with <a title="pymonkey.Context.new_function" class="reference" href="#pymonkey.Context.new_function"><tt class="xref docutils literal"><span class="pre">new_function()</span></tt></a>, then this
+<p>If <cite>object</cite> was created with <a title="pydermonkey.Context.new_function" class="reference" href="#pydermonkey.Context.new_function"><tt class="xref docutils literal"><span class="pre">new_function()</span></tt></a>, then this
 method returns the Python callable wrapped by <cite>object</cite>.</p>
 <p>This functionality is useful if you want to securely represent
 Python objects in JS-land.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.clear_object_private">
-<tt class="descname">clear_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pymonkey.Context.clear_object_private" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clears the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pymonkey.Context.new_object" class="reference" href="#pymonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
+<dt id="pydermonkey.Context.clear_object_private">
+<tt class="descname">clear_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.clear_object_private" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pydermonkey.Context.new_object" class="reference" href="#pydermonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
 when <cite>object</cite> was first created. If it doesn&#8217;t exist, this
 function returns nothing.</p>
-<p>If <cite>object</cite> was created with <a title="pymonkey.Context.new_function" class="reference" href="#pymonkey.Context.new_function"><tt class="xref docutils literal"><span class="pre">new_function()</span></tt></a>, then this
+<p>If <cite>object</cite> was created with <a title="pydermonkey.Context.new_function" class="reference" href="#pydermonkey.Context.new_function"><tt class="xref docutils literal"><span class="pre">new_function()</span></tt></a>, then this
 method effectively &#8220;unbinds&#8221; the Python callable wrapped by
 <cite>object</cite>. If <cite>object</cite> is later called, an exception will be
 raised.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.evaluate_script">
-<tt class="descname">evaluate_script</tt><big>(</big><em>globalobj</em>, <em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pymonkey.Context.evaluate_script" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.evaluate_script">
+<tt class="descname">evaluate_script</tt><big>(</big><em>globalobj</em>, <em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.evaluate_script" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the text <cite>code</cite> using <cite>globalobj</cite> as the global
 object/scope.</p>
 <p>It&#8217;s assumed that <cite>code</cite> is coming from the file named by <cite>filename</cite>;
@@ -346,7 +346,7 @@ the first line of <cite>code</cite> is assumed to be line number <cite>lineno</c
 <cite>filename</cite>. This metadata is very useful for debugging stack traces,
 exceptions, and so forth.</p>
 <p>For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;5 * Math&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
@@ -356,21 +356,21 @@ exceptions, and so forth.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.compile_script">
-<tt class="descname">compile_script</tt><big>(</big><em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pymonkey.Context.compile_script" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compiles the given string of code and returns a <a title="pymonkey.Script" class="reference" href="#pymonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a>
-instance that can be executed via <a title="pymonkey.Context.execute_script" class="reference" href="#pymonkey.Context.execute_script"><tt class="xref docutils literal"><span class="pre">execute_script()</span></tt></a>.</p>
+<dt id="pydermonkey.Context.compile_script">
+<tt class="descname">compile_script</tt><big>(</big><em>code</em>, <em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.compile_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compiles the given string of code and returns a <a title="pydermonkey.Script" class="reference" href="#pydermonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a>
+instance that can be executed via <a title="pydermonkey.Context.execute_script" class="reference" href="#pydermonkey.Context.execute_script"><tt class="xref docutils literal"><span class="pre">execute_script()</span></tt></a>.</p>
 <p><cite>filename</cite> and <cite>lineno</cite> are used just as in
-<a title="pymonkey.Context.evaluate_script" class="reference" href="#pymonkey.Context.evaluate_script"><tt class="xref docutils literal"><span class="pre">evaluate_script()</span></tt></a>.</p>
+<a title="pydermonkey.Context.evaluate_script" class="reference" href="#pydermonkey.Context.evaluate_script"><tt class="xref docutils literal"><span class="pre">evaluate_script()</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.execute_script">
-<tt class="descname">execute_script</tt><big>(</big><em>globalobj</em>, <em>script</em><big>)</big><a class="headerlink" href="#pymonkey.Context.execute_script" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes the code in the given <a title="pymonkey.Script" class="reference" href="#pymonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a> object, using
+<dt id="pydermonkey.Context.execute_script">
+<tt class="descname">execute_script</tt><big>(</big><em>globalobj</em>, <em>script</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.execute_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the code in the given <a title="pydermonkey.Script" class="reference" href="#pydermonkey.Script"><tt class="xref docutils literal"><span class="pre">Script</span></tt></a> object, using
 <cite>globalobj</cite> as the global object/scope, and returns the result.</p>
 <p>For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">script</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">compile_script</span><span class="p">(</span><span class="s">&#39;5 * Math&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
@@ -381,15 +381,15 @@ instance that can be executed via <a title="pymonkey.Context.execute_script" cla
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.call_function">
-<tt class="descname">call_function</tt><big>(</big><em>thisobj</em>, <em>func</em>, <em>args</em><big>)</big><a class="headerlink" href="#pymonkey.Context.call_function" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.call_function">
+<tt class="descname">call_function</tt><big>(</big><em>thisobj</em>, <em>func</em>, <em>args</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.call_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls a JavaScript function.</p>
-<p><cite>thisobj</cite> is an <a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that will be used as the value
+<p><cite>thisobj</cite> is an <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> that will be used as the value
 of <tt class="docutils literal"><span class="pre">this</span></tt> when the function executes, <cite>func</cite> is the
-<a title="pymonkey.Function" class="reference" href="#pymonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> to execute, and <cite>args</cite> is a tuple of arguments
+<a title="pydermonkey.Function" class="reference" href="#pydermonkey.Function"><tt class="xref docutils literal"><span class="pre">Function</span></tt></a> to execute, and <cite>args</cite> is a tuple of arguments
 to pass to the function.</p>
 <p>For instance:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">init_standard_classes</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Math</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;Math&#39;</span><span class="p">)</span>
@@ -401,38 +401,38 @@ to pass to the function.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.init_standard_classes">
-<tt class="descname">init_standard_classes</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pymonkey.Context.init_standard_classes" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.init_standard_classes">
+<tt class="descname">init_standard_classes</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.init_standard_classes" title="Permalink to this definition">¶</a></dt>
 <dd>Defines the standard JavaScript classes on the given
-<a title="pymonkey.Object" class="reference" href="#pymonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>, such as <tt class="docutils literal"><span class="pre">Array</span></tt>, <tt class="docutils literal"><span class="pre">eval</span></tt>, <tt class="docutils literal"><span class="pre">undefined</span></tt>, and
+<a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a>, such as <tt class="docutils literal"><span class="pre">Array</span></tt>, <tt class="docutils literal"><span class="pre">eval</span></tt>, <tt class="docutils literal"><span class="pre">undefined</span></tt>, and
 so forth. For more information, see the documentation to
 <a class="reference" href="https://developer.mozilla.org/en/SpiderMonkey/JSAPI_Reference/JS_InitStandardClasses">JS_InitStandardClasses()</a>,
 which this method wraps.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.gc">
-<tt class="descname">gc</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.gc" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.gc">
+<tt class="descname">gc</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.gc" title="Permalink to this definition">¶</a></dt>
 <dd>Performs garbage collection on the context&#8217;s JavaScript runtime.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.is_exception_pending">
-<tt class="descname">is_exception_pending</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.is_exception_pending" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.is_exception_pending">
+<tt class="descname">is_exception_pending</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.is_exception_pending" title="Permalink to this definition">¶</a></dt>
 <dd>Returns whether an exception is currently being propagated in
 the context.</dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.get_pending_exception">
-<tt class="descname">get_pending_exception</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.get_pending_exception" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.get_pending_exception">
+<tt class="descname">get_pending_exception</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_pending_exception" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current exception being propagated in the context. If
 no exception is being propagated, this method returns <tt class="xref docutils literal"><span class="pre">None</span></tt>.</p>
 <p>If you need to disambiguate between whether <tt class="xref docutils literal"><span class="pre">None</span></tt> is the
 pending exception or there is no pending exception, use
-<a title="pymonkey.Context.is_exception_pending" class="reference" href="#pymonkey.Context.is_exception_pending"><tt class="xref docutils literal"><span class="pre">is_exception_pending()</span></tt></a>.</p>
+<a title="pydermonkey.Context.is_exception_pending" class="reference" href="#pydermonkey.Context.is_exception_pending"><tt class="xref docutils literal"><span class="pre">is_exception_pending()</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.set_throw_hook">
-<tt class="descname">set_throw_hook</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pymonkey.Context.set_throw_hook" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.set_throw_hook">
+<tt class="descname">set_throw_hook</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.set_throw_hook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the throw hook for the context to the given Python callable.
 The hook is triggered whenever an exception is thrown in the
 context.</p>
@@ -450,13 +450,13 @@ an exception as it&#8217;s being propagated through the stack:</p>
 </pre></div>
 </div>
 <p>Here&#8217;s the hook in action:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">set_throw_hook</span><span class="p">(</span><span class="n">throwhook</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">code</span> <span class="o">=</span> <span class="s">&quot;(function foo() { throw &#39;oops&#39; })()&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">except</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="k">print</span> <span class="s">&quot;caught </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
 <span class="go">oops being thrown in foo</span>
 <span class="go">oops being thrown in &lt;string&gt;</span>
@@ -466,27 +466,27 @@ an exception as it&#8217;s being propagated through the stack:</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.set_operation_callback">
-<tt class="descname">set_operation_callback</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pymonkey.Context.set_operation_callback" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.set_operation_callback">
+<tt class="descname">set_operation_callback</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.set_operation_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the operation callback for the context to the given Python
 callable. The callback can be triggered via
-<a title="pymonkey.Context.trigger_operation_callback" class="reference" href="#pymonkey.Context.trigger_operation_callback"><tt class="xref docutils literal"><span class="pre">trigger_operation_callback()</span></tt></a>.</p>
+<a title="pydermonkey.Context.trigger_operation_callback" class="reference" href="#pydermonkey.Context.trigger_operation_callback"><tt class="xref docutils literal"><span class="pre">trigger_operation_callback()</span></tt></a>.</p>
 <p><cite>func</cite> takes one argument: the context that triggered it.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pymonkey.Context.trigger_operation_callback">
-<tt class="descname">trigger_operation_callback</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Context.trigger_operation_callback" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Context.trigger_operation_callback">
+<tt class="descname">trigger_operation_callback</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Context.trigger_operation_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Triggers the context&#8217;s operation callback. If no callback has
 yet been set, this function does nothing.</p>
 <p>This function is one of the few thread-safe functions available
 to a JS runtime, and together with
-<a title="pymonkey.Context.set_operation_callback" class="reference" href="#pymonkey.Context.set_operation_callback"><tt class="xref docutils literal"><span class="pre">set_operation_callback()</span></tt></a> can be used to abort the
+<a title="pydermonkey.Context.set_operation_callback" class="reference" href="#pydermonkey.Context.set_operation_callback"><tt class="xref docutils literal"><span class="pre">set_operation_callback()</span></tt></a> can be used to abort the
 execution of long-running code.</p>
 <p>For instance, we first create an operation callback to stop
 long-running code by throwing an exception:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">threading</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span> <span class="o">=</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">Runtime</span><span class="p">()</span><span class="o">.</span><span class="n">new_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">stop_running_code</span><span class="p">(</span><span class="n">cx</span><span class="p">):</span>
 <span class="gp">... </span>  <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;JS took too long to execute.&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cx</span><span class="o">.</span><span class="n">set_operation_callback</span><span class="p">(</span><span class="n">stop_running_code</span><span class="p">)</span>
@@ -506,7 +506,7 @@ aborted:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="n">cx</span><span class="o">.</span><span class="n">evaluate_script</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">new_object</span><span class="p">(),</span> <span class="s">&#39;while (1) {}&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                     <span class="s">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="mf">1</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">except</span> <span class="n">pymonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">pydermonkey</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
 <span class="gp">... </span>  <span class="k">print</span> <span class="n">cx</span><span class="o">.</span><span class="n">get_object_private</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
 <span class="go">JS took too long to execute.</span>
 </pre></div>
@@ -516,9 +516,9 @@ aborted:</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pymonkey.Runtime">
+<dt id="pydermonkey.Runtime">
 <em class="property">
-class </em><tt class="descclassname">pymonkey.</tt><tt class="descname">Runtime</tt><a class="headerlink" href="#pymonkey.Runtime" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">pydermonkey.</tt><tt class="descname">Runtime</tt><a class="headerlink" href="#pydermonkey.Runtime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new JavaScript runtime. JS objects created by the runtime
 may only interact with other JS objects of the same runtime.</p>
 <p>With few exceptions, objects belonging to a runtime can currently
@@ -527,8 +527,8 @@ in. This may be changed in the future, since SpiderMonkey itself
 has support for thread safety.</p>
 <p>JS runtimes are weak-referencable.</p>
 <dl class="method">
-<dt id="pymonkey.Runtime.new_context">
-<tt class="descname">new_context</tt><big>(</big><big>)</big><a class="headerlink" href="#pymonkey.Runtime.new_context" title="Permalink to this definition">¶</a></dt>
+<dt id="pydermonkey.Runtime.new_context">
+<tt class="descname">new_context</tt><big>(</big><big>)</big><a class="headerlink" href="#pydermonkey.Runtime.new_context" title="Permalink to this definition">¶</a></dt>
 <dd>Creates a new Context object and returns it. Contexts are best
 conceptualized as threads of execution in a JS runtme; each one
 has a program counter, a current exception state, and so
@@ -547,10 +547,10 @@ that are associated with the same JS runtime as the objects.</dd></dl>
         <div class="sphinxsidebarwrapper">
             <h4>Previous topic</h4>
             <p class="topless"><a href="index.html"
-                                  title="previous chapter">Pymonkey Documentation</a></p>
+                                  title="previous chapter">Pydermonkey Documentation</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/pymonkey.txt"
+              <li><a href="_sources/pydermonkey.txt"
                      rel="nofollow">Show Source</a></li>
             </ul>
           <div id="searchbox" style="display: none">
@@ -580,9 +580,9 @@ that are associated with the same JS runtime as the objects.</dd></dl>
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Pymonkey Documentation"
+          <a href="index.html" title="Pydermonkey Documentation"
              >previous</a> |</li>
-        <li><a href="index.html">Pymonkey v0.0.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Pydermonkey v0.0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

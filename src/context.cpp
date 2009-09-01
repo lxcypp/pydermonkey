@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -43,7 +43,7 @@
 #include "jsdbgapi.h"
 #include "jsscript.h"
 
-// This is the default throw hook for pymonkey-owned JS contexts,
+// This is the default throw hook for pydermonkey-owned JS contexts,
 // when they've defined one in Python.
 static JSTrapStatus
 PYM_throwHook(JSContext *cx, JSScript *script, jsbytecode *pc, jsval *rval,
@@ -70,7 +70,7 @@ PYM_throwHook(JSContext *cx, JSScript *script, jsbytecode *pc, jsval *rval,
   return JSTRAP_CONTINUE;
 }
 
-// This is the default JSOperationCallback for pymonkey-owned JS contexts,
+// This is the default JSOperationCallback for pydermonkey-owned JS contexts,
 // when they've defined one in Python.
 static JSBool
 PYM_operationCallback(JSContext *cx)
@@ -96,7 +96,7 @@ PYM_operationCallback(JSContext *cx)
   return JS_TRUE;
 }
 
-// This is the default JSErrorReporter for pymonkey-owned JS contexts.
+// This is the default JSErrorReporter for pydermonkey-owned JS contexts.
 static void
 PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
 {
@@ -804,7 +804,7 @@ static PyMethodDef PYM_JSContextMethods[] = {
 PyTypeObject PYM_JSContextType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.Context",          /*tp_name*/
+  "pydermonkey.Context",          /*tp_name*/
   sizeof(PYM_JSContextObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/

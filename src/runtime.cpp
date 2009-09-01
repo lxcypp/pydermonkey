@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Pymonkey.
+ * The Original Code is Pydermonkey.
  *
  * The Initial Developer of the Original Code is Mozilla.
  * Portions created by the Initial Developer are Copyright (C) 2007
@@ -151,7 +151,7 @@ static PyMethodDef PYM_JSRuntimeMethods[] = {
 PyTypeObject PYM_JSRuntimeType = {
   PyObject_HEAD_INIT(NULL)
   0,                           /*ob_size*/
-  "pymonkey.Runtime",          /*tp_name*/
+  "pydermonkey.Runtime",          /*tp_name*/
   sizeof(PYM_JSRuntimeObject), /*tp_basicsize*/
   0,                           /*tp_itemsize*/
                                /*tp_dealloc*/
