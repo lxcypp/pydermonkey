@@ -229,7 +229,7 @@ def test(options):
 
     result = subprocess.call(
         [sys.executable,
-         os.path.join("tests", "test_pydermonkey.py")],
+         os.path.join("test", "test_pydermonkey.py")],
         env = new_env
         )
 
