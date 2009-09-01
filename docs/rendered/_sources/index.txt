@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-======================
+=========================
 Pydermonkey Documentation
-======================
+=========================
 
 Pydermonkey is a Python C extension module to expose the `Mozilla
 SpiderMonkey <https://developer.mozilla.org/en/SpiderMonkey>`_ engine

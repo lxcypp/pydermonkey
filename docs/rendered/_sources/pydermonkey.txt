@@ -1,5 +1,5 @@
 :mod:`pydermonkey` --- Access SpiderMonkey from Python
-===================================================
+======================================================
 
 .. module:: pydermonkey
    :synopsis: Access SpiderMonkey from Python
