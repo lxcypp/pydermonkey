@@ -1,4 +1,5 @@
 recursive-include python-modules *.py
+recursive-include src *.h
 include *.py
 graft docs
 prune docs/rendered/.doctrees
