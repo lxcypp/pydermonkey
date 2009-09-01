@@ -5,3 +5,4 @@ docs/rendered/.doctrees
 docs/rendered/objects.inv
 spidermonkey-1.8.1pre
 build
+pydermonkey.egg-info
