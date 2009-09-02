@@ -97,7 +97,7 @@ setup_options = dict(
     )
 
 ext_options = dict(
-    define_macros = [('PYM_VERSION', '"%s"' % VERSION)],
+    define_macros = [('PYM_VERSION', '\\"%s\\"' % VERSION)],
     include_dirs = [os.path.join(SPIDERMONKEY_OBJDIR, 'dist', 'include')],
     library_dirs = [SPIDERMONKEY_OBJDIR]
     )
@@ -108,7 +108,7 @@ if sys.platform == 'win32':
     # we'll just link to the DLL on Windows platforms and install
     # it in a place where Windows can find it at runtime.
     ext_options['libraries'] = ['js3250']
-    ext_options['define_macros'] = [('XP_WIN', 1)]
+    ext_options['define_macros'].append(('XP_WIN', 1))
     # TODO: This is almost certainly not the ideal way to distribute
     # a DLL used by a C extension module.
     setup_options['data_files'] = [
@@ -169,11 +169,21 @@ def build_spidermonkey(options):
     if not os.path.exists(SPIDERMONKEY_MAKEFILE):
         print "Running configure."
 
-        configure = os.path.join(SPIDERMONKEY_DIR, "js", "src",
-                                 "configure")
-        cmdline = [configure,
+        # We need to go through this ridiculousness for Windows.
+        configure_dir = os.path.join(SPIDERMONKEY_DIR, "js", "src")
+	# Potentially convert the DOS-style path to a Unix-style path.
+	popen = subprocess.Popen([os.environ['SHELL'], '-c', 'pwd'],
+	                         stdout=subprocess.PIPE, cwd=configure_dir)
+        popen.wait()
+        configure_dir = popen.stdout.read().strip()
+	# No matter what, we're in a Unix-style environment now, so
+	# don't worry about the non-use of os.path.join() here, since
+	# it'd actually give us erroneous results on Windows.
+        configure = configure_dir + '/configure'
+        cmdline = [os.environ['SHELL'], configure,
                    "--enable-static",
                    "--disable-tests"]
+
         if options.get("build") and options.build.get("debug"):
             cmdline.extend(["--enable-debug",
                             "--enable-gczeal"])
