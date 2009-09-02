@@ -81,6 +81,7 @@ setup_options = dict(
     )
 
 ext_options = dict(
+    define_macros = [('PYM_VERSION', '"%s"' % VERSION)],
     include_dirs = [os.path.join(SPIDERMONKEY_OBJDIR, 'dist', 'include')],
     library_dirs = [SPIDERMONKEY_OBJDIR]
     )

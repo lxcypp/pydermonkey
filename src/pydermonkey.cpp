@@ -109,4 +109,7 @@ initpydermonkey(void)
 
   Py_INCREF(&PYM_JSScriptType);
   PyModule_AddObject(module, "Script", (PyObject *) &PYM_JSScriptType);
+
+  if (PyModule_AddStringConstant(module, "__version__", PYM_VERSION) < 0)
+    return;
 }

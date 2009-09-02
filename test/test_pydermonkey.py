@@ -57,6 +57,10 @@ class PydermonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
+    def testVersionIsString(self):
+        self.assertTrue(isinstance(pydermonkey.__version__, str))
+        print pydermonkey.__version__
+
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:
             self.assertRaises(pydermonkey.error, run, '5f')
