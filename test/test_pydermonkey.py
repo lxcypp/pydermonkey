@@ -57,8 +57,18 @@ class PydermonkeyTests(unittest.TestCase):
             was_raised = True
         self.assertTrue(was_raised)
 
-    def testVersionIsString(self):
-        self.assertTrue(isinstance(pydermonkey.__version__, str))
+    def testVersionIsCorrect(self):
+        # Really hackish way of importing values from setup.py.
+        import os
+
+        mydir = os.path.dirname(__file__)
+        rootdir = os.path.join(mydir, '..')
+        rootdir = os.path.normpath(rootdir)
+        sys.path.insert(0, rootdir)
+
+        import metadata
+
+        self.assertEqual(pydermonkey.__version__, metadata.VERSION)
 
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:
