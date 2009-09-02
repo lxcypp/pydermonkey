@@ -20,13 +20,13 @@ Rationale and Goals
 ===================
 
 * Python and JS are fairly complementary languages. Python provides
-  tremendous developer productivity via its dynamic language
-  features, its vibrant library of third-party client-side code, and
-  its ease of readability. JavaScript, on the other hand, is widely
-  known by a vast number of casual programmers due to its
+  tremendous developer productivity via its dynamic language features
+  and toolchain, its vibrant ecosystem of third-party client-side code,
+  and its ease of readability. JavaScript, on the other hand, is
+  widely known by a vast number of casual programmers due to its
   availability in web browsers; it was also envisioned from its
-  conception to be executed as untrusted code, which gives it a lot
-  of security features that Python has always lacked.
+  conception to be executed as untrusted code, which gives it a lot of
+  security characteristics that Python has always lacked.
 
 * There's an increasing need for being able to run JS on the server
   side--particularly untrusted JS. For instance, being able to
