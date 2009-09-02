@@ -16,7 +16,8 @@ to Python.
 
    pydermonkey
 
-Rationale and Goals:
+Rationale and Goals
+===================
 
 * Python and JS are fairly complementary languages. Python provides
   tremendous developer productivity via its dynamic language
