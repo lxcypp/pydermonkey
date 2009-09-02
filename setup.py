@@ -63,7 +63,7 @@ DOCTEST_OUTPUT_DIR = os.path.join(BUILD_DIR, 'doctest_output')
 
 setup_options = dict(
     name='pydermonkey',
-    version='0.0.1',
+    version='0.0.2',
     description='Access SpiderMonkey from Python',
     author='Atul Varma',
     author_email='atul@mozilla.com',
