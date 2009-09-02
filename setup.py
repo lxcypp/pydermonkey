@@ -71,13 +71,27 @@ VERSION = '0.0.2'
 # The full version, including alpha/beta/rc tags.
 RELEASE = VERSION
 
+LONG_DESCRIPTION = """Full documentation may be found at:
+
+  http://pydermonkey.googlecode.com/hg/docs/rendered/index.html
+"""
+
 setup_options = dict(
     name=PROJECT_FULL_NAME.lower(),
     version=VERSION,
     description='Access SpiderMonkey from Python',
+    long_description=LONG_DESCRIPTION,
     author='Atul Varma',
     author_email='atul@mozilla.com',
-    url='http://www.toolness.com'
+    url='http://code.google.com/p/pydermonkey/',
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
+        'Programming Language :: Python',
+        'Programming Language :: JavaScript',
+        'Topic :: Software Development :: Interpreters',
+        ]
     )
 
 ext_options = dict(
