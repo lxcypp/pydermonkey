@@ -162,9 +162,37 @@ def build_spidermonkey(options):
         sys.exit(retval)
 
 @task
+@needs('build_spidermonkey', 'setuptools.command.build_ext')
+def build_ext(options):
+    """Builds the pydermonkey extension."""
+
+    pass
+
+@task
 @needs('build_spidermonkey', 'setuptools.command.build')
 def build(options):
     """Builds the pydermonkey extension."""
+
+    pass
+
+@task
+@needs('build_spidermonkey', 'setuptools.command.bdist_egg')
+def bdist_egg(options):
+    """Create an "egg" distribution."""
+
+    pass
+
+@task
+@needs('build_spidermonkey', 'setuptools.command.bdist_rpm')
+def bdist_rpm(options):
+    """Create an RPM distribution."""
+
+    pass
+
+@task
+@needs('build_spidermonkey', 'setuptools.command.bdist_wininst')
+def bdist_wininst(options):
+    """Create an executable installer for MS Windows."""
 
     pass
 
