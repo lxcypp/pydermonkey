@@ -66,10 +66,12 @@ PROJECT_FULL_NAME = u'Pydermonkey'
 COPYRIGHT = u'2009, Atul Varma'
 
 # The short X.Y version.
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 # The full version, including alpha/beta/rc tags.
 RELEASE = VERSION
+
+DESCRIPTION = "Access the SpiderMonkey JavaScript engine from Python"
 
 LONG_DESCRIPTION = """Full documentation may be found at:
 
@@ -79,7 +81,7 @@ LONG_DESCRIPTION = """Full documentation may be found at:
 setup_options = dict(
     name=PROJECT_FULL_NAME.lower(),
     version=VERSION,
-    description='Access SpiderMonkey from Python',
+    description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author='Atul Varma',
     author_email='atul@mozilla.com',
