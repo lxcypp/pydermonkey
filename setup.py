@@ -66,7 +66,7 @@ PROJECT_FULL_NAME = u'Pydermonkey'
 COPYRIGHT = u'2009, Atul Varma'
 
 # The short X.Y version.
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 
 # The full version, including alpha/beta/rc tags.
 RELEASE = VERSION
