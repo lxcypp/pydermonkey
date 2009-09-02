@@ -96,8 +96,15 @@ setup_options = dict(
         ]
     )
 
+def str_macro(string):
+    if sys.platform == 'win32':
+        # MSVC is weird.
+        return '\\"%s\\"' % string
+    else:
+        return '"%s"' % string
+
 ext_options = dict(
-    define_macros = [('PYM_VERSION', '\\"%s\\"' % VERSION)],
+    define_macros = [('PYM_VERSION', str_macro(VERSION))],
     include_dirs = [os.path.join(SPIDERMONKEY_OBJDIR, 'dist', 'include')],
     library_dirs = [SPIDERMONKEY_OBJDIR]
     )
@@ -169,20 +176,23 @@ def build_spidermonkey(options):
     if not os.path.exists(SPIDERMONKEY_MAKEFILE):
         print "Running configure."
 
-        # We need to go through this ridiculousness for Windows.
+        cmdline = []
         configure_dir = os.path.join(SPIDERMONKEY_DIR, "js", "src")
-	# Potentially convert the DOS-style path to a Unix-style path.
-	popen = subprocess.Popen([os.environ['SHELL'], '-c', 'pwd'],
-	                         stdout=subprocess.PIPE, cwd=configure_dir)
-        popen.wait()
-        configure_dir = popen.stdout.read().strip()
+        if sys.platform == 'win32':
+            # Convert the DOS-style path to a Unix-style path.
+            popen = subprocess.Popen([os.environ['SHELL'], '-c', 'pwd'],
+                                     stdout=subprocess.PIPE,
+                                     cwd=configure_dir)
+            popen.wait()
+            configure_dir = popen.stdout.read().strip()
+
+            cmdline.append(os.environ['SHELL'])
+
 	# No matter what, we're in a Unix-style environment now, so
 	# don't worry about the non-use of os.path.join() here, since
 	# it'd actually give us erroneous results on Windows.
         configure = configure_dir + '/configure'
-        cmdline = [os.environ['SHELL'], configure,
-                   "--enable-static",
-                   "--disable-tests"]
+        cmdline.extend([configure, "--enable-static", "--disable-tests"])
 
         if options.get("build") and options.build.get("debug"):
             cmdline.extend(["--enable-debug",
