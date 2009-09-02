@@ -61,9 +61,19 @@ SPIDERMONKEY_MAKEFILE = os.path.join(SPIDERMONKEY_OBJDIR, 'Makefile')
 
 DOCTEST_OUTPUT_DIR = os.path.join(BUILD_DIR, 'doctest_output')
 
+PROJECT_FULL_NAME = u'Pydermonkey'
+
+COPYRIGHT = u'2009, Atul Varma'
+
+# The short X.Y version.
+VERSION = '0.0.2'
+
+# The full version, including alpha/beta/rc tags.
+RELEASE = VERSION
+
 setup_options = dict(
-    name='pydermonkey',
-    version='0.0.2',
+    name=PROJECT_FULL_NAME.lower(),
+    version=VERSION,
     description='Access SpiderMonkey from Python',
     author='Atul Varma',
     author_email='atul@mozilla.com',
