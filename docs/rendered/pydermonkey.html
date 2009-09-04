@@ -249,11 +249,19 @@ is empty), this method returns <tt class="xref docutils literal"><span class="pr
 
 <dl class="method">
 <dt id="pydermonkey.Context.new_object">
-<tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pydermonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
-<dd>Creates a new <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
-it. <tt class="docutils literal"><span class="pre">private_obj</span></tt> is any Python object that is privately
+<tt class="descname">new_object</tt><big>(</big><span class="optional">[</span><em>private_obj</em><span class="optional">[</span>, <em>proto</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pydermonkey.Context.new_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance and returns
+it.</p>
+<p><cite>private_obj</cite> is any Python object that is privately
 stored within the new JS object; it can be retrieved using
-<a title="pydermonkey.Context.get_object_private" class="reference" href="#pydermonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">get_object_private()</span></tt></a>.</dd></dl>
+<a title="pydermonkey.Context.get_object_private" class="reference" href="#pydermonkey.Context.get_object_private"><tt class="xref docutils literal"><span class="pre">get_object_private()</span></tt></a>.</p>
+<p><cite>proto</cite> is a <a title="pydermonkey.Object" class="reference" href="#pydermonkey.Object"><tt class="xref docutils literal"><span class="pre">Object</span></tt></a> instance representing the
+prototype for the new object. The new object will inherit all of
+the prototype object&#8217;s properties and methods, and the new
+object&#8217;s <tt class="docutils literal"><span class="pre">__proto__</span></tt> property will be a reference to the
+prototype object. If not provided, a default prototype object is
+used.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pydermonkey.Context.new_function">
