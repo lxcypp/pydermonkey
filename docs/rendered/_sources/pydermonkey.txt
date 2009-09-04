@@ -183,7 +183,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       stored within the new JS object; it can be retrieved using
       :meth:`get_object_private()`.
 
-      `proto` is a :class:`Object` instance representing the
+      `proto` is an :class:`Object` instance representing the
       prototype for the new object. The new object will inherit all of
       the prototype object's properties and methods, and the new
       object's ``__proto__`` property will be a reference to the
