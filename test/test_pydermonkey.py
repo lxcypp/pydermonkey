@@ -109,6 +109,13 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertTrue(pc >= 0 and pc < len(buffer(script)))
         self.assertEqual(stack['caller']['caller']['caller'], None)
 
+    def testNewObjectTakesProto(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.define_property(obj, 5, "foo")
+        obj2 = cx.new_object(None, obj)
+        self.assertEqual(cx.get_property(obj2, 5), "foo")
+
     def testScriptHasFilenameMember(self):
         cx = pydermonkey.Runtime().new_context()
         script = cx.compile_script('foo', '<string>', 1)

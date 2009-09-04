@@ -40,9 +40,10 @@
 #include "utils.h"
 
 JSObject *
-PYM_JS_newObject(JSContext *cx, PyObject *pyObject)
+PYM_JS_newObject(JSContext *cx, PyObject *pyObject, JSObject *proto,
+                 JSObject *parent)
 {
-  JSObject *obj = JS_NewObject(cx, &PYM_JS_ObjectClass, NULL, NULL);
+  JSObject *obj = JS_NewObject(cx, &PYM_JS_ObjectClass, proto, parent);
   if (obj) {
     if (!JS_SetPrivate(cx, obj, pyObject))
       return NULL;

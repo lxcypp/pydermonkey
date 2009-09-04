@@ -385,11 +385,18 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
   PyObject *privateObj = NULL;
+  PYM_JSObject *proto = NULL;
 
-  if (!PyArg_ParseTuple(args, "|O", &privateObj))
+  if (!PyArg_ParseTuple(args, "|OO!", &privateObj,
+                        &PYM_JSObjectType, &proto))
     return NULL;
 
-  JSObject *obj = PYM_JS_newObject(self->cx, privateObj);
+  JSObject *jsProto = NULL;
+
+  if (proto)
+    jsProto = proto->obj;
+
+  JSObject *obj = PYM_JS_newObject(self->cx, privateObj, jsProto, NULL);
   if (obj == NULL) {
     PyErr_SetString(PYM_error, "PYM_JS_newObject() failed");
     return NULL;

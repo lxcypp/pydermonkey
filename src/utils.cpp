@@ -210,7 +210,7 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
     Py_XDECREF(message);
   } else {
     if (value) {
-      JSObject *exception = PYM_JS_newObject(context->cx, value);
+      JSObject *exception = PYM_JS_newObject(context->cx, value, NULL, NULL);
       if (exception)
         JS_SetPendingException(context->cx, OBJECT_TO_JSVAL(exception));
       else

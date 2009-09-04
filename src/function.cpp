@@ -273,7 +273,8 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     // been decremented by PYM_newJSObject().
     return NULL;
 
-  JSObject *functionHolder = PYM_JS_newObject(context->cx, callable);
+  JSObject *functionHolder = PYM_JS_newObject(context->cx, callable,
+                                              NULL, NULL);
   if (functionHolder == NULL) {
     Py_DECREF((PyObject *) object);
     PyErr_SetString(PYM_error, "PYM_JS_newObject() failed");
