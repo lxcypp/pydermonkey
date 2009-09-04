@@ -437,8 +437,6 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
   PyObject *property;
-  char *buffer = NULL;
-  int size;
 
   if (!PyArg_ParseTuple(args, "O!O", &PYM_JSObjectType, &object,
                         &property))
