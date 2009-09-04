@@ -149,6 +149,23 @@ PYM_JSContextDealloc(PYM_JSContextObject *self)
   PyObject_GC_Del(self);
 }
 
+static int
+PYM_pyObjectToPropertyJsval(PYM_JSContextObject *context,
+                            PyObject *object,
+                            jsval *rval)
+{
+  if (PYM_pyObjectToJsval(context, object, rval) == -1)
+    return -1;
+
+  if (!(JSVAL_IS_STRING(*rval) || JSVAL_IS_INT(*rval))) {
+    PyErr_SetString(PyExc_TypeError,
+                    "Property must be a string or integer.");
+    return -1;
+  }
+
+  return 0;
+}
+
 static PyObject *
 PYM_getRuntime(PYM_JSContextObject *self, PyObject *args)
 {
@@ -388,21 +405,31 @@ PYM_hasProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
-  char *buffer = NULL;
-  int size;
+  PyObject *property;
 
-  if (!PyArg_ParseTuple(args, "O!es#", &PYM_JSObjectType, &object,
-                        "utf-16", &buffer, &size))
+  if (!PyArg_ParseTuple(args, "O!O", &PYM_JSObjectType, &object,
+                        &property))
     return NULL;
-
-  PYM_UTF16String str(buffer, size);
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
   JSBool hasProperty;
   JSBool result;
-  result = JS_HasUCProperty(self->cx, object->obj, str.jsbuffer,
-                            str.jslen, &hasProperty);
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_HasElement(self->cx, object->obj,
+                           JSVAL_TO_INT(propertyVal),
+                           &hasProperty);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_HasUCProperty(self->cx, object->obj,
+                              JS_GetStringChars(str),
+                              JS_GetStringLength(str),
+                              &hasProperty);
+  }
 
   if (!result) {
     PYM_jsExceptionToPython(self);
@@ -412,23 +439,6 @@ PYM_hasProperty(PYM_JSContextObject *self, PyObject *args)
   if (hasProperty)
     Py_RETURN_TRUE;
   Py_RETURN_FALSE;
-}
-
-static int
-PYM_pyObjectToPropertyJsval(PYM_JSContextObject *context,
-                            PyObject *object,
-                            jsval *rval)
-{
-  if (PYM_pyObjectToJsval(context, object, rval) == -1)
-    return -1;
-
-  if (!(JSVAL_IS_STRING(*rval) || JSVAL_IS_INT(*rval))) {
-    PyErr_SetString(PyExc_TypeError,
-                    "Property must be a string or integer.");
-    return -1;
-  }
-
-  return 0;
 }
 
 static PyObject *

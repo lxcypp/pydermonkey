@@ -552,6 +552,13 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self.last_exception.args[0],
                          'Property must be a string or integer.')
 
+    def testHasPropertyWorksWithIntegers(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertEqual(cx.has_property(obj, 0), False)
+        cx.define_property(obj, 0, 'hi')
+        self.assertEqual(cx.has_property(obj, 0), True)
+
     def testGetPropertyWorksWithIntegers(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
