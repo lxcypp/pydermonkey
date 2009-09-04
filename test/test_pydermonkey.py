@@ -536,6 +536,13 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)
 
+    def testGetElementWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        array = cx.evaluate_script(obj, "['test']", '<string>', 1)
+        self.assertEqual(cx.get_element(array, 0), 'test')
+
     def testHasPropertyWorks(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()

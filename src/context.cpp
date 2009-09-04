@@ -415,6 +415,32 @@ PYM_hasProperty(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_getElement(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  int index;
+
+  if (!PyArg_ParseTuple(args, "O!i", &PYM_JSObjectType, &object, &index))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  jsval val;
+  JSBool result;
+  Py_BEGIN_ALLOW_THREADS;
+  result = JS_GetElement(self->cx, object->obj, index, &val);
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, val);
+}
+
+static PyObject *
 PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -771,6 +797,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"new_function",
    (PyCFunction) PYM_newFunction, METH_VARARGS,
    "Creates a new function callable from JS."},
+  {"get_element", (PyCFunction) PYM_getElement, METH_VARARGS,
+   "Gets the given element index for the given JavaScript object."},
   {"define_property",
    (PyCFunction) PYM_defineProperty, METH_VARARGS,
    "Defines a property on an object."},
