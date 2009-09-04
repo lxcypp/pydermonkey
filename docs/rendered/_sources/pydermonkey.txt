@@ -209,15 +209,15 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
-   .. method:: define_property(object, name, value)
+   .. method:: define_property(object, key, value)
 
       Creates a new property on `object`, bypassing any JavaScript setters.
 
-   .. method:: has_property(object, name)
+   .. method:: has_property(object, key)
 
       Returns whether or not `object` has the specified property.
 
-   .. method:: get_property(object, name)
+   .. method:: get_property(object, key)
 
       Finds the specified property on `object` and returns its value,
       possibly invoking a JavaScript getter.
