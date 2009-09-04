@@ -638,9 +638,7 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
   if (!JS_DefineUCProperty(self->cx, object->obj, str.jsbuffer,
                            str.jslen, jsValue, NULL, NULL,
                            JSPROP_ENUMERATE)) {
-    // TODO: There's probably an exception pending on self->cx,
-    // what should we do about it?
-    PyErr_SetString(PYM_error, "JS_DefineProperty() failed");
+    PYM_jsExceptionToPython(self);
     return NULL;
   }
 
