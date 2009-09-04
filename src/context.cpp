@@ -393,8 +393,10 @@ PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 
   JSObject *jsProto = NULL;
 
-  if (proto)
+  if (proto) {
+    PYM_ENSURE_RUNTIME_MATCH(self->runtime, proto->runtime);
     jsProto = proto->obj;
+  }
 
   JSObject *obj = PYM_JS_newObject(self->cx, privateObj, jsProto, NULL);
   if (obj == NULL) {
@@ -633,6 +635,54 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_enumerate(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+
+  if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  JSIdArray *idArray = JS_Enumerate(self->cx, object->obj);
+  if (idArray == NULL) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  PyObject *tuple = PyTuple_New(idArray->length);
+  if (tuple == NULL) {
+    JS_DestroyIdArray(self->cx, idArray);
+    return NULL;
+  }
+
+  for (int i = 0; i < idArray->length; i++) {
+    jsval val;
+    if (!JS_IdToValue(self->cx, idArray->vector[i], &val)) {
+      Py_DECREF(tuple);
+      JS_DestroyIdArray(self->cx, idArray);
+      PYM_jsExceptionToPython(self);
+      return NULL;
+    }
+
+    PyObject *item = PYM_jsvalToPyObject(self, val);
+    if (item == NULL) {
+      Py_DECREF(tuple);
+      JS_DestroyIdArray(self->cx, idArray);
+      return NULL;
+    }
+
+    // Note that this function "steals" a reference to item, so
+    // we don't need to decrement its reference count.
+    PyTuple_SET_ITEM(tuple, i, item);
+  }
+
+  JS_DestroyIdArray(self->cx, idArray);
+  return tuple;
+}
+
+static PyObject *
 PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -827,6 +877,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"new_function",
    (PyCFunction) PYM_newFunction, METH_VARARGS,
    "Creates a new function callable from JS."},
+  {"enumerate", (PyCFunction) PYM_enumerate, METH_VARARGS,
+   "Returns a tuple of all an object's enumerable properties."},
   {"define_property",
    (PyCFunction) PYM_defineProperty, METH_VARARGS,
    "Defines a property on an object."},

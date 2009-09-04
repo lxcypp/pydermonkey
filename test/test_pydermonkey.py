@@ -116,6 +116,13 @@ class PydermonkeyTests(unittest.TestCase):
         obj2 = cx.new_object(None, obj)
         self.assertEqual(cx.get_property(obj2, 5), "foo")
 
+    def testEnumerateWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.evaluate_script(obj, "var blah = 1; var foo = 2; this[0] = 5;",
+                           "<string>", 1)
+        self.assertEqual(cx.enumerate(obj), ("blah", "foo", 0))
+
     def testScriptHasFilenameMember(self):
         cx = pydermonkey.Runtime().new_context()
         script = cx.compile_script('foo', '<string>', 1)
