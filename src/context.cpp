@@ -414,30 +414,21 @@ PYM_hasProperty(PYM_JSContextObject *self, PyObject *args)
   Py_RETURN_FALSE;
 }
 
-static PyObject *
-PYM_getElement(PYM_JSContextObject *self, PyObject *args)
+static int
+PYM_pyObjectToPropertyJsval(PYM_JSContextObject *context,
+                            PyObject *object,
+                            jsval *rval)
 {
-  PYM_SANITY_CHECK(self->runtime);
-  PYM_JSObject *object;
-  int index;
+  if (PYM_pyObjectToJsval(context, object, rval) == -1)
+    return -1;
 
-  if (!PyArg_ParseTuple(args, "O!i", &PYM_JSObjectType, &object, &index))
-    return NULL;
-
-  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
-
-  jsval val;
-  JSBool result;
-  Py_BEGIN_ALLOW_THREADS;
-  result = JS_GetElement(self->cx, object->obj, index, &val);
-  Py_END_ALLOW_THREADS;
-
-  if (!result) {
-    PYM_jsExceptionToPython(self);
-    return NULL;
+  if (!(JSVAL_IS_STRING(*rval) || JSVAL_IS_INT(*rval))) {
+    PyErr_SetString(PyExc_TypeError,
+                    "Property must be a string or integer.");
+    return -1;
   }
 
-  return PYM_jsvalToPyObject(self, val);
+  return 0;
 }
 
 static PyObject *
@@ -445,22 +436,34 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
+  PyObject *property;
   char *buffer = NULL;
   int size;
 
-  if (!PyArg_ParseTuple(args, "O!es#", &PYM_JSObjectType, &object,
-                        "utf-16", &buffer, &size))
+  if (!PyArg_ParseTuple(args, "O!O", &PYM_JSObjectType, &object,
+                        &property))
     return NULL;
-
-  PYM_UTF16String str(buffer, size);
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
   jsval val;
   JSBool result;
+
   Py_BEGIN_ALLOW_THREADS;
-  result = JS_GetUCProperty(self->cx, object->obj, str.jsbuffer,
-                            str.jslen, &val);
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_GetElement(self->cx, object->obj,
+                           JSVAL_TO_INT(propertyVal), &val);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_GetUCProperty(self->cx, object->obj,
+                              JS_GetStringChars(str),
+                              JS_GetStringLength(str),
+                              &val);
+  }
   Py_END_ALLOW_THREADS;
 
   if (!result) {
@@ -795,8 +798,6 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"new_function",
    (PyCFunction) PYM_newFunction, METH_VARARGS,
    "Creates a new function callable from JS."},
-  {"get_element", (PyCFunction) PYM_getElement, METH_VARARGS,
-   "Gets the given element index for the given JavaScript object."},
   {"define_property",
    (PyCFunction) PYM_defineProperty, METH_VARARGS,
    "Defines a property on an object."},

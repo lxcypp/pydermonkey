@@ -536,12 +536,21 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)
 
-    def testGetElementWorks(self):
+    def testGetPropertyDoesNotWorkWithFloats(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(TypeError,
+                          cx.get_property,
+                          obj, 0.534)
+        self.assertEqual(self.last_exception.args[0],
+                         'Property must be a string or integer.')
+
+    def testGetPropertyWorksWithIntegers(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         array = cx.evaluate_script(obj, "['test']", '<string>', 1)
-        self.assertEqual(cx.get_element(array, 0), 'test')
+        self.assertEqual(cx.get_property(array, 0), 'test')
 
     def testHasPropertyWorks(self):
         cx = pydermonkey.Runtime().new_context()
