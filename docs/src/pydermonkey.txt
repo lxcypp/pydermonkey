@@ -218,6 +218,11 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
+   .. method:: enumerate(object)
+
+      Returns a tuple containing the names of all enumerable properties
+      in `object`.
+
    .. method:: define_property(object, key, value)
 
       Creates a new property on `object`, bypassing any JavaScript setters.
