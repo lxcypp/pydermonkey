@@ -13,7 +13,7 @@
 
 import sys, os
 
-# Really hackish way of importing values from setup.py.
+# Really hackish way of importing values from metadata.py.
 mydir = os.path.dirname(__file__)
 rootdir = os.path.join(mydir, '..', '..')
 rootdir = os.path.normpath(rootdir)

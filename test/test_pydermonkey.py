@@ -58,7 +58,7 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertTrue(was_raised)
 
     def testVersionIsCorrect(self):
-        # Really hackish way of importing values from setup.py.
+        # Really hackish way of importing values from metadata.py.
         import os
 
         mydir = os.path.dirname(__file__)
