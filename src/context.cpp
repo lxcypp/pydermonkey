@@ -620,25 +620,39 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
   PYM_JSObject *object;
+  PyObject *property;
   PyObject *value;
-  char *name = NULL;
-  int namelen;
 
-  if (!PyArg_ParseTuple(args, "O!es#O", &PYM_JSObjectType, &object,
-                        "utf-16", &name, &namelen, &value))
+  if (!PyArg_ParseTuple(args, "O!OO", &PYM_JSObjectType, &object,
+                        &property, &value))
     return NULL;
-
-  PYM_UTF16String str(name, namelen);
-  jsval jsValue;
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
+  JSAutoLocalRootScope localRootScope(self->cx);
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
+  jsval jsValue;
   if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
     return NULL;
 
-  if (!JS_DefineUCProperty(self->cx, object->obj, str.jsbuffer,
-                           str.jslen, jsValue, NULL, NULL,
-                           JSPROP_ENUMERATE)) {
+  JSBool result;
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_DefineElement(self->cx, object->obj,
+                              JSVAL_TO_INT(propertyVal),
+                              jsValue, NULL, NULL, JSPROP_ENUMERATE);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_DefineUCProperty(self->cx, object->obj,
+                                 JS_GetStringChars(str),
+                                 JS_GetStringLength(str),
+                                 jsValue, NULL, NULL,
+                                 JSPROP_ENUMERATE);
+  }
+
+  if (!result) {
     PYM_jsExceptionToPython(self);
     return NULL;
   }

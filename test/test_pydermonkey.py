@@ -536,6 +536,13 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
                          2147483647)
 
+    def testDefinePropertyWorksWithIntegers(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.define_property(obj, 0, 'test')
+        self.assertEqual(cx.evaluate_script(obj, "this[0]", '<string>', 1),
+                         'test')
+
     def testGetPropertyDoesNotWorkWithFloats(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
