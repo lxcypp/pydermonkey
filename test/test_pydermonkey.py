@@ -833,6 +833,19 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(cx.evaluate_script(obj, '5+3', '<string>', 1),
                          8)
 
+    def testTypeConversionNotImplementedMentionsTypeName(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(
+            NotImplementedError,
+            cx.define_property,
+            obj, 'hi', 2 ** 91
+            )
+        self.assertEqual(
+            self.last_exception.args[0],
+            "Data type conversion not implemented for type 'long'."
+            )
+
     def testCallFunctionRaisesErrorOnBadFuncArgs(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()

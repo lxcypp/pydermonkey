@@ -134,8 +134,14 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
   }
 
   // TODO: Support more types.
-  PyErr_SetString(PyExc_NotImplementedError,
-                  "Data type conversion not implemented.");
+  //   * We could try converting PyLong objects to
+  //     doubles, but this may result in an approximation; not sure if
+  //     that's the right thing to do here, or if we should just raise
+  //     a ValueError or an OverflowError.
+  //   * Consider auto-converting buffer objects to strings.
+  PyErr_Format(PyExc_NotImplementedError,
+               "Data type conversion not implemented for type '%s'.",
+               object->ob_type->tp_name);
   return -1;
 }
 
