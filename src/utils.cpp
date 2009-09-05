@@ -188,9 +188,7 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
     return (PyObject *) PYM_newJSObject(context, JSVAL_TO_OBJECT(value),
                                         NULL);
 
-  // TODO: Support more types.
-  PyErr_SetString(PyExc_NotImplementedError,
-                  "Data type conversion not implemented.");
+  PyErr_SetString(PyExc_SystemError, "Unknown jsval type.");
   return NULL;
 }
 
