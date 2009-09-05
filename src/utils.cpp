@@ -202,16 +202,23 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
   PyErr_Fetch(&type, &value, &traceback);
 
   if (type == PYM_error && value &&
-      PyObject_HasAttrString(value, "message")) {
-    jsval val;
-    PyObject *message = PyObject_GetAttrString(value, "message");
-    if (message && PYM_pyObjectToJsval(context, message, &val) == 0) {
-      JS_SetPendingException(context->cx, val);
-    } else
+      PyObject_HasAttrString(value, "args")) {
+    bool success = false;
+    PyObject *args = PyObject_GetAttrString(value, "args");
+    if (args && PyTuple_Check(args) && PyTuple_Size(args) > 0) {
+      // This reference is borrowed.
+      PyObject *message = PyTuple_GetItem(args, 0);
+      jsval val;
+      if (message && PYM_pyObjectToJsval(context, message, &val) == 0) {
+        JS_SetPendingException(context->cx, val);
+        success = true;
+      }
+    }
+    if (!success)
       JS_ReportError(context->cx,
                      "Python exception occurred, but exception "
                      "couldn't be converted");
-    Py_XDECREF(message);
+    Py_XDECREF(args);
   } else {
     if (value) {
       JSObject *exception = PYM_JS_newObject(context->cx, value, NULL, NULL);
