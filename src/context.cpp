@@ -154,6 +154,13 @@ PYM_pyObjectToPropertyJsval(PYM_JSContextObject *context,
                             PyObject *object,
                             jsval *rval)
 {
+  if ((PyInt_Check(object) && !INT_FITS_IN_JSVAL(PyInt_AS_LONG(object))) ||
+      PyLong_Check(object)) {
+    PyErr_SetString(PyExc_ValueError,
+                    "Integer property value out of range.");
+    return -1;
+  }
+
   if (PYM_pyObjectToJsval(context, object, rval) == -1)
     return -1;
 

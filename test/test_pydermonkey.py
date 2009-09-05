@@ -130,6 +130,28 @@ class PydermonkeyTests(unittest.TestCase):
                            "<string>", 1)
         self.assertEqual(cx.enumerate(obj), ("blah", "foo", 0))
 
+    def testReallyBigArrayIndicesRaiseValueError(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(
+            ValueError,
+            cx.define_property,
+            obj, 2 ** 33, 'foo'
+            )
+        self.assertEqual(self.last_exception.args[0],
+                         "Integer property value out of range.")
+
+    def testBigArrayIndicesRaiseValueError(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertRaises(
+            ValueError,
+            cx.define_property,
+            obj, 2 ** 30, 'foo'
+            )
+        self.assertEqual(self.last_exception.args[0],
+                         "Integer property value out of range.")
+
     def testScriptHasFilenameMember(self):
         cx = pydermonkey.Runtime().new_context()
         script = cx.compile_script('foo', '<string>', 1)
