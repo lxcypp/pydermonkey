@@ -635,6 +635,22 @@ PYM_evaluateScript(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_isArrayObject(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+
+  if (!PyArg_ParseTuple(args, "O!", &PYM_JSObjectType, &object))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  if (JS_IsArrayObject(self->cx, object->obj))
+    Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+static PyObject *
 PYM_enumerate(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -877,11 +893,13 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"new_function",
    (PyCFunction) PYM_newFunction, METH_VARARGS,
    "Creates a new function callable from JS."},
+  {"is_array_object", (PyCFunction) PYM_isArrayObject, METH_VARARGS,
+   "Returns whether or not the given JavaScript object is an array."},
   {"enumerate", (PyCFunction) PYM_enumerate, METH_VARARGS,
-   "Returns a tuple of all an object's enumerable properties."},
+   "Returns a tuple of all a JavaScript object's enumerable properties."},
   {"define_property",
    (PyCFunction) PYM_defineProperty, METH_VARARGS,
-   "Defines a property on an object."},
+   "Defines a property on a JavaScript object."},
   {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
    "Gets the given property for the given JavaScript object."},
   {"has_property", (PyCFunction) PYM_hasProperty, METH_VARARGS,

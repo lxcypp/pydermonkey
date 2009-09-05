@@ -116,6 +116,13 @@ class PydermonkeyTests(unittest.TestCase):
         obj2 = cx.new_object(None, obj)
         self.assertEqual(cx.get_property(obj2, 5), "foo")
 
+    def testIsArrayWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertFalse(cx.is_array_object(obj))
+        array = cx.evaluate_script(obj, '[1]', '<string>', 1)
+        self.assertTrue(cx.is_array_object(array))
+
     def testEnumerateWorks(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
