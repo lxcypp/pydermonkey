@@ -195,7 +195,15 @@ PYM_jsvalToPyObject(PYM_JSContextObject *context,
 void
 PYM_pythonExceptionToJs(PYM_JSContextObject *context)
 {
-  PyObject *type;
+  PyObject *type = PyErr_Occurred();
+
+  if (type && !PyErr_GivenExceptionMatches(type, PyExc_Exception))
+    // A KeyboardInterrupt or other kind of exception that we don't
+    // want JS code to catch was thrown; just return without setting
+    // a pending JS exception, and SpiderMonkey will unroll the stack
+    // for us.
+    return;
+
   PyObject *value;
   PyObject *traceback;
 

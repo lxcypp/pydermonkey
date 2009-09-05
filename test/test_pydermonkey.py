@@ -234,6 +234,28 @@ class PydermonkeyTests(unittest.TestCase):
         gc.collect()
         self.assertEqual(wcx(), None)
 
+    def testKeyboardInterruptStopsScript(self):
+        def opcb(cx):
+            raise KeyboardInterrupt()
+
+        cx = pydermonkey.Runtime().new_context()
+        cx.set_operation_callback(opcb)
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+
+        def watchdog():
+            time.sleep(0.1)
+            cx.trigger_operation_callback()
+
+        thread = threading.Thread(target = watchdog)
+        thread.start()
+
+        self.assertRaises(
+            KeyboardInterrupt,
+            cx.evaluate_script,
+            obj, 'try { while (1) {} } catch (e) {}', '<string>', 1
+            )
+
     def testOperationCallbackIsCalled(self):
         def opcb(cx):
             raise Exception("stop eet!")
