@@ -235,6 +235,9 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(wcx(), None)
 
     def testKeyboardInterruptStopsScript(self):
+        # Let's be super-evil and have multiple interleavings of the JS
+        # stack with the Python stack.
+
         def opcb(cx):
             raise KeyboardInterrupt()
 
@@ -242,6 +245,17 @@ class PydermonkeyTests(unittest.TestCase):
         cx.set_operation_callback(opcb)
         obj = cx.new_object()
         cx.init_standard_classes(obj)
+
+        def func(cx, this, args):
+            cx.evaluate_script(
+                this,
+                'try { while (1) {} } catch (e) {}',
+                '<string>', 1
+                )
+
+        cx.define_property(obj,
+                           'func',
+                           cx.new_function(func, 'func'))
 
         def watchdog():
             time.sleep(0.1)
@@ -253,7 +267,7 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertRaises(
             KeyboardInterrupt,
             cx.evaluate_script,
-            obj, 'try { while (1) {} } catch (e) {}', '<string>', 1
+            obj, 'while (1) { func(); }', '<string>', 1
             )
 
     def testOperationCallbackIsCalled(self):
