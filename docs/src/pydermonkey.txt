@@ -415,13 +415,21 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       :meth:`set_operation_callback()` can be used to abort the
       execution of long-running code.
 
-      For instance, we first create an operation callback to stop
-      long-running code by throwing an exception:
+      For instance, we can first create a custom error class for
+      script timeouts:
+
+        >>> class ScriptTimeoutError(BaseException):
+        ...   # Derived from BaseException, like KeyboardInterrupt,
+        ...   # which ensures that JS code can't catch it.
+        ...   pass
+
+      Now, we create an operation callback to stop long-running code
+      by throwing the custom exception:
 
         >>> import time, threading
         >>> cx = pydermonkey.Runtime().new_context()
         >>> def stop_running_code(cx):
-        ...   raise Exception('JS took too long to execute.')
+        ...   raise ScriptTimeoutError()
         >>> cx.set_operation_callback(stop_running_code)
 
       Then we create a watchdog thread to trigger the operation
@@ -436,12 +444,12 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       Now, when we execute code that takes too long to run, it gets
       aborted:
 
-        >>> try:
-        ...   cx.evaluate_script(cx.new_object(), 'while (1) {}',
-        ...                      '<string>', 1)
-        ... except pydermonkey.error, e:
-        ...   print cx.get_object_private(e.args[0])
-        JS took too long to execute.
+        >>> cx.evaluate_script(cx.new_object(),
+        ...                    'try { while (1) {} } catch (e) {}',
+        ...                    '<string>', 1)
+        Traceback (most recent call last):
+        ...
+        ScriptTimeoutError
 
 .. class:: Runtime()
 
