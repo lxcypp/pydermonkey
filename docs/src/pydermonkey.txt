@@ -218,6 +218,10 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
+   .. method:: is_array_object(object)
+
+      Returns whether or not the given JavaScript object is an ``Array``.
+
    .. method:: enumerate(object)
 
       Returns a tuple containing the names of all enumerable properties
