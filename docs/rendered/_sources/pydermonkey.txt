@@ -415,10 +415,10 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       :meth:`set_operation_callback()` can be used to abort the
       execution of long-running code.
 
-      For instance, we can first create a custom error class for
+      For instance, we can first create a custom exception class for
       script timeouts:
 
-        >>> class ScriptTimeoutError(BaseException):
+        >>> class ScriptTimeout(BaseException):
         ...   # Derived from BaseException, like KeyboardInterrupt,
         ...   # which ensures that JS code can't catch it.
         ...   pass
@@ -429,7 +429,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> import time, threading
         >>> cx = pydermonkey.Runtime().new_context()
         >>> def stop_running_code(cx):
-        ...   raise ScriptTimeoutError()
+        ...   raise ScriptTimeout()
         >>> cx.set_operation_callback(stop_running_code)
 
       Then we create a watchdog thread to trigger the operation
@@ -449,7 +449,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         ...                    '<string>', 1)
         Traceback (most recent call last):
         ...
-        ScriptTimeoutError
+        ScriptTimeout
 
 .. class:: Runtime()
 
