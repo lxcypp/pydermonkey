@@ -542,6 +542,12 @@ class PydermonkeyTests(unittest.TestCase):
                                                    'hai2u("blah\x00 ")'),
                          u"blah\x00 o hai")
 
+    def testJsWrappedPythonFunctionReturnsUndefined(self):
+        def hai2u(cx, this, args):
+            return pydermonkey.undefined
+        self.assertEqual(self._evalJsWrappedPyFunc(hai2u, 'hai2u()'),
+                         pydermonkey.undefined)
+
     def testJsWrappedPythonFunctionReturnsString(self):
         def hai2u(cx, this, args):
             return "o hai"

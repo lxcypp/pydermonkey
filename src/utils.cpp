@@ -133,6 +133,11 @@ PYM_pyObjectToJsval(PYM_JSContextObject *context,
     return 0;
   }
 
+  if (object == (PyObject *) PYM_undefined) {
+    *rval = JSVAL_VOID;
+    return 0;
+  }
+
   // TODO: Support more types.
   //   * We could try converting PyLong objects to
   //     doubles, but this may result in an approximation; not sure if
