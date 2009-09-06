@@ -147,7 +147,7 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertRaises(
             ValueError,
             cx.define_property,
-            obj, 2 ** 33, 'foo'   # Should be a PyLong object.
+            obj, sys.maxint + 1, 'foo'   # Should be a PyLong object.
             )
         self.assertEqual(self.last_exception.args[0],
                          "Integer property value out of range.")
