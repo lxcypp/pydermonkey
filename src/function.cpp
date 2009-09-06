@@ -208,7 +208,8 @@ PYM_newJSFunction(PYM_JSContextObject *context,
   jsFunction->filename = NULL;
   jsFunction->baseLineno = 0;
   jsFunction->lineExtent = 0;
-  jsFunction->isPython = 0;
+  jsFunction->isPython = (JS_GetFunctionNative(context->cx, function) ==
+                          PYM_dispatchJSFunctionToPython);
 
   JSString *name = JS_GetFunctionId(jsFunction->fun);
   if (name != NULL) {
@@ -287,8 +288,6 @@ PYM_newJSFunctionFromCallable(PYM_JSContextObject *context,
     PyErr_SetString(PYM_error, "JS_SetReservedSlot() failed");
     return NULL;
   }
-
-  object->isPython = 1;
 
   return object;
 }

@@ -302,6 +302,16 @@ class PydermonkeyTests(unittest.TestCase):
                                     '(function(){})', '<string>', 1)
         self.assertFalse(jsfunc.is_python)
 
+    def testRecreatedJsWrappedPythonFuncHasIsPythonTrue(self):
+        def foo(cx, this, args):
+            pass
+
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.define_property(obj, 'foo',
+                           cx.new_function(foo, foo.__name__))
+        self.assertTrue(cx.get_property(obj, 'foo').is_python)
+
     def testJsWrappedPythonFuncHasIsPythonTrue(self):
         def foo(cx, this, args):
             pass
