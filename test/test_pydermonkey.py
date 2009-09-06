@@ -578,6 +578,14 @@ class PydermonkeyTests(unittest.TestCase):
                           hai2u, 'hai2u()')
         self.assertEqual(self.last_exception.args[0], u"blarg")
 
+    def testJsWrappedPythonFunctionThrowsJsException2(self):
+        def hai2u(cx, this, args):
+            cx.evaluate_script(this, 'throw "blarg"', '<string>', 1)
+        self.assertRaises(pydermonkey.error,
+                          self._evalJsWrappedPyFunc,
+                          hai2u, 'hai2u()')
+        self.assertEqual(self.last_exception.args[0], u"blarg")
+
     def testJsWrappedPythonFunctionThrowsPyException(self):
         thecx = []
         def hai2u(cx, this, args):

@@ -215,10 +215,15 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
   PyErr_Fetch(&type, &value, &traceback);
 
   if (type == PYM_error && value &&
-      PyObject_HasAttrString(value, "args")) {
+      (PyTuple_Check(value) || PyObject_HasAttrString(value, "args"))) {
     bool success = false;
-    PyObject *args = PyObject_GetAttrString(value, "args");
-    if (args && PyTuple_Check(args) && PyTuple_Size(args) > 0) {
+    PyObject *args = value;
+    if (!PyTuple_Check(value)) {
+      args = PyObject_GetAttrString(value, "args");
+      if (!PyTuple_Check(args))
+        args = NULL;
+    }
+    if (args && PyTuple_Size(args) > 0) {
       // This reference is borrowed.
       PyObject *message = PyTuple_GetItem(args, 0);
       jsval val;
