@@ -390,6 +390,20 @@ PYM_clearObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_newArrayObject(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+
+  JSObject *array = JS_NewArrayObject(self->cx, 0, NULL);
+  if (array == NULL) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, OBJECT_TO_JSVAL(array));
+}
+
+static PyObject *
 PYM_newObject(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -878,6 +892,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Get the JavaScript runtime associated with this context."},
   {"get_stack", (PyCFunction) PYM_getStack, METH_VARARGS,
    "Get the current stack for the context."},
+  {"new_array_object", (PyCFunction) PYM_newArrayObject, METH_VARARGS,
+   "Create a new JavaScript Array object."},
   {"new_object", (PyCFunction) PYM_newObject, METH_VARARGS,
    "Create a new JavaScript object."},
   {"init_standard_classes",

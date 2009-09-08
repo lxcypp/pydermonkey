@@ -116,6 +116,11 @@ class PydermonkeyTests(unittest.TestCase):
         obj2 = cx.new_object(None, obj)
         self.assertEqual(cx.get_property(obj2, 5), "foo")
 
+    def testNewArrayObjectWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        array = cx.new_array_object()
+        self.assertTrue(cx.is_array_object(array))
+
     def testIsArrayWorks(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
