@@ -24,11 +24,13 @@ class PydermonkeyTests(unittest.TestCase):
     def _clearOnTeardown(self, obj):
         self._teardowns.append(obj)
 
-    def _evaljs(self, code):
-        rt = pydermonkey.Runtime()
-        cx = rt.new_context()
-        obj = cx.new_object()
-        cx.init_standard_classes(obj)
+    def _evaljs(self, code, cx=None, obj=None):
+        if cx is None:
+            rt = pydermonkey.Runtime()
+            cx = rt.new_context()
+        if obj is None:
+            obj = cx.new_object()
+            cx.init_standard_classes(obj)
         return cx.evaluate_script(obj, code, '<string>', 1)
 
     def _execjs(self, code):
@@ -77,6 +79,39 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(cx.set_property(obj, 3, 2), 2)
         self.assertEqual(cx.set_property(obj, u'blah\u2026', 5), 5)
         self.assertEqual(cx.get_property(obj, 3), 2)
+
+    def testSetPropertyRaisesExceptionOnReadOnly(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        o2 = self._evaljs("({get blah() { return 5; }})", cx, obj)
+        self.assertRaises(
+            pydermonkey.error,
+            cx.set_property,
+            o2, 'blah', 3
+            )
+        self.assertEqual(self.last_exception.args[0],
+                         "setting a property that has only a getter")
+
+    def testDefinePropertyRaisesNoExceptionOnReadOnly(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        o2 = self._evaljs("({get blah() { return 5; }})", cx, obj)
+        cx.define_property(o2, 'blah', 3)
+        self.assertEqual(cx.get_property(o2, 'blah'), 3)
+
+    def testLookupPropertyWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        o2 = self._evaljs("({foo: 1, get blah() { return 5; }})", cx, obj)
+        self.assertEqual(cx.lookup_property(o2, 'bar'),
+                         pydermonkey.undefined)
+        self.assertEqual(cx.lookup_property(o2, 'foo'), 1)
+        self.assertEqual(cx.lookup_property(o2, 'blah'), True)
+        self.assertEqual(cx.get_property(o2, 'blah'), 5)
+        self.assertEqual(cx.lookup_property(o2, 'blah'), True)
 
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:

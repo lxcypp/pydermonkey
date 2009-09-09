@@ -110,8 +110,9 @@ PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
     else
       PyErr_Warn(NULL, message);
   } else {
-    PyErr_Warn(NULL, "A JS error was reported:");
-    PyErr_Warn(NULL, message);
+    PyErr_SetString(PYM_error, message);
+    if (JS_IsExceptionPending(cx))
+      JS_ClearPendingException(cx);
   }
 }
 
@@ -503,6 +504,47 @@ PYM_getProperty(PYM_JSContextObject *self, PyObject *args)
                               JS_GetStringChars(str),
                               JS_GetStringLength(str),
                               &val);
+  }
+  Py_END_ALLOW_THREADS;
+
+  if (!result) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, val);
+}
+
+static PyObject *
+PYM_lookupProperty(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  PyObject *property;
+
+  if (!PyArg_ParseTuple(args, "O!O", &PYM_JSObjectType, &object,
+                        &property))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
+  jsval val;
+  JSBool result;
+
+  Py_BEGIN_ALLOW_THREADS;
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_LookupElement(self->cx, object->obj,
+                              JSVAL_TO_INT(propertyVal), &val);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_LookupUCProperty(self->cx, object->obj,
+                                 JS_GetStringChars(str),
+                                 JS_GetStringLength(str),
+                                 &val);
   }
   Py_END_ALLOW_THREADS;
 
@@ -984,6 +1026,9 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "Sets a property on a JavaScript object."},
   {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
    "Gets the given property for the given JavaScript object."},
+  {"lookup_property", (PyCFunction) PYM_lookupProperty, METH_VARARGS,
+   "Gets the stored value of the given property for the given "
+   "JavaScript object."},
   {"has_property", (PyCFunction) PYM_hasProperty, METH_VARARGS,
    "Returns whether the given JavaScript object has the given property."},
   {"gc", (PyCFunction) PYM_gc, METH_VARARGS,
