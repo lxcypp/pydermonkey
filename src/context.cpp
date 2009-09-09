@@ -730,6 +730,51 @@ PYM_enumerate(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_setProperty(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  PyObject *property;
+  PyObject *value;
+
+  if (!PyArg_ParseTuple(args, "O!OO", &PYM_JSObjectType, &object,
+                        &property, &value))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  // TODO: Do we really need this, or do we just want to root a single var?
+  JSAutoLocalRootScope localRootScope(self->cx);
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
+  jsval jsValue;
+  if (PYM_pyObjectToJsval(self, value, &jsValue) == -1)
+    return NULL;
+
+  JSBool result;
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_SetElement(self->cx, object->obj,
+                           JSVAL_TO_INT(propertyVal),
+                           &jsValue);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_SetUCProperty(self->cx, object->obj,
+                              JS_GetStringChars(str),
+                              JS_GetStringLength(str),
+                              &jsValue);
+  }
+
+  if (!result) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, jsValue);
+}
+
+static PyObject *
 PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -743,6 +788,7 @@ PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
 
+  // TODO: Do we really need this, or do we just want to root a single var?
   JSAutoLocalRootScope localRootScope(self->cx);
   jsval propertyVal;
   if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
@@ -933,6 +979,9 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"define_property",
    (PyCFunction) PYM_defineProperty, METH_VARARGS,
    "Defines a property on a JavaScript object."},
+  {"set_property",
+   (PyCFunction) PYM_setProperty, METH_VARARGS,
+   "Sets a property on a JavaScript object."},
   {"get_property", (PyCFunction) PYM_getProperty, METH_VARARGS,
    "Gets the given property for the given JavaScript object."},
   {"has_property", (PyCFunction) PYM_hasProperty, METH_VARARGS,

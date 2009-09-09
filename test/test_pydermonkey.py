@@ -70,6 +70,14 @@ class PydermonkeyTests(unittest.TestCase):
 
         self.assertEqual(pydermonkey.__version__, metadata.VERSION)
 
+    def testSetPropertyWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        self.assertEqual(cx.set_property(obj, 'blah', 5), 5)
+        self.assertEqual(cx.set_property(obj, 3, 2), 2)
+        self.assertEqual(cx.set_property(obj, u'blah\u2026', 5), 5)
+        self.assertEqual(cx.get_property(obj, 3), 2)
+
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:
             self.assertRaises(pydermonkey.error, run, '5f')
