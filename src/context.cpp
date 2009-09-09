@@ -817,6 +817,45 @@ PYM_setProperty(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_deleteProperty(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+  PYM_JSObject *object;
+  PyObject *property;
+
+  if (!PyArg_ParseTuple(args, "O!O", &PYM_JSObjectType, &object,
+                        &property))
+    return NULL;
+
+  PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  jsval propertyVal;
+  if (PYM_pyObjectToPropertyJsval(self, property, &propertyVal) == -1)
+    return NULL;
+
+  jsval jsValue;
+  JSBool result;
+  if (JSVAL_IS_INT(propertyVal)) {
+    result = JS_DeleteElement2(self->cx, object->obj,
+                               JSVAL_TO_INT(propertyVal),
+                               &jsValue);
+  } else {
+    JSString *str = JSVAL_TO_STRING(propertyVal);
+    result = JS_DeleteUCProperty2(self->cx, object->obj,
+                                  JS_GetStringChars(str),
+                                  JS_GetStringLength(str),
+                                  &jsValue);
+  }
+
+  if (!result) {
+    PYM_jsExceptionToPython(self);
+    return NULL;
+  }
+
+  return PYM_jsvalToPyObject(self, jsValue);
+}
+
+static PyObject *
 PYM_defineProperty(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -1031,6 +1070,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
    "JavaScript object."},
   {"has_property", (PyCFunction) PYM_hasProperty, METH_VARARGS,
    "Returns whether the given JavaScript object has the given property."},
+  {"delete_property", (PyCFunction) PYM_deleteProperty, METH_VARARGS,
+   "Deletes the given property on the given object."},
   {"gc", (PyCFunction) PYM_gc, METH_VARARGS,
    "Performs garbage collection on the context's runtime."},
   {"set_operation_callback", (PyCFunction) PYM_setOperationCallback,

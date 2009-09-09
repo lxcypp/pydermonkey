@@ -72,6 +72,15 @@ class PydermonkeyTests(unittest.TestCase):
 
         self.assertEqual(pydermonkey.__version__, metadata.VERSION)
 
+    def testDeletePropertyWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.define_property(obj, 'foo', 1)
+        self.assertEqual(cx.delete_property(obj, 'foo'), True)
+        self.assertEqual(cx.delete_property(obj, 'foo'), True)
+        self.assertEqual(cx.get_property(obj, 'foo'),
+                         pydermonkey.undefined)
+
     def testSetPropertyWorks(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
