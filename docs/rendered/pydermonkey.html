@@ -313,7 +313,10 @@ in <cite>object</cite>.</dd></dl>
 <dl class="method">
 <dt id="pydermonkey.Context.set_property">
 <tt class="descname">set_property</tt><big>(</big><em>object</em>, <em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.set_property" title="Permalink to this definition">¶</a></dt>
-<dd>Creates a new property on <cite>object</cite>, triggering any JavaScript setters.</dd></dl>
+<dd>Sets the given property on <cite>object</cite>, triggering any JavaScript
+setters. Returns the value that the property was set to; this is
+usually the same as <cite>value</cite>, but in some cases&#8211;such as custom
+JavaScript setters&#8211;it is different.</dd></dl>
 
 <dl class="method">
 <dt id="pydermonkey.Context.has_property">
