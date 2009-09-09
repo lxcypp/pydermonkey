@@ -109,10 +109,10 @@ PYM_reportError(JSContext *cx, const char *message, JSErrorReport *report)
                          NULL, NULL);
     else
       PyErr_Warn(NULL, message);
-  } else
-    // TODO: Not sure if this will ever get called, but we should know
-    // if it is.
-    PyErr_Warn(NULL, "A JS error was reported.");
+  } else {
+    PyErr_Warn(NULL, "A JS error was reported:");
+    PyErr_Warn(NULL, message);
+  }
 }
 
 static int
@@ -532,6 +532,14 @@ PYM_initStandardClasses(PYM_JSContextObject *self, PyObject *args)
     return NULL;
 
   PYM_ENSURE_RUNTIME_MATCH(self->runtime, object->runtime);
+
+  if (JS_GetGlobalObject(self->cx)) {
+    // TODO: This is really just a workaround for issue #3:
+    // http://code.google.com/p/pydermonkey/issues/detail?id=3
+    PyErr_SetString(PYM_error,
+                    "Can't init standard classes on the same context twice.");
+    return NULL;
+  }
 
   if (!JS_InitStandardClasses(self->cx, object->obj)) {
     PyErr_SetString(PYM_error, "JS_InitStandardClasses() failed");

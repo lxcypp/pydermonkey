@@ -116,6 +116,24 @@ class PydermonkeyTests(unittest.TestCase):
         obj2 = cx.new_object(None, obj)
         self.assertEqual(cx.get_property(obj2, 5), "foo")
 
+    def testInitStandardClassesWorksTwice(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        obj2 = cx.new_object()
+
+        # TODO: This is really just a workaround for issue #3:
+        # http://code.google.com/p/pydermonkey/issues/detail?id=3
+        self.assertRaises(
+            pydermonkey.error,
+            cx.init_standard_classes,
+            obj2
+            )
+        self.assertEqual(
+            self.last_exception.args[0],
+            "Can't init standard classes on the same context twice."
+            )             
+
     def testNewArrayObjectWorks(self):
         cx = pydermonkey.Runtime().new_context()
         array = cx.new_array_object()
