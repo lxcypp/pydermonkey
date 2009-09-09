@@ -243,7 +243,6 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
       Returns whether or not `object` has the specified property.
 
-
    .. method:: get_property(object, key)
 
       Finds the specified property on `object` and returns its value,
@@ -262,6 +261,13 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
 
         >>> cx.get_property(obj, 'carrots')
         pydermonkey.undefined
+
+   .. method:: lookup_property(object, key)
+
+      Retrieves the `stored value
+      <https://developer.mozilla.org/En/SpiderMonkey/JSAPI_Reference/Stored_value>`_
+      of the given object's property without invoking any JavaScript
+      getter.
 
    .. method:: get_object_private(object)
 

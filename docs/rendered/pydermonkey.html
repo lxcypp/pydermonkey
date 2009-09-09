@@ -342,6 +342,13 @@ yields <a title="pydermonkey.undefined" class="reference" href="#pydermonkey.und
 </dd></dl>
 
 <dl class="method">
+<dt id="pydermonkey.Context.lookup_property">
+<tt class="descname">lookup_property</tt><big>(</big><em>object</em>, <em>key</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.lookup_property" title="Permalink to this definition">¶</a></dt>
+<dd>Retrieves the <a class="reference" href="https://developer.mozilla.org/En/SpiderMonkey/JSAPI_Reference/Stored_value">stored value</a>
+of the given object&#8217;s property without invoking any JavaScript
+getter.</dd></dl>
+
+<dl class="method">
 <dt id="pydermonkey.Context.get_object_private">
 <tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pydermonkey.Context.new_object" class="reference" href="#pydermonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
