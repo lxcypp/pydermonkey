@@ -272,6 +272,12 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       of the given object's property without invoking any JavaScript
       getter.
 
+   .. method:: delete_property(object, key)
+
+      Deletes the given property on the given object. If the property is permanent
+      and can't be deleted, this method returns ``False``.  Otherwise, it
+      returns ``True``.
+
    .. method:: get_object_private(object)
 
       Returns the ``private_obj`` passed to :meth:`new_object()`

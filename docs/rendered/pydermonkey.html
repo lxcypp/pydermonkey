@@ -352,6 +352,13 @@ of the given object&#8217;s property without invoking any JavaScript
 getter.</dd></dl>
 
 <dl class="method">
+<dt id="pydermonkey.Context.delete_property">
+<tt class="descname">delete_property</tt><big>(</big><em>object</em>, <em>key</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.delete_property" title="Permalink to this definition">¶</a></dt>
+<dd>Deletes the given property on the given object. If the property is permanent
+and can&#8217;t be deleted, this method returns <tt class="xref docutils literal"><span class="pre">False</span></tt>.  Otherwise, it
+returns <tt class="xref docutils literal"><span class="pre">True</span></tt>.</dd></dl>
+
+<dl class="method">
 <dt id="pydermonkey.Context.get_object_private">
 <tt class="descname">get_object_private</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#pydermonkey.Context.get_object_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the <tt class="docutils literal"><span class="pre">private_obj</span></tt> passed to <a title="pydermonkey.Context.new_object" class="reference" href="#pydermonkey.Context.new_object"><tt class="xref docutils literal"><span class="pre">new_object()</span></tt></a>
