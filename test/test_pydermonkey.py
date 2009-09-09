@@ -80,6 +80,13 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(cx.set_property(obj, u'blah\u2026', 5), 5)
         self.assertEqual(cx.get_property(obj, 3), 2)
 
+    def testSetPropertyReturnsDifferentValue(self):
+        cx = pydermonkey.Runtime().new_context()
+        obj = cx.new_object()
+        cx.init_standard_classes(obj)
+        o2 = self._evaljs("({set blah() { return 5; }})", cx, obj)
+        self.assertEqual(cx.set_property(o2, 'blah', 3), 5)
+
     def testSetPropertyRaisesExceptionOnReadOnly(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
