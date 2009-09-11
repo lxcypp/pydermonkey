@@ -348,6 +348,15 @@ PYM_setDefaultGCZeal(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_getVersion(PYM_JSContextObject *self, PyObject *args)
+{
+  PYM_SANITY_CHECK(self->runtime);
+
+  const char *version = JS_VersionToString(JS_GetVersion(self->cx));
+  return PyString_FromString(version);
+}
+
+static PyObject *
 PYM_setGCZeal(PYM_JSContextObject *self, PyObject *args)
 {
 #ifdef JS_GC_ZEAL
@@ -1125,6 +1134,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"trigger_operation_callback", (PyCFunction) PYM_triggerOperationCallback,
    METH_VARARGS,
    "Triggers the operation callback for the context."},
+  {"get_version", (PyCFunction) PYM_getVersion, METH_VARARGS,
+   "Returns the JS version of the context."},
   {"set_gc_zeal", (PyCFunction) PYM_setGCZeal, METH_VARARGS,
    "Sets the frequency of garbage collection."},
   {"get_object_private", (PyCFunction) PYM_getObjectPrivate, METH_VARARGS,

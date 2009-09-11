@@ -1047,6 +1047,11 @@ class PydermonkeyTests(unittest.TestCase):
             )
         self.assertEqual(cx.call_function(thisArg, obj, (1,2)), 6)
 
+    def testGetVersionWorks(self):
+        # Note that this will change someday.
+        self.assertEqual(pydermonkey.Runtime().new_context().get_version(),
+                         "1.8")
+
     def testSetGCZealWorks(self):
         cx = pydermonkey.Runtime().new_context()
         for i in range(3):
