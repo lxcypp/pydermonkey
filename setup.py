@@ -177,11 +177,13 @@ def build_spidermonkey(options):
 	# don't worry about the non-use of os.path.join() here, since
 	# it'd actually give us erroneous results on Windows.
         configure = configure_dir + '/configure'
-        cmdline.extend([configure, "--enable-static", "--disable-tests"])
+        cmdline.extend([configure,
+	                "--enable-static",
+			"--disable-tests",
+			"--enable-gczeal"])
 
         if options.get("build") and options.build.get("debug"):
-            cmdline.extend(["--enable-debug",
-                            "--enable-gczeal"])
+            cmdline.extend(["--enable-debug"])
         retval = subprocess.call(cmdline,
                                  cwd = SPIDERMONKEY_OBJDIR)
         if retval:
