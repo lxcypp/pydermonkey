@@ -351,6 +351,8 @@ static PyObject *
 PYM_setGCZeal(PYM_JSContextObject *self, PyObject *args)
 {
 #ifdef JS_GC_ZEAL
+  PYM_SANITY_CHECK(self->runtime);
+
   int level;
   if (!PyArg_ParseTuple(args, "i", &level))
     return NULL;
