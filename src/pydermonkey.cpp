@@ -53,6 +53,8 @@ PYM_getDebugInfo(PyObject *self, PyObject *args)
 static PyMethodDef PYM_methods[] = {
   {"get_debug_info", PYM_getDebugInfo, METH_VARARGS,
    "Get debugging information about the module."},
+  {"set_default_gc_zeal", PYM_setDefaultGCZeal, METH_VARARGS,
+   "Sets the default frequency of garbage collection for new contexts."},
   {NULL, NULL, 0, NULL}
 };
 

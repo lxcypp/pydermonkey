@@ -43,6 +43,9 @@
 #include "jsdbgapi.h"
 #include "jsscript.h"
 
+// Default GC zeal level for new JS contexts.
+static uint8 PYM_defaultGCZeal;
+
 // This is the default throw hook for pydermonkey-owned JS contexts,
 // when they've defined one in Python.
 static JSTrapStatus
@@ -326,6 +329,22 @@ PYM_getPendingException(PYM_JSContextObject *self, PyObject *args)
   }
 
   return PYM_jsvalToPyObject(self, exception);
+}
+
+PyObject *
+PYM_setDefaultGCZeal(PyObject *self, PyObject *args)
+{
+  int level;
+  if (!PyArg_ParseTuple(args, "i", &level))
+    return NULL;
+
+  if (level >= 0 && level <= 2) {
+    PYM_defaultGCZeal = level;
+    Py_RETURN_NONE;
+  }
+
+  PyErr_SetString(PyExc_ValueError, "Level must be between 0 and 2.");
+  return NULL;
 }
 
 static PyObject *
@@ -1184,6 +1203,10 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   context->cx = cx;
   JS_SetContextPrivate(cx, context);
   JS_SetErrorReporter(cx, PYM_reportError);
+
+#ifdef JS_GC_ZEAL
+  JS_SetGCZeal(cx, PYM_defaultGCZeal);
+#endif
 
   PyObject_GC_Track((PyObject *) context);
   return context;

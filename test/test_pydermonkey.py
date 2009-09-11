@@ -7,6 +7,8 @@ import threading
 
 import pydermonkey
 
+pydermonkey.set_default_gc_zeal(2)
+
 class PydermonkeyTests(unittest.TestCase):
     def setUp(self):
         self._teardowns = []
@@ -1048,9 +1050,11 @@ class PydermonkeyTests(unittest.TestCase):
     def testSetGCZealWorks(self):
         cx = pydermonkey.Runtime().new_context()
         for i in range(3):
+            pydermonkey.set_default_gc_zeal(i)
             cx.set_gc_zeal(i)
         for i in [-1, 3]:
             self.assertRaises(ValueError, cx.set_gc_zeal, i)
+            self.assertRaises(ValueError, pydermonkey.set_default_gc_zeal, i)
 
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)

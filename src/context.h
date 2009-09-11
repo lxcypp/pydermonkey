@@ -59,4 +59,7 @@ extern PYM_JSContextObject *
 PYM_newJSContextObject(PYM_JSRuntimeObject *runtime,
                        JSContext *cx);
 
+extern PyObject *
+PYM_setDefaultGCZeal(PyObject *self, PyObject *args);
+
 #endif
