@@ -329,6 +329,28 @@ PYM_getPendingException(PYM_JSContextObject *self, PyObject *args)
 }
 
 static PyObject *
+PYM_setGCZeal(PYM_JSContextObject *self, PyObject *args)
+{
+#ifdef JS_GC_ZEAL
+  int level;
+  if (!PyArg_ParseTuple(args, "i", &level))
+    return NULL;
+
+  if (level >= 0 && level <= 2) {
+    JS_SetGCZeal(self->cx, level);
+    Py_RETURN_NONE;
+  }
+
+  PyErr_SetString(PyExc_ValueError, "Level must be between 0 and 2.");
+  return NULL;
+#else
+  PyErr_SetString(PyExc_NotImplementedError,
+                  "Spidermonkey built without support for JS_SetGCZeal()");
+  return NULL;
+#endif
+}
+
+static PyObject *
 PYM_getObjectPrivate(PYM_JSContextObject *self, PyObject *args)
 {
   PYM_SANITY_CHECK(self->runtime);
@@ -1082,6 +1104,8 @@ static PyMethodDef PYM_JSContextMethods[] = {
   {"trigger_operation_callback", (PyCFunction) PYM_triggerOperationCallback,
    METH_VARARGS,
    "Triggers the operation callback for the context."},
+  {"set_gc_zeal", (PyCFunction) PYM_setGCZeal, METH_VARARGS,
+   "Sets the frequency of garbage collection."},
   {"get_object_private", (PyCFunction) PYM_getObjectPrivate, METH_VARARGS,
    "Returns the private Python object stored in the JavaScript object."},
   {"clear_object_private", (PyCFunction) PYM_clearObjectPrivate, METH_VARARGS,
@@ -1160,12 +1184,6 @@ PYM_newJSContextObject(PYM_JSRuntimeObject *runtime, JSContext *cx)
   context->cx = cx;
   JS_SetContextPrivate(cx, context);
   JS_SetErrorReporter(cx, PYM_reportError);
-
-#ifdef JS_GC_ZEAL
-  // TODO: Consider exposing JS_SetGCZeal() to Python instead of
-  // hard-coding it here.
-  JS_SetGCZeal(cx, 2);
-#endif
 
   PyObject_GC_Track((PyObject *) context);
   return context;

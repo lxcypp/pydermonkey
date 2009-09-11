@@ -1045,6 +1045,13 @@ class PydermonkeyTests(unittest.TestCase):
             )
         self.assertEqual(cx.call_function(thisArg, obj, (1,2)), 6)
 
+    def testSetGCZealWorks(self):
+        cx = pydermonkey.Runtime().new_context()
+        for i in range(3):
+            cx.set_gc_zeal(i)
+        for i in [-1, 3]:
+            self.assertRaises(ValueError, cx.set_gc_zeal, i)
+
     def testEvaluateReturnsTrue(self):
         self.assertTrue(self._evaljs('true') is True)
 
