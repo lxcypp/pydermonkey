@@ -323,19 +323,25 @@ class PydermonkeyTests(unittest.TestCase):
         # stack with the Python stack.
 
         def opcb(cx):
-            raise KeyboardInterrupt()
+            raise Exception('hello')
 
         cx = pydermonkey.Runtime().new_context()
         cx.set_operation_callback(opcb)
         obj = cx.new_object()
         cx.init_standard_classes(obj)
 
+        passthrus = []
+
         def func(cx, this, args):
-            cx.evaluate_script(
-                this,
-                'try { while (1) {} } catch (e) {}',
-                '<string>', 1
-                )
+            try:
+                cx.evaluate_script(
+                    this,
+                    'try { while (1) {} } catch (e) {}',
+                    '<string>', 1
+                    )
+            except Exception, e:
+                passthrus.append(e)
+                raise
 
         cx.define_property(obj,
                            'func',
@@ -349,10 +355,13 @@ class PydermonkeyTests(unittest.TestCase):
         thread.start()
 
         self.assertRaises(
-            KeyboardInterrupt,
+            Exception,
             cx.evaluate_script,
             obj, 'while (1) { func(); }', '<string>', 1
             )
+        self.assertEqual(len(passthrus), 1)
+        self.assertEqual(self.last_exception, passthrus[0])
+        self.assertEqual(self.last_exception.args[0], 'hello')
 
     def testOperationCallbackIsCalled(self):
         def opcb(cx):

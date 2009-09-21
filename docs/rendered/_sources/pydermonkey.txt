@@ -218,6 +218,13 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
+      If the function raises an :exc:`error`, then the argument of the
+      error will be converted to a JS exception and propagated into
+      any JS code in the stack, which will have a chance to catch
+      it. If the function raises any other kind of exception, however,
+      any calling JS code will be unable to catch the exception and it
+      will propagate to the nearest Python stack frame.
+
    .. method:: new_array_object()
 
       Creates a new JavaScript ``Array`` object and returns it.
@@ -442,9 +449,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
       For instance, we can first create a custom exception class for
       script timeouts:
 
-        >>> class ScriptTimeout(BaseException):
-        ...   # Derived from BaseException, like KeyboardInterrupt,
-        ...   # which ensures that JS code can't catch it.
+        >>> class ScriptTimeout(Exception):
         ...   pass
 
       Now, we create an operation callback to stop long-running code
