@@ -371,10 +371,12 @@ class PydermonkeyTests(unittest.TestCase):
         thread.start()
 
         self.assertRaises(
-            pydermonkey.error,
+            Exception,
             cx.evaluate_script,
             obj, 'while (1) {}', '<string>', 1
             )
+        self.assertEqual(self.last_exception.args[0],
+                         'stop eet!')
 
     def testUndefinedStrIsUndefined(self):
         self.assertEqual(str(pydermonkey.undefined),
@@ -671,15 +673,34 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self.last_exception.args[0], u"blarg")
 
     def testJsWrappedPythonFunctionThrowsPyException(self):
-        thecx = []
         def hai2u(cx, this, args):
-            thecx.append(cx)
             raise Exception("hello")
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(Exception,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
-        exc = thecx[0].get_object_private(self.last_exception.args[0])
-        self.assertEqual(exc.args[0], "hello")
+        self.assertEqual(self.last_exception.args[0], "hello")
+
+    def testJsWrappedPythonFunctionThrowsUncatchablePyException(self):
+        def hai2u(cx, this, args):
+            raise Exception("hello")
+        self.assertRaises(Exception,
+                          self._evalJsWrappedPyFunc,
+                          hai2u, 'try { hai2u() } catch (e) {}')
+        self.assertEqual(self.last_exception.args[0], "hello")
+
+    def testJsWrappedPythonFunctionCannotReturnLong(self):
+        def hai2u(cx, this, args):
+            return sys.maxint + 1    # Should be a PyLong object.
+        self.assertRaises(NotImplementedError,
+                          self._evalJsWrappedPyFunc,
+                          hai2u, 'hai2u()')
+
+    def testJsWrappedPythonFunctionRaisesUnicodeDecodeError(self):
+        def hai2u(cx, this, args):
+            return "o hai\xc3"
+        self.assertRaises(UnicodeDecodeError,
+                          self._evalJsWrappedPyFunc,
+                          hai2u, 'hai2u()')
 
     def testJsWrappedPythonFunctionReturnsNone(self):
         def hai2u(cx, this, args):

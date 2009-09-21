@@ -202,21 +202,20 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
 {
   PyObject *type = PyErr_Occurred();
 
-  if (type && !PyErr_GivenExceptionMatches(type, PyExc_Exception))
-    // A KeyboardInterrupt or other kind of exception that we don't
-    // want JS code to catch was thrown; just return without setting
-    // a pending JS exception, and SpiderMonkey will unroll the stack
-    // for us.
+  if (type && !PyErr_GivenExceptionMatches(type, PYM_error))
+    // A kind of exception that we don't want JS code to catch was
+    // thrown; just return without setting a pending JS exception, and
+    // SpiderMonkey will unroll the stack for us.
     return;
 
   PyObject *value;
   PyObject *traceback;
+  bool success = false;
 
   PyErr_Fetch(&type, &value, &traceback);
 
-  if (type == PYM_error && value &&
+  if (value &&
       (PyTuple_Check(value) || PyObject_HasAttrString(value, "args"))) {
-    bool success = false;
     PyObject *args = NULL;
 
     if (PyTuple_Check(value)) {
@@ -240,21 +239,13 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
       }
     }
 
-    if (!success)
-      JS_ReportError(context->cx,
-                     "Python exception occurred, but exception "
-                     "couldn't be converted");
     Py_XDECREF(args);
-  } else {
-    if (value) {
-      JSObject *exception = PYM_JS_newObject(context->cx, value, NULL, NULL);
-      if (exception)
-        JS_SetPendingException(context->cx, OBJECT_TO_JSVAL(exception));
-      else
-        JS_ReportOutOfMemory(context->cx);
-    } else
-      JS_ReportError(context->cx, "Python exception occurred");
   }
+
+  if (!success)
+    JS_ReportError(context->cx,
+                   "Python exception occurred, but exception "
+                   "couldn't be converted");
 
   Py_XDECREF(type);
   Py_XDECREF(value);
