@@ -217,13 +217,20 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
   if (type == PYM_error && value &&
       (PyTuple_Check(value) || PyObject_HasAttrString(value, "args"))) {
     bool success = false;
-    PyObject *args = value;
-    if (!PyTuple_Check(value)) {
+    PyObject *args = NULL;
+
+    if (PyTuple_Check(value)) {
+      args = value;
+      Py_INCREF(args);
+    } else {
+      // This reference is new.
+
+      // TODO: What if this returns NULL and a new exception has been
+      // raised?
       args = PyObject_GetAttrString(value, "args");
-      if (!PyTuple_Check(args))
-        args = NULL;
     }
-    if (args && PyTuple_Size(args) > 0) {
+
+    if (args && PyTuple_Check(args) && PyTuple_Size(args) > 0) {
       // This reference is borrowed.
       PyObject *message = PyTuple_GetItem(args, 0);
       jsval val;
@@ -232,6 +239,7 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
         success = true;
       }
     }
+
     if (!success)
       JS_ReportError(context->cx,
                      "Python exception occurred, but exception "

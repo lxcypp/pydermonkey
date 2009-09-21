@@ -983,7 +983,7 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertRaises(
             NotImplementedError,
             cx.define_property,
-            obj, 'hi', 2 ** 91
+            obj, 'hi', sys.maxint + 1
             )
         self.assertEqual(
             self.last_exception.args[0],
