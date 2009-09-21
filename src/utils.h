@@ -86,6 +86,7 @@ typedef struct {
 } PYM_HashEntry;
 
 extern PyObject *PYM_error;
+extern PyObject *PYM_scriptError;
 
 // Convert a PyObject to a jsval. Returns 0 on success,
 // -1 on error. If an error occurs, a Python exception is

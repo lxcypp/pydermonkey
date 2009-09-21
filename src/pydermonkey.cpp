@@ -76,9 +76,15 @@ initpydermonkey(void)
   Py_INCREF(PYM_undefined);
   PyModule_AddObject(module, "undefined", (PyObject *) PYM_undefined);
 
-  PYM_error = PyErr_NewException("pydermonkey.error", NULL, NULL);
+  PYM_error = PyErr_NewException("pydermonkey.InterpreterError",
+                                 PyExc_StandardError, NULL);
   Py_INCREF(PYM_error);
-  PyModule_AddObject(module, "error", PYM_error);
+  PyModule_AddObject(module, "InterpreterError", PYM_error);
+
+  PYM_scriptError = PyErr_NewException("pydermonkey.ScriptError",
+                                       PyExc_StandardError, NULL);
+  Py_INCREF(PYM_scriptError);
+  PyModule_AddObject(module, "ScriptError", PYM_scriptError);
 
   if (!PyType_Ready(&PYM_JSRuntimeType) < 0)
     return;

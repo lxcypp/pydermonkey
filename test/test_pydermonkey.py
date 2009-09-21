@@ -104,7 +104,8 @@ class PydermonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         o2 = self._evaljs("({get blah() { return 5; }})", cx, obj)
         self.assertRaises(
-            pydermonkey.error,
+            # TODO: Shouldn't this be a ScriptError?
+            pydermonkey.InterpreterError,
             cx.set_property,
             o2, 'blah', 3
             )
@@ -133,7 +134,7 @@ class PydermonkeyTests(unittest.TestCase):
 
     def testSyntaxErrorsAreRaised(self):
         for run in [self._evaljs, self._execjs]:
-            self.assertRaises(pydermonkey.error, run, '5f')
+            self.assertRaises(pydermonkey.ScriptError, run, '5f')
             self.assertEqual(
                 self.last_exception.args[1],
                 u'SyntaxError: missing ; before statement'
@@ -186,7 +187,7 @@ class PydermonkeyTests(unittest.TestCase):
         # TODO: This is really just a workaround for issue #3:
         # http://code.google.com/p/pydermonkey/issues/detail?id=3
         self.assertRaises(
-            pydermonkey.error,
+            pydermonkey.InterpreterError,
             cx.init_standard_classes,
             obj2
             )
@@ -257,7 +258,7 @@ class PydermonkeyTests(unittest.TestCase):
         self.assertEqual(self._execjs('5 + 1'), 6)
 
     def testErrorsRaisedIncludeStrings(self):
-        self.assertRaises(pydermonkey.error, self._evaljs, 'boop()')
+        self.assertRaises(pydermonkey.ScriptError, self._evaljs, 'boop()')
         self.assertEqual(self.last_exception.args[1],
                          u'ReferenceError: boop is not defined')
 
@@ -268,7 +269,7 @@ class PydermonkeyTests(unittest.TestCase):
         thread = threading.Thread(target = make_runtime)
         thread.start()
         thread.join()
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.InterpreterError,
                           stuff['rt'].new_context)
         self.assertEqual(self.last_exception.args[0],
                          'Function called from wrong thread')
@@ -443,7 +444,7 @@ class PydermonkeyTests(unittest.TestCase):
         cx = pydermonkey.Runtime().new_context()
         cx.set_throw_hook(throwhook)
         self.assertRaises(
-            pydermonkey.error,
+            pydermonkey.ScriptError,
             cx.evaluate_script,
             cx.new_object(),
             '(function() { throw "hi"; })()',
@@ -574,7 +575,9 @@ class PydermonkeyTests(unittest.TestCase):
         jsfunc = cx.new_function(func, func.__name__)
         cx.define_property(obj, func.__name__, jsfunc)
         cx.clear_object_private(jsfunc)
-        self.assertRaises(pydermonkey.error,
+
+        # TODO: Shouldn't this be an InternalError?
+        self.assertRaises(pydermonkey.ScriptError,
                           cx.evaluate_script,
                           obj, code, '<string>', 1)
         self.assertEqual(
@@ -667,8 +670,8 @@ class PydermonkeyTests(unittest.TestCase):
 
     def testJsWrappedPythonFunctionThrowsJsException(self):
         def hai2u(cx, this, args):
-            raise pydermonkey.error(u"blarg")
-        self.assertRaises(pydermonkey.error,
+            raise pydermonkey.ScriptError(u"blarg")
+        self.assertRaises(pydermonkey.ScriptError,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
         self.assertEqual(self.last_exception.args[0], u"blarg")
@@ -676,7 +679,7 @@ class PydermonkeyTests(unittest.TestCase):
     def testJsWrappedPythonFunctionThrowsJsException2(self):
         def hai2u(cx, this, args):
             cx.evaluate_script(this, 'throw "blarg"', '<string>', 1)
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.ScriptError,
                           self._evalJsWrappedPyFunc,
                           hai2u, 'hai2u()')
         self.assertEqual(self.last_exception.args[0], u"blarg")
@@ -841,7 +844,7 @@ class PydermonkeyTests(unittest.TestCase):
         cx.init_standard_classes(obj)
         result = cx.evaluate_script(obj, '({get foo() { throw "blah"; }})',
                                     '<string>', 1)
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.ScriptError,
                           cx.get_property,
                           result,
                           u"foo")
@@ -852,7 +855,7 @@ class PydermonkeyTests(unittest.TestCase):
         obj = cx.new_object()
         cx.init_standard_classes(obj)
         self.assertRaises(
-            pydermonkey.error,
+            pydermonkey.ScriptError,
             cx.evaluate_script,
             obj, '(function foo() { foo(); })();', '<string>', 1
             )
@@ -928,7 +931,7 @@ class PydermonkeyTests(unittest.TestCase):
     def testEvaluateThrowsException(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.ScriptError,
                           cx.evaluate_script,
                           obj, 'hai2u()', '<string>', 1)
         self.assertEqual(self._tostring(cx,
@@ -937,7 +940,7 @@ class PydermonkeyTests(unittest.TestCase):
 
     def testThrowingObjWithBadToStringWorks(self):
         self.assertRaises(
-            pydermonkey.error,
+            pydermonkey.ScriptError,
             self._evaljs,
             "throw {toString: function() { throw 'dujg' }}"
             )
@@ -1001,7 +1004,7 @@ class PydermonkeyTests(unittest.TestCase):
     def testJsExceptionStateIsClearedAfterExceptionIsCaught(self):
         cx = pydermonkey.Runtime().new_context()
         obj = cx.new_object()
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.ScriptError,
                           cx.evaluate_script,
                           obj, 'blah()', '<string>', 1)
         self.assertEqual(cx.evaluate_script(obj, '5+3', '<string>', 1),
@@ -1047,7 +1050,7 @@ class PydermonkeyTests(unittest.TestCase):
             '(function boop(a, b) { blarg(); })',
             '<string>', 1
             )
-        self.assertRaises(pydermonkey.error,
+        self.assertRaises(pydermonkey.ScriptError,
                           cx.call_function,
                           obj, obj, (1,))
         self.assertEqual(self._tostring(cx,

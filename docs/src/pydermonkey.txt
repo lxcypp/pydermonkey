@@ -11,15 +11,16 @@
 This module offers a low-level interface to the `Mozilla SpiderMonkey
 <https://developer.mozilla.org/en/SpiderMonkey>`_ JavaScript engine.
 
-.. exception:: error
+.. exception:: InterpreterError
 
-   This is the type of any SpiderMonkey-related errors thrown by this
-   module.
+   This is the type of any internal SpiderMonkey-related errors thrown
+   by this module. These kinds of errors should be fairly rare.
 
-   If the error is a wrapped JavaScript exception, the first argument
+.. exception:: ScriptError
+
+   A wrapped JavaScript exception. The first argument
    will be the thrown JS exception, and the second argument will be 
-   the JS exception converted to a string. Otherwise, the error
-   will only contain a descriptive string argument.
+   the JS exception converted to a string.
 
    For example:
 
@@ -27,7 +28,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
      >>> cx.evaluate_script(cx.new_object(), 'throw 1', '<string>', 1)
      Traceback (most recent call last):
      ...
-     error: (1, u'1')
+     ScriptError: (1, u'1')
 
 .. data:: undefined
 
@@ -218,9 +219,9 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> cx.evaluate_script(obj, 'add(1, 1);', '<string>', 1)
         2
 
-      If the function raises an :exc:`error`, then the argument of the
-      error will be converted to a JS exception and propagated into
-      any JS code in the stack, which will have a chance to catch
+      If the function raises a :exc:`ScriptError`, then the argument
+      of the error will be converted to a JS exception and propagated
+      into any JS code in the stack, which will have a chance to catch
       it. If the function raises any other kind of exception, however,
       any calling JS code will be unable to catch the exception and it
       will propagate to the nearest Python stack frame.
@@ -422,7 +423,7 @@ This module offers a low-level interface to the `Mozilla SpiderMonkey
         >>> code = "(function foo() { throw 'oops' })()"
         >>> try:
         ...   cx.evaluate_script(obj, code, '<string>', 1)
-        ... except pydermonkey.error, e:
+        ... except pydermonkey.ScriptError, e:
         ...   print "caught %s" % e.args[0]
         oops being thrown in foo
         oops being thrown in <string>

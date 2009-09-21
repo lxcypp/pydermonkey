@@ -39,6 +39,7 @@
 #include "object.h"
 
 PyObject *PYM_error;
+PyObject *PYM_scriptError;
 
 static int
 PYM_doubleToJsval(PYM_JSContextObject *context,
@@ -202,7 +203,7 @@ PYM_pythonExceptionToJs(PYM_JSContextObject *context)
 {
   PyObject *type = PyErr_Occurred();
 
-  if (type && !PyErr_GivenExceptionMatches(type, PYM_error))
+  if (type && !PyErr_GivenExceptionMatches(type, PYM_scriptError))
     // A kind of exception that we don't want JS code to catch was
     // thrown; just return without setting a pending JS exception, and
     // SpiderMonkey will unroll the stack for us.
@@ -288,7 +289,7 @@ PYM_jsExceptionToPython(PYM_JSContextObject *context)
     if (pyStr) {
       tuple = Py_BuildValue("(OO)", obj, pyStr);
       if (tuple)
-        PyErr_SetObject(PYM_error, tuple);
+        PyErr_SetObject(PYM_scriptError, tuple);
     }
     Py_DECREF(obj);
     Py_XDECREF(pyStr);
