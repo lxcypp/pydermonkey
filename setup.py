@@ -182,6 +182,13 @@ def build_spidermonkey(options):
 			"--disable-tests",
 			"--enable-gczeal"])
 
+        if sys.platform == "darwin":
+            # TODO: If we're on OS X 10.6, we get compiled for x64, which
+            # the version of SpiderMonkey we build by default isn't
+            # ready for. Just blanket disabling JIT for now, but will
+            # need to fix this the right way later.
+            cmdline.append("--disable-jit")
+
         if options.get("build") and options.build.get("debug"):
             cmdline.extend(["--enable-debug"])
         retval = subprocess.call(cmdline,
